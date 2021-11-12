@@ -36,7 +36,6 @@ export const GoDataCallForm = () => {
     jsonData && jsonData.constant.constants.length >0
     ? JSON.parse(jsonData.constant.constants[0].description)
             : {}
-
     const  queryGoData = () => {
                 axios
                 .post("http://localhost:8000/api/users/login", {
