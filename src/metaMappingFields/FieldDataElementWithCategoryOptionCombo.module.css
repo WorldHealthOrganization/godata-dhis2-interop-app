@@ -1,0 +1,11 @@
+.container {
+    padding: 8px;
+}
+
+.field {
+    margin-right: var(--spacers-dp8);
+}
+
+.codeField {
+    margin-bottom: var(--spacers-dp8);
+}

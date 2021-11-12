@@ -1,0 +1,9 @@
+{
+    "projectId": "z5ax7f",
+    "baseUrl": "http://localhost:3000",
+    "testFiles": "**/*.feature",
+    "video": false,
+    "env": {
+        "dhis2_datatest_prefix": "dhis2-smsconfiguration"
+    }
+}

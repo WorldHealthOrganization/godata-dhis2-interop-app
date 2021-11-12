@@ -1,0 +1,509 @@
+# 
+# Translators:
+# Viktor Varland <viktor@dhis2.org>, 2020
+# Gabriela Rodriguez <grodriguezcoronado@gmail.com>, 2020
+# Edem Kossi <ekossi@hispwca.org>, 2020
+# phil_dhis2, 2020
+# Karoline Tufte Lien <karoline@dhis2.org>, 2020
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"POT-Creation-Date: 2020-11-12T07:59:47.850Z\n"
+"PO-Revision-Date: 2020-09-08 10:27+0000\n"
+"Last-Translator: Karoline Tufte Lien <karoline@dhis2.org>, 2020\n"
+"Language-Team: French (https://www.transifex.com/hisp-uio/teams/100509/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Are you sure you want to cancel? Unsaved changes will be lost"
+msgstr ""
+"Voulez-vous vraiment annuler? Toutes les modifications non enregistrées "
+"seront perdues."
+
+msgid "No, stay on page"
+msgstr "Non, rester sur la page"
+
+msgid "Yes, cancel"
+msgstr "Oui, annuler"
+
+msgid "Data set"
+msgstr "Ensemble de données"
+
+msgid ""
+"Please make sure the value of this input matches the value in "
+"\"{{otherField}}\"."
+msgstr ""
+
+msgid "Confirm deletion"
+msgstr "Confirmer la suppression"
+
+msgid "Are you sure you want to delete the selected gateways?"
+msgstr "Vous êtes sûre de vouloir supprimer la passerelle sélectionnée?"
+
+msgid "Auth token"
+msgstr ""
+
+msgid "Configuration template"
+msgstr ""
+
+msgid "Please refer to the documentation for possible values"
+msgstr ""
+
+msgid "Application/json"
+msgstr ""
+
+msgid "Application/xml"
+msgstr ""
+
+msgid "Form url encoded"
+msgstr ""
+
+msgid "Plain text"
+msgstr ""
+
+msgid "Content type"
+msgstr ""
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Confirm password"
+msgstr "Confirmer mot de passe"
+
+msgid "Send url parameters"
+msgstr ""
+
+msgid "Url template"
+msgstr ""
+
+msgid "Use GET"
+msgstr ""
+
+msgid "Use GET instead of POST to send data to gateway"
+msgstr ""
+
+msgid "User name"
+msgstr "Nom d'utilisateur"
+
+msgid "Add key value pair"
+msgstr "Ajouter une paire clé valeur"
+
+msgid "Save gateway"
+msgstr "Enregistrer la passerelle"
+
+msgid "Add gateway"
+msgstr "Ajouter passerelle"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Gateway setup"
+msgstr "Configuration de passerelle"
+
+msgid "Key value pairs"
+msgstr "Paires clé valeur"
+
+msgid "Key"
+msgstr "Clé"
+
+msgid "Send as header"
+msgstr "Envoyer comme entête"
+
+msgid "Encode"
+msgstr ""
+
+msgid "Confidential"
+msgstr "Confidentiel"
+
+msgid "Remove key value pair"
+msgstr "Supprimer la paire clé valeur"
+
+msgid "Value"
+msgstr "Valeur"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Make default"
+msgstr ""
+
+msgid "Default gateway"
+msgstr "Passerelle par défaut"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "BulkSMS"
+msgstr ""
+
+msgid "Clickatell"
+msgstr ""
+
+msgid "Generic"
+msgstr ""
+
+msgid "Program"
+msgstr "Programme"
+
+msgid "Program stage"
+msgstr "Étape du programme"
+
+msgid "Are you sure you want to delete the selected commands?"
+msgstr "Voulez-vous vraiment supprimer les commandes sélectionnées?"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Save command"
+msgstr "Enregistrer la commande"
+
+msgid "Something went wrong whilst submitting the form"
+msgstr "Une erreur s'est produite lors de l'envoi du formulaire"
+
+msgid "Something went wrong whilst loading the sms command"
+msgstr "Une erreur s'est produite lors du chargement de la commande sms"
+
+msgid "Something went wrong whilst loading the command's details"
+msgstr ""
+
+msgid "SMS short codes"
+msgstr "Codes courts SMS"
+
+msgid "Add special character"
+msgstr "Ajouter un caractère spécial"
+
+msgid "Required values notice"
+msgstr "Notification pour les valeurs requises"
+
+msgid "Completeness method"
+msgstr "Méthode de complétude"
+
+msgid "Confirm message"
+msgstr ""
+
+msgid "Reply message if no codes are sent (only the command)"
+msgstr "Répondre au message si aucun code n'est envoyé (seule la commande)"
+
+msgid "More than one orgunit message"
+msgstr ""
+
+msgid "No user message"
+msgstr ""
+
+msgid "Parser"
+msgstr "Analyseur syntaxique"
+
+msgid "Field separator"
+msgstr "Séparateur de champs"
+
+msgid "Special character name"
+msgstr "Nom du caractère spécial"
+
+msgid "Special character value"
+msgstr "Valeur du caractère spécial"
+
+msgid "Remove"
+msgstr "Supprimer"
+
+msgid "Success message"
+msgstr ""
+
+msgid "Use current period for reporting"
+msgstr ""
+
+msgid "Wrong format message"
+msgstr "Message de mauvais format"
+
+msgid "default"
+msgstr "par défaut"
+
+msgid "Formula"
+msgstr "Formule"
+
+msgid "Loading formula"
+msgstr "Chargement de formule"
+
+msgid "Edit formula"
+msgstr "Editer la formule"
+
+msgid "Add formula"
+msgstr "Ajouter une formule"
+
+msgid "Formula for {{combo}}"
+msgstr "Formule pour  {{combo}}"
+
+msgid "Data element"
+msgstr "Élément de données"
+
+msgid "formula operator"
+msgstr "opérateur de formule"
+
+msgid "Something went wrong whilst saving"
+msgstr ""
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Receive all data values"
+msgstr ""
+
+msgid "Receive at least one data value"
+msgstr ""
+
+msgid "Do not mark as complete"
+msgstr ""
+
+msgid "Key value parser"
+msgstr ""
+
+msgid "J2ME parser"
+msgstr ""
+
+msgid "Alert parser"
+msgstr ""
+
+msgid "Unregistered parser"
+msgstr ""
+
+msgid "Tracked entity registration parser"
+msgstr ""
+
+msgid "Program stage data entry parser"
+msgstr ""
+
+msgid "Event registration parser"
+msgstr ""
+
+msgid "Duplicate value!"
+msgstr ""
+
+msgid "Special characters"
+msgstr ""
+
+msgid "User group"
+msgstr "Groupe d'utilisateur"
+
+msgid "Something went wrong whilst loading gateways"
+msgstr ""
+
+msgid "Edit gateway"
+msgstr ""
+
+msgid "Something went wrong whilst saving gateways"
+msgstr ""
+
+msgid "Gateway not found"
+msgstr ""
+
+msgid "The requested gateway could not be loaded"
+msgstr ""
+
+msgid "Something went wrong whilst saving the gateway"
+msgstr ""
+
+msgid "Something went wrong whilst performing the requested operation"
+msgstr ""
+
+msgid ""
+"An SMS gateway lets a DHIS2 instance send and receive SMS messages. "
+"Different gateway types can be added and configured below. At least one "
+"gateway is needed to send and receive SMS messages. Load balancing will use "
+"all gateways if there are multiple available. Read about gateway "
+"configuration in the DHIS2 documentation."
+msgstr ""
+
+msgid "Delete selected"
+msgstr ""
+
+msgid "No gateways found"
+msgstr ""
+
+msgid ""
+"It looks like there aren't any configured gateways, or they couldn't be "
+"loaded."
+msgstr ""
+
+msgid "Overview: SMS Configuration"
+msgstr ""
+
+msgid ""
+"Configure settings for SMS sending, receiving, data reporting, alerts, "
+"registration and more."
+msgstr ""
+
+msgid "Gateway Configuration"
+msgstr "Configuration de la passerelle"
+
+msgid ""
+"Add and manage gateways for sending and receiving SMS messages in DHIS2."
+msgstr ""
+
+msgid "Set up gateways"
+msgstr ""
+
+msgid "SMS Commands"
+msgstr "Commandes SMS"
+
+msgid ""
+"Add and manage commands triggered by incoming SMS messages to register, "
+"alert and more."
+msgstr ""
+
+msgid "Set up SMS commands"
+msgstr ""
+
+msgid "Sent SMS messages"
+msgstr ""
+
+msgid "Open logs of all SMS messages sent from DHIS2."
+msgstr ""
+
+msgid "View all sent SMS"
+msgstr ""
+
+msgid "Received SMS messages"
+msgstr ""
+
+msgid "Open logs of all SMS messages received by DHIS2."
+msgstr ""
+
+msgid "View all received SMS"
+msgstr ""
+
+msgid "Filter by status"
+msgstr ""
+
+msgid "Filter by phone number"
+msgstr ""
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Show"
+msgstr "Afficher"
+
+msgid "per page"
+msgstr ""
+
+msgid "Viewing {{firstItem}}-{{lastItem}} of {{total}}"
+msgstr ""
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of {{pageCount}}"
+msgstr ""
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Something went wrong whilst loading received SMSes"
+msgstr ""
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Phone number"
+msgstr "Numéro de téléphone"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Sender"
+msgstr ""
+
+msgid "Received"
+msgstr ""
+
+msgid "No SMSes to display"
+msgstr ""
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "Failed"
+msgstr "Echoué"
+
+msgid "Incoming"
+msgstr "Entrant"
+
+msgid "Processed"
+msgstr "Traité"
+
+msgid "Processing"
+msgstr "Traitement"
+
+msgid "Sent"
+msgstr "Envoyé"
+
+msgid "Unhandled"
+msgstr "Non pris en charge"
+
+msgid "Something went wrong whilst loading sent SMSes"
+msgstr ""
+
+msgid "Recipients"
+msgstr "Destinataires"
+
+msgid "Delivered"
+msgstr ""
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Outbound"
+msgstr "Sortant"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Scheduled"
+msgstr "Programmé"
+
+msgid "Something went wrong whilst loading commands"
+msgstr "Une erreur s'est produite lors du chargement des commandes"
+
+msgid "Edit command"
+msgstr "Editer la commande"
+
+msgid "Unrecognised parser type"
+msgstr "Type de parseur demandé non reconnu"
+
+msgid "Could not find the requested parser type"
+msgstr "Impossible de trouver le type de parseur demandé"
+
+msgid "Add command"
+msgstr "Ajouter commande"
+
+msgid "Automatically selected by selecting a program"
+msgstr ""
+
+msgid "Commands"
+msgstr "Commande"
+
+msgid ""
+"SMS commands process SMS messages received by a DHIS2 instance, taking "
+"certain actions depending on the command and message content. Multiple SMS "
+"commands can be set up to process and handle data in multiple ways. Add and "
+"configure SMS commands below. Read about SMS commands in the DHIS2 "
+"documentation."
+msgstr ""
+
+msgid "Sms command"
+msgstr "Commande SMS"
+
+msgid "No commands to display"
+msgstr "Aucune commande à afficher"

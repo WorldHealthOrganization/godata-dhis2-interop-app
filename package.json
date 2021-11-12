@@ -1,0 +1,47 @@
+{
+    "name": "godata-dhis2-configuration-app",
+    "version": "1.0.0",
+    "description": "",
+    "license": "WHO",
+    "author": "Murodillo Latifov mlatifov@gmail.com>",
+    "private": true,
+    "scripts": {
+        "build": "d2-app-scripts build",
+        "start": "d2-app-scripts start",
+        "test": "d2-app-scripts test",
+        "cy:start": "BROWSER=none yarn start",
+        "cy:open": "d2-utils-cypress open --appStart 'yarn cy:start'",
+        "cy:run": "d2-utils-cypress run --appStart 'yarn cy:start'",
+        "lint:js": "d2-style js check",
+        "lint:text": "d2-style text check",
+        "lint:staged": "yarn lint:js --staged && yarn lint:text --staged",
+        "lint": "yarn lint:js && yarn lint:text",
+        "format:js": "d2-style js apply",
+        "format:text": "d2-style text apply",
+        "format:staged": "yarn format:js --staged && yarn format:text --staged",
+        "format": "yarn format:js && yarn format:text"
+    },
+    "devDependencies": {
+        "@dhis2/cli-app-scripts": "^5.2.0",
+        "@dhis2/cli-style": "^7.0.0",
+        "@dhis2/cli-utils-cypress": "^2.2.1",
+        "@testing-library/react-hooks": "^3.3.0",
+        "react-test-renderer": "^16.13.1"
+    },
+    "dependencies": {
+        "@dhis2/app-runtime": "^2.2.2",
+        "@dhis2/prop-types": "^2.0.0",
+        "@dhis2/ui": "^5.6.2",
+        "ajv": "^8.7.1",
+        "axios": "^0.24.0",
+        "base-64": "^1.0.0",
+        "classnames": "^2.2.6",
+        "express": "^4.17.1",
+        "http-proxy-middleware": "^2.0.1",
+        "jsoneditor": "^9.5.7",
+        "jsoneditor-react": "^3.1.1",
+        "moment": "^2.27.0",
+        "react-http-client": "^1.0.1",
+        "react-router-dom": "^5.2.0"
+    }
+}

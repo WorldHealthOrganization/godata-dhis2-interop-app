@@ -1,0 +1,27 @@
+.container {
+    max-width: 800px;
+}
+
+.explanation {
+    color: var(--colors-grey800);
+    line-height: 20px;
+    font-size: 14px;
+    margin-bottom: var(--spacers-dp24);
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: calc(-1 * var(--spacers-dp8));
+}
+
+.gridItem {
+    flex: 1 0 100%;
+    padding: var(--spacers-dp8);
+}
+
+@media (min-width: 800px) {
+    .gridItem {
+        flex: 1 0 50%;
+    }
+}

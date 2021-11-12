@@ -1,0 +1,32 @@
+{
+    "programs": [
+        {
+            "id": "P000000000",
+            "displayName": "Antenatal care visit"
+        },
+        {
+            "id": "P000000001",
+            "displayName": "Contraceptives Voucher Program"
+        },
+        {
+            "id": "P000000002",
+            "displayName": "Information Campaign"
+        },
+        {
+            "id": "P000000003",
+            "displayName": "Inpatient morbidity and mortality"
+        },
+        {
+            "id": "P000000004",
+            "displayName": "Malaria case registration"
+        },
+        {
+            "id": "P000000005",
+            "displayName": "Malaria testing and surveillance"
+        },
+        {
+            "id": "P000000006",
+            "displayName": "XX MAL RDT - Case Registration"
+        }
+    ]
+}

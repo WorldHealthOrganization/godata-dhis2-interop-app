@@ -1,0 +1,20 @@
+{
+    "userGroups": [
+        {
+            "id": "G000000000",
+            "displayName": "Administrators"
+        },
+        {
+            "id": "G000000001",
+            "displayName": "Africare HQ"
+        },
+        {
+            "id": "G000000002",
+            "displayName": "Bo District M&E officers"
+        },
+        {
+            "id": "G000000003",
+            "displayName": "Bonthe District M&E Officers"
+        }
+    ]
+}

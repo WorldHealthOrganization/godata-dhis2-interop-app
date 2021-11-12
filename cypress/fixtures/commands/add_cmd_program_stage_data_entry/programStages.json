@@ -1,0 +1,12 @@
+{
+    "programStages": [
+        {
+            "id": "PS00000000",
+            "displayName": "Baby Postnatal"
+        },
+        {
+            "id": "PS00000001",
+            "displayName": "Birth"
+        }
+    ]
+}
