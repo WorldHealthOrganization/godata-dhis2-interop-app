@@ -102,7 +102,7 @@ export const MetaMappingFormEdit = () => {
             className={styles.container}
             data-test={dataTest('views-smscommandformedit')}
         >
-            <PageHeadline>{i18n.t('Edit command')}</PageHeadline>
+            <PageHeadline>{i18n.t('Edit mapping')}</PageHeadline>
 
             {FormComponent && (
                 <FormComponent

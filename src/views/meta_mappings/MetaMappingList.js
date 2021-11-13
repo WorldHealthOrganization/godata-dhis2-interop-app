@@ -30,7 +30,7 @@ import { dataTest } from '../../dataTest'
 import i18n from '../../locales'
 import styles from './MetaMappingList.module.css'
 
-export const META_MAPPING_LIST_LABEL = i18n.t('Commands')
+export const META_MAPPING_LIST_LABEL = i18n.t('Mapping')
 export const META_MAPPING_LIST_PATH = '/sms-config'
 
 export const MetaMappingList = () => {
@@ -137,7 +137,7 @@ export const MetaMappingList = () => {
 
             <Paragraph>
                 {i18n.t(
-                    'SMS commands process SMS messages received by a DHIS2 instance, taking certain actions depending on the command and message content. Multiple SMS commands can be set up to process and handle data in multiple ways. Add and configure SMS commands below. Read about SMS commands in the DHIS2 documentation.'
+                    'Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple mappings can be set up to process and handle data in multiple ways. Add and configure mappings below.'
                 )}
             </Paragraph>
 

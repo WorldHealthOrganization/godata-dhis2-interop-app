@@ -185,7 +185,7 @@ const ActualForm = ({ handleSubmit, submitting }) => {
                         icon={submitting ? <CircularLoader small /> : null}
                         disabled={submitting}
                     >
-                        {i18n.t('Add command')}
+                        {i18n.t('Add mapping')}
                     </Button>
 
                     <Button onClick={() => history.goBack()}>

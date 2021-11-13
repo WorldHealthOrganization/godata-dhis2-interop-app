@@ -37,7 +37,7 @@ const formatSmsCodes = updates => ({
 
 const query = {
     metaMapping: {
-        resource: 'metaMappings',
+        resource: 'smsCommands',
         id: ({ commandId }) => commandId,
         params: {
             fields: [
