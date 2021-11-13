@@ -2,6 +2,10 @@ import { Menu } from '@dhis2/ui'
 import React from 'react'
 
 import {
+    METADATA_CONFIG_LIST_PATH,
+    METADATA_CONFIG_LIST_LABEL,
+    META_DATA_MAPPING_LIST_PATH,
+    META_DATA_MAPPING_LIST_LABEL,
     GODATA_CALL_FORM_PATH,
     GODATA_CALL_FORM_LABEL,
     META_MAPPING_LIST_LABEL,
@@ -24,6 +28,11 @@ export const Navigation = () => (
         />
 
         <NavigationItem
+            path={META_DATA_MAPPING_LIST_PATH}
+            label={META_DATA_MAPPING_LIST_LABEL}
+        />
+
+        <NavigationItem
             path={META_MAPPING_LIST_PATH}
             label={META_MAPPING_LIST_LABEL}
         />
@@ -31,6 +40,11 @@ export const Navigation = () => (
         <NavigationItem
             path={GODATA_CALL_FORM_PATH}
             label={GODATA_CALL_FORM_LABEL}
+        />
+        
+        <NavigationItem
+            path={METADATA_CONFIG_LIST_PATH}
+            label={METADATA_CONFIG_LIST_LABEL}
         />
 
     </Menu>

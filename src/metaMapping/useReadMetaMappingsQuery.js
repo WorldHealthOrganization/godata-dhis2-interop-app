@@ -1,8 +1,8 @@
 import { useDataQuery } from '@dhis2/app-runtime'
 
-export const META_MAPPINGS_QUERY = {
-    smsCommands: {
-        resource: 'smsCommands',
+export const META_DATA_MAPPINGS_QUERY = {
+    metadataMappings: {
+        resource: 'constants',
         pager: false,
         params: ({ ids } = {}) => ({
             // @TODO: Why is `paging: false` not working?
@@ -13,4 +13,4 @@ export const META_MAPPINGS_QUERY = {
     },
 }
 
-export const useReadMetaMappingsQuery = () => useDataQuery(META_MAPPINGS_QUERY)
+export const useReadMetaMappingsQuery = () => useDataQuery(META_DATA_MAPPINGS_QUERY)

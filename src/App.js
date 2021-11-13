@@ -6,11 +6,23 @@ import styles from './App.module.css'
 import { AlertHandler } from './notifications'
 import { Navigation } from './navigation'
 import {
+    METADATA_CONFIG_LIST_PATH,
+    METADATA_CONFIG_FORM_NEW_PATH,
+    METADATA_CONFIG_FORM_EDIT_PATH,
+    META_DATA_MAPPING_FORM_EDIT_PATH,
+    META_DATA_MAPPING_FORM_NEW_PATH,
+    META_DATA_MAPPING_LIST_PATH,
     GODATA_CALL_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     META_MAPPING_LIST_PATH,
     META_MAPPING_FORM_EDIT_PATH,
     META_MAPPING_FORM_NEW_PATH,
+    MetadataConfigFormNew,
+    MetaDataMappingList,
+    MetadataConfigFormEdit,
+    MetadataConfigList,
+    MetaDataMappingFormEdit,
+    MetaDataMappingFormNew,
     GoDataCallForm,
     GoDataConfigForm,
     MetaMappingList,
@@ -44,6 +56,25 @@ const App = () => (
                         {/* MetaData configuration */ ''}
                         <Route
                             exact
+                            path={META_DATA_MAPPING_LIST_PATH}
+                            component={MetaDataMappingList}
+                        />
+
+                        <Route
+                            exact
+                            path={META_DATA_MAPPING_FORM_EDIT_PATH}
+                            component={MetaDataMappingFormEdit}
+                        />
+
+                        <Route
+                            exact
+                            path={META_DATA_MAPPING_FORM_NEW_PATH}
+                            component={MetaDataMappingFormNew}
+                        />                        
+
+                        {/* MetaData configuration */ ''}
+                        <Route
+                            exact
                             path={META_MAPPING_LIST_PATH}
                             component={MetaMappingList}
                         />
@@ -64,6 +95,26 @@ const App = () => (
                             exact
                             path={GODATA_CALL_FORM_PATH}
                             component={GoDataCallForm}
+                        />
+
+
+                        {/* MetaData configuration */ ''}
+                        <Route
+                            exact
+                            path={METADATA_CONFIG_LIST_PATH}
+                            component={MetadataConfigList}
+                        />
+
+                        <Route
+                            exact
+                            path={METADATA_CONFIG_FORM_EDIT_PATH}
+                            component={MetadataConfigFormEdit}
+                        />
+
+                        <Route
+                            exact
+                            path={METADATA_CONFIG_FORM_NEW_PATH}
+                            component={MetadataConfigFormNew}
                         />
 
                         <Redirect from="*" to={HOME_PATH} />

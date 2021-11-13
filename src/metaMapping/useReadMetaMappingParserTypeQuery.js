@@ -1,11 +1,11 @@
 import { useDataQuery } from '@dhis2/app-runtime'
 
 export const READ_META_MAPPING_PARSER_TYPE_QUERY = {
-    smsCommand: {
-        resource: 'smsCommands',
+    metaMapping: {
+        resource: 'constants',
         id: ({ id }) => id,
         params: {
-            fields: 'parserType',
+            fields: 'name',
             paging: 'false',
         },
     },
