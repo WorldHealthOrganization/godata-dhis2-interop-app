@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-14T03:56:06.098Z\n"
-"PO-Revision-Date: 2021-11-14T03:56:06.098Z\n"
+"POT-Creation-Date: 2021-11-14T07:04:31.963Z\n"
+"PO-Revision-Date: 2021-11-14T07:04:31.963Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -47,13 +47,19 @@ msgstr ""
 msgid "User name"
 msgstr ""
 
-msgid "BulkSMS"
+msgid "Go.Data Outbreak"
 msgstr ""
 
-msgid "Clickatell"
+msgid "Go.Data Case"
 msgstr ""
 
-msgid "Generic"
+msgid "Go.Data Contact"
+msgstr ""
+
+msgid "Go.Data Contact of Contact"
+msgstr ""
+
+msgid "Go.Data Organisation Unit"
 msgstr ""
 
 msgid "Save"
@@ -121,10 +127,13 @@ msgstr ""
 msgid "Add gateway"
 msgstr ""
 
-msgid "Gateway setup"
+msgid "Save mappings"
 msgstr ""
 
-msgid "Key value pairs"
+msgid "Add mappings"
+msgstr ""
+
+msgid "Mappings setup"
 msgstr ""
 
 msgid "Key"
@@ -146,6 +155,15 @@ msgid "Value"
 msgstr ""
 
 msgid "Default gateway"
+msgstr ""
+
+msgid "BulkSMS"
+msgstr ""
+
+msgid "Clickatell"
+msgstr ""
+
+msgid "Generic"
 msgstr ""
 
 msgid "Are you sure you want to delete the selected commands?"
@@ -355,9 +373,6 @@ msgid ""
 "Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple "
 "mappings can be set up to process and handle data in multiple ways. Add and "
 "configure mappings below."
-msgstr ""
-
-msgid "Add mappings"
 msgstr ""
 
 msgid "Delete selected"

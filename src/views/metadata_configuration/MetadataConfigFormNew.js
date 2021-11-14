@@ -85,7 +85,7 @@ export const MetadataConfigFormNew = () => {
             data-test={dataTest('views-gatewayconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Add gateway')}</PageHeadline>
+            <PageHeadline>{i18n.t('Add mappings')}</PageHeadline>
 
             <FormRow>
                 <SingleSelectField

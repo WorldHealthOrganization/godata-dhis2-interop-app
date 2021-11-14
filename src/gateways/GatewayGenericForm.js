@@ -2,16 +2,14 @@ import { Button, ButtonStrip, ReactFinalForm, CircularLoader } from '@dhis2/ui'
 import React from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 
+import axios from 'axios'
+
+import { JsonEditor as Editor } from 'jsoneditor-react'
+import 'jsoneditor-react/es/editor.min.css'
+
 import {
     FieldGatewayName,
-    FieldGatewayUrlTemplate,
-    GatewayAddKeyValuePair,
-    GatewayKeyValuePair,
 } from '../gateways'
-import { FieldGatewayConfigurationTemplate } from './FieldGatewayConfigurationTemplate'
-import { FieldGatewayUseGet } from './FieldGatewayUseGet'
-import { FieldGatewaySendUrlParameters } from './FieldGatewaySendUrlParameters'
-import { FieldGatewayContentType } from './FieldGatewayContentType'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
@@ -25,8 +23,40 @@ export const GatewayGenericForm = ({
     initialValues,
 }) => {
     const submitText = initialValues
-        ? i18n.t('Save gateway')
-        : i18n.t('Add gateway')
+        ? i18n.t('Save mappings')
+        : i18n.t('Add mappings')
+
+        const data = () => {
+            axios
+            .post("http://localhost:8000/api/users/login", {
+              email: 'admin@who.int',
+              password: 'Rabota@2021murod',
+            }
+            )
+            .then(response => {
+                //https://godata-r5.who.int
+              //const data = response.data.results;
+              //this.setState({ data });
+              axios
+              .get("http://localhost:8000/api/locations", {
+                headers : {
+                    Authorization: response.data.id,
+                  }
+              }, 
+              
+              ).then(response => {
+               // Editor.set(response.data)  
+                  console.log(response.data)
+              })
+            })
+            .catch(error => {
+              console.log(error);
+            });
+            }        
+
+            console.log('data ' + data)
+
+        const handleChange = () => console.log('jsontreechanges')        
 
     return (
         <Form
@@ -39,41 +69,17 @@ export const GatewayGenericForm = ({
                     onSubmit={handleSubmit}
                     data-test={dataTest('gateways-gatewaygenericform')}
                 >
-                    <PageSubHeadline>{i18n.t('Gateway setup')}</PageSubHeadline>
+                    <PageSubHeadline>{i18n.t('Mappings setup')}</PageSubHeadline>
 
                     <FormRow>
                         <FieldGatewayName />
                     </FormRow>
 
-                    <FormRow>
-                        <FieldGatewayUrlTemplate />
-                    </FormRow>
 
-                    <FormRow>
-                        <FieldGatewayConfigurationTemplate />
-                    </FormRow>
-
-                    <FormRow>
-                        <FieldGatewayContentType />
-                    </FormRow>
-
-                    <FormRow>
-                        <FieldGatewayUseGet />
-                    </FormRow>
-
-                    <FormRow>
-                        <FieldGatewaySendUrlParameters />
-                    </FormRow>
-
-                    <PageSubHeadline>
-                        {i18n.t('Key value pairs')}
-                    </PageSubHeadline>
-
-                    {values.parameters.map((_, index) => (
-                        <GatewayKeyValuePair index={index} key={index} />
-                    ))}
-
-                    <GatewayAddKeyValuePair />
+            <Editor
+            value={{}}
+            onChange={handleChange}
+            />
 
                     <ButtonStrip>
                         <Button

@@ -10,7 +10,7 @@ import { dataTest } from '../../dataTest'
 import {
     GoDataServerConfigForm,
     useCreateGoDataServerConfigConstantMutation,
-    useReadGoDataServerConfigConstantQueryByCode,
+    useReadMappingConfigConstantsQueryForConfig,
     useUpdateGoDataServerConfigConstantMutation,
 } from '../../constants'
 import i18n from '../../locales'
@@ -23,17 +23,20 @@ export const GoDataConfigForm = () => {
     const history = useHistory()
     const { code } = 'godataserverconf'
 
-    const { loading, error: loadError, data: jsonData } = useReadGoDataServerConfigConstantQueryByCode(
+    const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryForConfig(
         code
     )
 
-    var exists = false
-
     const data = 
 
-    jsonData && jsonData.constant.constants.length >0
-    ? JSON.parse(jsonData.constant.constants[0].description)
+    jsonData && jsonData.constants.constants.length >0
+    ? JSON.parse(jsonData.constants.constants[0].description)
             : {}
+
+const exists = 
+jsonData
+? true : false
+
 
     const initialValues = data
 
@@ -81,7 +84,7 @@ export const GoDataConfigForm = () => {
         try {
 
             if(exists){
-                values.id=jsonData.constant.constants[0].id
+               // values.id=jsonData.constant.constants[0].id
                 await updateGoDataServerConfigConstant(values)
             }else{
                 await saveGoDataServerConfigConstant(values)

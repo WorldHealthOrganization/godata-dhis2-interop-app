@@ -1,6 +1,6 @@
 import { useDataQuery } from '@dhis2/app-runtime'
 
-export const CONSTANT_QUERY_BY_CODE = {
+export const CONSTANT_QUERY_MAPPINGS_CODE = {
     constants: {
         resource: 'constants',
         params: {
@@ -11,5 +11,5 @@ export const CONSTANT_QUERY_BY_CODE = {
     },
 }
 
-export const useReadMappingConfigConstantsQueryByCode = value =>
-    useDataQuery(CONSTANT_QUERY_BY_CODE, { variables: { value } })
+export const useReadMappingConfigConstantsQueryForMappings = value =>
+    useDataQuery(CONSTANT_QUERY_MAPPINGS_CODE, { variables: { value } })

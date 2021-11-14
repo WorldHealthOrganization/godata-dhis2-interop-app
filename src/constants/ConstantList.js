@@ -71,8 +71,8 @@ ConstantList.propTypes = {
     checkedConstants: PropTypes.arrayOf(PropTypes.string).isRequired,
     constants: PropTypes.arrayOf(
         PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
+            displayName: PropTypes.string.isRequired,
+           // type: PropTypes.string.isRequired,
             uid: PropTypes.string.isRequired,
             isDefault: PropTypes.bool,
         })

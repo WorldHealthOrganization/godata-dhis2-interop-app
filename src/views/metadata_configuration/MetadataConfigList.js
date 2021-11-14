@@ -9,7 +9,7 @@ import {
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
     ConstantList,
-    useReadMappingConfigConstantsQueryByCode
+    useReadMappingConfigConstantsQueryForMappings
 } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
@@ -32,7 +32,7 @@ export const MetadataConfigList = () => {
         error: errorReadConstants,
         data,
         refetch: refetchReadConstants,
-    } = useReadMappingConfigConstantsQueryByCode()
+    } = useReadMappingConfigConstantsQueryForMappings()
 
     const [
         deleteCheckedConstants,

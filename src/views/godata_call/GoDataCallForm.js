@@ -13,7 +13,7 @@ import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
     useCreateGoDataServerConfigConstantMutation,
-    useReadGoDataServerConfigConstantQueryByCode,
+    useReadMappingConfigConstantsQueryForConfig,
     useUpdateGoDataServerConfigConstantMutation,
 } from '../../constants'
 import i18n from '../../locales'
@@ -27,14 +27,14 @@ const { code } = 'godataserverconf'
 export const GoDataCallForm = () => {
     const history = useHistory()
 
-    const { loading, error: loadError, data: jsonData } = useReadGoDataServerConfigConstantQueryByCode(
+    const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryForConfig(
         code
     )
 
     const data = 
 
-    jsonData && jsonData.constant.constants.length >0
-    ? JSON.parse(jsonData.constant.constants[0].description)
+    jsonData && jsonData.constants.constants.length >0
+    ? JSON.parse(jsonData.constants.constants[0].description)
             : {}
     const  queryGoData = () => {
                 axios
