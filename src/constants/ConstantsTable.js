@@ -82,31 +82,6 @@ export const ConstantsTable = ({
                             {getTypeLabelByType(constant.type)}
                         </TableCell>
 
-                        <TableCell className={styles.defaultCell}>
-                            {!constant.isDefault ? (
-                                <Button
-                                    dataTest={dataTest(
-                                        'constants-constantstable-makedefault'
-                                    )}
-                                    onClick={() =>
-                                        onMakeDefaultClick(constant.id)
-                                    }
-                                    className={styles.makeDefaultButton}
-                                >
-                                    {i18n.t('Make default')}
-                                </Button>
-                            ) : (
-                                <span
-                                    className={styles.isDefaultText}
-                                    data-test={dataTest(
-                                        'constants-constantstable-isdefault'
-                                    )}
-                                >
-                                    {i18n.t('Default constant')}
-                                </span>
-                            )}
-                        </TableCell>
-
                         <TableCell
                             dataTest={dataTest(
                                 'constants-constantstable-actions'
@@ -140,7 +115,7 @@ ConstantsTable.propTypes = {
     constants: PropTypes.arrayOf(
         PropTypes.shape({
             isDefault: PropTypes.bool.isRequired,
-            name: PropTypes.string.isRequired,
+            displayName: PropTypes.string.isRequired,
             type: PropTypes.string.isRequired,
             id: PropTypes.string.isRequired,
         })

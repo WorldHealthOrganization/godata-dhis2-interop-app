@@ -27,12 +27,6 @@ export const Navigation = () => (
             label={GODATA_CONFIG_FORM_LABEL}
         />
 
-
-        <NavigationItem
-            path={GODATA_CALL_FORM_PATH}
-            label={GODATA_CALL_FORM_LABEL}
-        />
-        
         <NavigationItem
             path={METADATA_CONFIG_LIST_PATH}
             label={METADATA_CONFIG_LIST_LABEL}

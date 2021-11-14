@@ -9,7 +9,7 @@ import {
     METADATA_CONFIG_LIST_PATH,
     METADATA_CONFIG_FORM_NEW_PATH,
     METADATA_CONFIG_FORM_EDIT_PATH,
-    GODATA_CALL_FORM_PATH,
+    //GODATA_CALL_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     MetadataConfigFormNew,
     MetadataConfigFormEdit,
@@ -39,12 +39,6 @@ const App = () => (
                             exact
                             path={GODATA_CONFIG_FORM_PATH}
                             component={GoDataConfigForm}
-                        />
-
-                        <Route
-                            exact
-                            path={GODATA_CALL_FORM_PATH}
-                            component={GoDataCallForm}
                         />
 
 

@@ -39,11 +39,11 @@ export const OutbreaksForm = ({
        ? JSON.parse(jsonData.constants.constants[0].description)
                : {}
 
-        console.log(data.urlTemplate)
     const submitText = initialValues
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
+        const { loginLoading, loginError: loginLoadError, data: loginResponse } = 
         axios
         .post(data.urlTemplate+"/api/users/login", {
           email: data.username,
@@ -73,7 +73,29 @@ export const OutbreaksForm = ({
  
 
 
-
+        if (loginLoading) {
+            return (
+                <>
+                    <PageHeadline>{i18n.t('Add New')}</PageHeadline>
+                    <CenteredContent>
+                        <CircularLoader />
+                    </CenteredContent>
+                </>
+            )
+        }
+    
+        if (loginLoadError) {
+            const msg = i18n.t('Something went wrong whilst loading gateways')
+    
+            return (
+                <>
+                    <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+                    <NoticeBox error title={msg}>
+                        {loadError.message}
+                    </NoticeBox>
+                </>
+            )
+        }
 
         const handleChange = () => console.log('jsontreechanges')        
 

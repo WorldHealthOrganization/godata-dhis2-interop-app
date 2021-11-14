@@ -17,7 +17,7 @@ import i18n from '../../locales'
 import styles from './GoDataConfigForm.module.css'
 
 export const GODATA_CONFIG_FORM_PATH = '/godata-config'
-export const GODATA_CONFIG_FORM_LABEL = 'Go.Data configuration'
+export const GODATA_CONFIG_FORM_LABEL = 'Go.Data Server Configuration'
 
 export const GoDataConfigForm = () => {
     const history = useHistory()

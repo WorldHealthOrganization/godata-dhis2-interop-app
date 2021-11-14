@@ -53,6 +53,7 @@ export const LocationsForm = ({
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
+        const { loginLoading, loginError: loginLoadError, data: loginResponse } = 
         axios
         .post(data.urlTemplate+"/api/users/login", {
           email: 'mlatifov@gmail.com',
@@ -81,7 +82,29 @@ export const LocationsForm = ({
         });
  
 
-
+        if (loginLoading) {
+            return (
+                <>
+                    <PageHeadline>{i18n.t('Add New')}</PageHeadline>
+                    <CenteredContent>
+                        <CircularLoader />
+                    </CenteredContent>
+                </>
+            )
+        }
+    
+        if (loginLoadError) {
+            const msg = i18n.t('Something went wrong whilst loading gateways')
+    
+            return (
+                <>
+                    <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+                    <NoticeBox error title={msg}>
+                        {loadError.message}
+                    </NoticeBox>
+                </>
+            )
+        }
 
 
         const handleChange = () => console.log('jsontreechanges')        
