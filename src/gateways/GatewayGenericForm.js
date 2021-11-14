@@ -1,6 +1,7 @@
 import { Button, ButtonStrip, ReactFinalForm, CircularLoader } from '@dhis2/ui'
 import React from 'react'
 import { PropTypes } from '@dhis2/prop-types'
+import {useReadMappingConfigConstantsQueryForConfig} from '../constants'
 
 import axios from 'axios'
 
@@ -15,46 +16,73 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 
+
+
+
 const { Form } = ReactFinalForm
+
+
+var metaObjects;
+
+
 
 export const GatewayGenericForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
 }) => {
+    
+       //  console.log('data ' + data)
+       const { code } = 'godataserverconf'
+
+       const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryForConfig(
+           code
+       )
+
+       const data = 
+
+       jsonData && jsonData.constants.constants.length >0
+       ? JSON.parse(jsonData.constants.constants[0].description)
+               : {}
+          //     console.log(data.constants.constants[0].description+ "Data")
+      // console.log("Data "+JSON.parse(jsonData?.constants?.constants[0]?.description))
+
+      // const URL_ADDRESS = jsonData?.constants?.constants[0]?.description
+        console.log(data.urlTemplate)
     const submitText = initialValues
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
-        const data = () => {
-            axios
-            .post("http://localhost:8000/api/users/login", {
-              email: 'admin@who.int',
-              password: 'Rabota@2021murod',
-            }
-            )
-            .then(response => {
-                //https://godata-r5.who.int
-              //const data = response.data.results;
-              //this.setState({ data });
-              axios
-              .get("http://localhost:8000/api/locations", {
-                headers : {
-                    Authorization: response.data.id,
-                  }
-              }, 
-              
-              ).then(response => {
-               // Editor.set(response.data)  
-                  console.log(response.data)
-              })
-            })
-            .catch(error => {
-              console.log(error);
-            });
-            }        
+        axios
+        .post(data.urlTemplate+"/api/users/login", {
+          email: 'mlatifov@gmail.com',
+          password: 'Rabota@2021murod',
+        }
+        )
+        .then(response => {
+            //https://godata-r5.who.int
+          //const data = response.data.results;
+          //this.setState({ data });
+          axios
+          .get(data.urlTemplate+"/api/locations", {
+            headers : {
+                Authorization: response.data.id,
+              }
+          }, 
+          
+          ).then(response => {
+           // Editor.set(response.data)  
+            //  console.log(response.data)
+              metaObjects=response.data[0]
+          })
+        })
+        .catch(error => {
+          console.log(error);
+        });
+ 
+        
 
-            console.log('data ' + data)
+
 
         const handleChange = () => console.log('jsontreechanges')        
 
@@ -77,7 +105,7 @@ export const GatewayGenericForm = ({
 
 
             <Editor
-            value={{}}
+            value={metaObjects}
             onChange={handleChange}
             />
 
