@@ -3,7 +3,7 @@ import i18n from '../../locales'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
-    META_MAPPING_LIST_PATH,
+    METADATA_CONFIG_LIST_PATH,
     GODATA_CONFIG_FORM_PATH,
 } from '../'
 import s from './Home.module.css'
@@ -43,7 +43,7 @@ export const Home = () => {
                             'Add and manage GoData and DHIS2 Metadata for data exchange.'
                         )}
                         linkText={i18n.t('Map Metadata')}
-                        to={META_MAPPING_LIST_PATH}
+                        to={METADATA_CONFIG_LIST_PATH}
                     />
                 </div>
             </div>

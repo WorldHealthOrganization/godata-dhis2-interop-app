@@ -9,25 +9,13 @@ import {
     METADATA_CONFIG_LIST_PATH,
     METADATA_CONFIG_FORM_NEW_PATH,
     METADATA_CONFIG_FORM_EDIT_PATH,
-    META_DATA_MAPPING_FORM_EDIT_PATH,
-    META_DATA_MAPPING_FORM_NEW_PATH,
-    META_DATA_MAPPING_LIST_PATH,
     GODATA_CALL_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
-    META_MAPPING_LIST_PATH,
-    META_MAPPING_FORM_EDIT_PATH,
-    META_MAPPING_FORM_NEW_PATH,
     MetadataConfigFormNew,
-    MetaDataMappingList,
     MetadataConfigFormEdit,
     MetadataConfigList,
-    MetaDataMappingFormEdit,
-    MetaDataMappingFormNew,
     GoDataCallForm,
     GoDataConfigForm,
-    MetaMappingList,
-    MetaMappingFormEdit,
-    MetaMappingFormNew,
     HOME_PATH,
     Home,
 } from './views'
@@ -51,44 +39,6 @@ const App = () => (
                             exact
                             path={GODATA_CONFIG_FORM_PATH}
                             component={GoDataConfigForm}
-                        />
-
-                        {/* MetaData configuration */ ''}
-                        <Route
-                            exact
-                            path={META_DATA_MAPPING_LIST_PATH}
-                            component={MetaDataMappingList}
-                        />
-
-                        <Route
-                            exact
-                            path={META_DATA_MAPPING_FORM_EDIT_PATH}
-                            component={MetaDataMappingFormEdit}
-                        />
-
-                        <Route
-                            exact
-                            path={META_DATA_MAPPING_FORM_NEW_PATH}
-                            component={MetaDataMappingFormNew}
-                        />                        
-
-                        {/* MetaData configuration */ ''}
-                        <Route
-                            exact
-                            path={META_MAPPING_LIST_PATH}
-                            component={MetaMappingList}
-                        />
-
-                        <Route
-                            exact
-                            path={META_MAPPING_FORM_EDIT_PATH}
-                            component={MetaMappingFormEdit}
-                        />
-
-                        <Route
-                            exact
-                            path={META_MAPPING_FORM_NEW_PATH}
-                            component={MetaMappingFormNew}
                         />
 
                         <Route

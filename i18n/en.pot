@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-14T07:04:31.963Z\n"
-"PO-Revision-Date: 2021-11-14T07:04:31.963Z\n"
+"POT-Creation-Date: 2021-11-14T09:29:11.612Z\n"
+"PO-Revision-Date: 2021-11-14T09:29:11.612Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -384,46 +384,4 @@ msgstr ""
 msgid ""
 "It looks like there aren't any configured metadta, or they couldn't be "
 "loaded."
-msgstr ""
-
-msgid "Something went wrong whilst loading mapping"
-msgstr ""
-
-msgid "Edit mapping"
-msgstr ""
-
-msgid "Unrecognised parser type"
-msgstr ""
-
-msgid "Could not find the requested parser type"
-msgstr ""
-
-msgid "Add command"
-msgstr ""
-
-msgid "Automatically selected by selecting a program"
-msgstr ""
-
-msgid "Add mapping"
-msgstr ""
-
-msgid "Metadata Mappings"
-msgstr ""
-
-msgid "Mapping Name"
-msgstr ""
-
-msgid "No mapping to display"
-msgstr ""
-
-msgid "Something went wrong whilst loading commands"
-msgstr ""
-
-msgid "Mapping"
-msgstr ""
-
-msgid "Sms command"
-msgstr ""
-
-msgid "No commands to display"
 msgstr ""
