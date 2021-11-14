@@ -52,7 +52,7 @@ export const ConstantsTable = ({
             <TableBody>
                 {constants.map(constant => (
                     <TableRow
-                        key={constant.uid}
+                        key={constant.id}
                         dataTest={dataTest('constants-constantstable-row')}
                     >
                         <TableCell
@@ -62,9 +62,9 @@ export const ConstantsTable = ({
                             )}
                         >
                             <Checkbox
-                                value={constant.uid}
-                                onChange={() => onConstantToggle(constant.uid)}
-                                checked={checkedConstants.includes(constant.uid)}
+                                value={constant.id}
+                                onChange={() => onConstantToggle(constant.id)}
+                                checked={checkedConstants.includes(constant.id)}
                                 dataTest={dataTest('constants-constantstable-id')}
                             />
                         </TableCell>
@@ -89,7 +89,7 @@ export const ConstantsTable = ({
                                         'constants-constantstable-makedefault'
                                     )}
                                     onClick={() =>
-                                        onMakeDefaultClick(constant.uid)
+                                        onMakeDefaultClick(constant.id)
                                     }
                                     className={styles.makeDefaultButton}
                                 >
@@ -120,7 +120,7 @@ export const ConstantsTable = ({
                                     )}
                                     onClick={() => {
                                         history.push(
-                                            `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/${constant.uid}`
+                                            `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/${constant.id}`
                                         )
                                     }}
                                 >
@@ -142,7 +142,7 @@ ConstantsTable.propTypes = {
             isDefault: PropTypes.bool.isRequired,
             name: PropTypes.string.isRequired,
             type: PropTypes.string.isRequired,
-            uid: PropTypes.string.isRequired,
+            id: PropTypes.string.isRequired,
         })
     ).isRequired,
     onConstantToggle: PropTypes.func.isRequired,

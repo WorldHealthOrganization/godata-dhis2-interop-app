@@ -35,7 +35,7 @@ export const ConstantList = ({
 
     const toggleAll = () => {
         if (!allConstantsChecked) {
-            const allConstantIds = constants.map(({ uid }) => uid)
+            const allConstantIds = constants.map(({ id }) => id)
             setCheckedConstants(allConstantIds)
         } else {
             setCheckedConstants([])
@@ -73,7 +73,7 @@ ConstantList.propTypes = {
         PropTypes.shape({
             displayName: PropTypes.string.isRequired,
            // type: PropTypes.string.isRequired,
-            uid: PropTypes.string.isRequired,
+            id: PropTypes.string.isRequired,
             isDefault: PropTypes.bool,
         })
     ).isRequired,
