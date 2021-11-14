@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-13T15:54:27.539Z\n"
-"PO-Revision-Date: 2021-11-13T15:54:27.539Z\n"
+"POT-Creation-Date: 2021-11-14T03:56:06.098Z\n"
+"PO-Revision-Date: 2021-11-14T03:56:06.098Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -17,6 +17,27 @@ msgstr ""
 msgid "Yes, cancel"
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Make default"
+msgstr ""
+
+msgid "Default constant"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Confirm deletion"
+msgstr ""
+
+msgid "Are you sure you want to delete the selected constants?"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
@@ -24,6 +45,15 @@ msgid "Url template"
 msgstr ""
 
 msgid "User name"
+msgstr ""
+
+msgid "BulkSMS"
+msgstr ""
+
+msgid "Clickatell"
+msgstr ""
+
+msgid "Generic"
 msgstr ""
 
 msgid "Save"
@@ -41,9 +71,6 @@ msgstr ""
 msgid ""
 "Please make sure the value of this input matches the value in "
 "\"{{otherField}}\"."
-msgstr ""
-
-msgid "Confirm deletion"
 msgstr ""
 
 msgid "Are you sure you want to delete the selected gateways?"
@@ -71,9 +98,6 @@ msgid "Plain text"
 msgstr ""
 
 msgid "Content type"
-msgstr ""
-
-msgid "Name"
 msgstr ""
 
 msgid "Confirm password"
@@ -121,25 +145,7 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-msgid "Type"
-msgstr ""
-
-msgid "Make default"
-msgstr ""
-
 msgid "Default gateway"
-msgstr ""
-
-msgid "Edit"
-msgstr ""
-
-msgid "BulkSMS"
-msgstr ""
-
-msgid "Clickatell"
-msgstr ""
-
-msgid "Generic"
 msgstr ""
 
 msgid "Are you sure you want to delete the selected commands?"
@@ -346,21 +352,22 @@ msgid "Something went wrong whilst performing the requested operation"
 msgstr ""
 
 msgid ""
-"An SMS gateway lets a DHIS2 instance send and receive SMS messages. "
-"Different gateway types can be added and configured below. At least one "
-"gateway is needed to send and receive SMS messages. Load balancing will use "
-"all gateways if there are multiple available. Read about gateway "
-"configuration in the DHIS2 documentation."
+"Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple "
+"mappings can be set up to process and handle data in multiple ways. Add and "
+"configure mappings below."
+msgstr ""
+
+msgid "Add mappings"
 msgstr ""
 
 msgid "Delete selected"
 msgstr ""
 
-msgid "No gateways found"
+msgid "No mappings found"
 msgstr ""
 
 msgid ""
-"It looks like there aren't any configured gateways, or they couldn't be "
+"It looks like there aren't any configured metadta, or they couldn't be "
 "loaded."
 msgstr ""
 
@@ -386,12 +393,6 @@ msgid "Add mapping"
 msgstr ""
 
 msgid "Metadata Mappings"
-msgstr ""
-
-msgid ""
-"Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple "
-"mappings can be set up to process and handle data in multiple ways. Add and "
-"configure mappings below."
 msgstr ""
 
 msgid "Mapping Name"

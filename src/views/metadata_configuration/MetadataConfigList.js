@@ -3,13 +3,14 @@ import React, { useState } from 'react'
 import { NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
 
 import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
+
 import {
-    DeleteGatewaysConfirmationDialog,
-    GatewayList,
-    useDeleteGatewaysMutation,
-    useReadGatewaysQuery,
-    useSetDefaultGatewayMutation,
-} from '../../gateways'
+    useSetDefaultConstantMutation,
+    useDeleteConstantsMutation,
+    DeleteConstantsConfirmationDialog,
+    ConstantList,
+    useReadMappingConfigConstantsQueryByCode
+} from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
 import { Paragraph } from '../../text'
@@ -22,39 +23,39 @@ export const METADATA_CONFIG_LIST_LABEL = 'Metadata configuration'
 
 export const MetadataConfigList = () => {
     const history = useHistory()
-    const onAddGatewayClick = () => history.push(METADATA_CONFIG_FORM_NEW_PATH)
-    const [checkedGateways, setCheckedGateways] = useState([])
+    const onAddConstantClick = () => history.push(METADATA_CONFIG_FORM_NEW_PATH)
+    const [checkedConstants, setCheckedConstants] = useState([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
     const {
-        loading: loadingReadGateways,
-        error: errorReadGateways,
+        loading: loadingReadConstants,
+        error: errorReadConstants,
         data,
-        refetch: refetchReadGateways,
-    } = useReadGatewaysQuery()
+        refetch: refetchReadConstants,
+    } = useReadMappingConfigConstantsQueryByCode()
 
     const [
-        deleteCheckedGateways,
+        deleteCheckedConstants,
         { loading: loadingDelete, error: errorDelete },
-    ] = useDeleteGatewaysMutation()
+    ] = useDeleteConstantsMutation()
 
     const [
-        makeGatewayDefault,
+        makeConstantDefault,
         { loading: loadingSetDefault, error: errorSetDefault },
-    ] = useSetDefaultGatewayMutation()
+    ] = useSetDefaultConstantMutation()
 
     const onDeleteClick = () => {
-        const variables = { ids: checkedGateways }
-        deleteCheckedGateways(variables).then(refetchReadGateways)
+        const variables = { ids: checkedConstants }
+        deleteCheckedConstants(variables).then(refetchReadConstants)
         setShowDeleteDialog(false)
     }
 
     const onMakeDefaultClick = id => {
         const variables = { id }
-        makeGatewayDefault(variables).then(refetchReadGateways)
+        makeConstantDefault(variables).then(refetchReadConstants)
     }
 
-    const loading = loadingReadGateways || loadingDelete || loadingSetDefault
+    const loading = loadingReadConstants || loadingDelete || loadingSetDefault
 
     if (loading) {
         return (
@@ -67,7 +68,7 @@ export const MetadataConfigList = () => {
         )
     }
 
-    const error = errorReadGateways || errorDelete || errorSetDefault
+    const error = errorReadConstants || errorDelete || errorSetDefault
 
     if (error) {
         const msg = i18n.t(
@@ -84,7 +85,7 @@ export const MetadataConfigList = () => {
         )
     }
 
-    const hasGateways = !!data?.gateways?.gateways?.length
+    const hasMappings = !!data?.constants?.constants?.length
 
     return (
         <div
@@ -95,38 +96,38 @@ export const MetadataConfigList = () => {
 
             <Paragraph>
                 {i18n.t(
-                    'An SMS gateway lets a DHIS2 instance send and receive SMS messages. Different gateway types can be added and configured below. At least one gateway is needed to send and receive SMS messages. Load balancing will use all gateways if there are multiple available. Read about gateway configuration in the DHIS2 documentation.'
+                    'Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple mappings can be set up to process and handle data in multiple ways. Add and configure mappings below.'
                 )}
             </Paragraph>
 
             <ListActions
-                addLabel={i18n.t('Add gateway')}
+                addLabel={i18n.t('Add mappings')}
                 deleteLabel={i18n.t('Delete selected')}
                 dataTest="views-gatewayconfiglist"
-                onAddClick={onAddGatewayClick}
+                onAddClick={onAddConstantClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
                 disableAdd={loadingDelete}
-                disableDelete={!checkedGateways.length || loadingDelete}
+                disableDelete={!checkedConstants.length || loadingDelete}
             />
 
-            {hasGateways ? (
-                <GatewayList
+            {hasMappings ? (
+                <ConstantList
                     processing={loading}
-                    checkedGateways={checkedGateways}
-                    setCheckedGateways={setCheckedGateways}
-                    gateways={data.gateways.gateways}
+                    checkedConstants={checkedConstants}
+                    setCheckedConstants={setCheckedConstants}
+                    constants={data.constants.constants}
                     onMakeDefaultClick={onMakeDefaultClick}
                 />
             ) : (
-                <NoticeBox info title={i18n.t('No gateways found')}>
+                <NoticeBox info title={i18n.t('No mappings found')}>
                     {i18n.t(
-                        "It looks like there aren't any configured gateways, or they couldn't be loaded."
+                        "It looks like there aren't any configured metadta, or they couldn't be loaded."
                     )}
                 </NoticeBox>
             )}
 
             {showDeleteDialog && (
-                <DeleteGatewaysConfirmationDialog
+                <DeleteConstantsConfirmationDialog
                     onCancelClick={() => setShowDeleteDialog(false)}
                     onDeleteClick={onDeleteClick}
                 />

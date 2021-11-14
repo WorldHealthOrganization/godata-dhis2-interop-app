@@ -1,3 +1,6 @@
-export const PROGRAM_OUTBREAK = 'DHIS2 Program to Go.Data Outbreak'
-export const ELEMENT_ELEMENT = 'Data Elements mapping GoData to DHIS2'
-export const ROOT_ORG_UNIT = 'Root ORganisation Unit'
+export const GODATA_OUTBREAK = 'Go.Data Outbreak'
+export const GODATA_CASE = 'Go.Data Case'
+export const GODATA_CONTACT = 'Go.Data Contact'
+export const GODATA_CONTACT_OF_CONTACT = 'Go.Data Contact of Contact'
+export const GODATA_ORG_UNIT = 'Go.Data Organisation Unit'
+

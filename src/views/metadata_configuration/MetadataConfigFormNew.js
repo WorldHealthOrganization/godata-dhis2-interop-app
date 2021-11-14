@@ -3,7 +3,8 @@ import { useHistory } from 'react-router-dom'
 import React, { useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
-import { GENERIC_FORM, BULK_SMS_FORM, CLICKATELL_FORM } from '../../gateways'
+import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
+    GODATA_ORG_UNIT } from '../../gateways'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
@@ -22,7 +23,7 @@ export const METADATA_CONFIG_FORM_NEW_PATH = '/metadata/new'
 
 export const MetadataConfigFormNew = () => {
     const history = useHistory()
-    const [visibleForm, setVisibleForm] = useState(GENERIC_FORM)
+    const [visibleForm, setVisibleForm] = useState(GODATA_OUTBREAK)
 
     const [
         saveGenericGateway,
@@ -59,15 +60,15 @@ export const MetadataConfigFormNew = () => {
 
     const onSubmit = async values => {
         try {
-            if (visibleForm === GENERIC_FORM) {
+            if (visibleForm === GODATA_OUTBREAK) {
                 await saveGenericGateway(values)
             }
 
-            if (visibleForm === BULK_SMS_FORM) {
+            if (visibleForm === GODATA_CASE) {
                 await saveBulkSMSGateway(values)
             }
 
-            if (visibleForm === CLICKATELL_FORM) {
+            if (visibleForm === GODATA_CONTACT) {
                 await saveClickatellGateway(values)
             }
 
@@ -96,31 +97,42 @@ export const MetadataConfigFormNew = () => {
                     )}
                 >
                     <SingleSelectOption
-                        value={GENERIC_FORM}
-                        label={i18n.t('Generic')}
+                        value={GODATA_OUTBREAK}
+                        label={i18n.t(GODATA_OUTBREAK)}
                     />
 
                     <SingleSelectOption
-                        value={BULK_SMS_FORM}
-                        label={i18n.t('BulkSMS')}
+                        value={GODATA_CASE}
+                        label={i18n.t(GODATA_CASE)}
                     />
 
                     <SingleSelectOption
-                        value={CLICKATELL_FORM}
-                        label={i18n.t('Clickatell')}
+                        value={GODATA_CONTACT}
+                        label={i18n.t(GODATA_CONTACT)}
                     />
+
+                    <SingleSelectOption
+                        value={GODATA_CONTACT_OF_CONTACT}
+                        label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
+                    />
+                    
+                    <SingleSelectOption
+                        value={GODATA_ORG_UNIT}
+                        label={i18n.t(GODATA_ORG_UNIT)}
+                    />
+
                 </SingleSelectField>
             </FormRow>
 
             <FormRow>
-                {visibleForm === GENERIC_FORM && (
+                {visibleForm === GODATA_OUTBREAK && (
                     <GatewayGenericForm
                         onSubmit={onSubmit}
                         onCancelClick={onCancelClick}
                     />
                 )}
 
-                {visibleForm === BULK_SMS_FORM && (
+                {visibleForm === GODATA_CASE && (
                     <GatewayBulkSMSForm
                         onSubmit={onSubmit}
                         passwordRequired={true}
@@ -128,7 +140,7 @@ export const MetadataConfigFormNew = () => {
                     />
                 )}
 
-                {visibleForm === CLICKATELL_FORM && (
+                {visibleForm === GODATA_CONTACT && (
                     <GatewayClickatellForm
                         onSubmit={onSubmit}
                         passwordRequired={true}

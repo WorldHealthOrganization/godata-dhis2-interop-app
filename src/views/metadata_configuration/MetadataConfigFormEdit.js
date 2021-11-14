@@ -4,9 +4,11 @@ import React, { useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
 import {
-    GENERIC_FORM,
-    BULK_SMS_FORM,
-    CLICKATELL_FORM,
+    GODATA_OUTBREAK,
+    GODATA_CASE,
+    GODATA_CONTACT,
+    GODATA_CONTACT_OF_CONTACT,
+    GODATA_ORG_UNIT,
     FIELD_GATEWAY_PASSWORD_CONFIRMATION_NAME,
     FIELD_GATEWAY_PASSWORD_NAME,
     GatewayBulkSMSForm,
@@ -27,15 +29,15 @@ export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
 export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
 
 const getFormComponent = gatewayType => {
-    if (gatewayType === GENERIC_FORM) {
+    if (gatewayType === GODATA_OUTBREAK) {
         return GatewayGenericForm
     }
 
-    if (gatewayType === BULK_SMS_FORM) {
+    if (gatewayType === GODATA_CASE) {
         return GatewayBulkSMSForm
     }
 
-    if (gatewayType === CLICKATELL_FORM) {
+    if (gatewayType === GODATA_CONTACT) {
         return GatewayClickatellForm
     }
 
@@ -43,7 +45,7 @@ const getFormComponent = gatewayType => {
 }
 
 const getInitialValues = gateway => {
-    if (gateway.type === BULK_SMS_FORM) {
+    if (gateway.type === GODATA_CASE) {
         return {
             ...gateway,
             [FIELD_GATEWAY_PASSWORD_CONFIRMATION_NAME]:
@@ -122,15 +124,15 @@ export const MetadataConfigFormEdit = () => {
         const values = { ...formValues, id: data.gateway.uid }
 
         try {
-            if (values.type === GENERIC_FORM) {
+            if (values.type === GODATA_OUTBREAK) {
                 await saveGenericGateway(values)
             }
 
-            if (values.type === BULK_SMS_FORM) {
+            if (values.type === GODATA_CASE) {
                 await saveBulkSMSGateway(values)
             }
 
-            if (values.type === CLICKATELL_FORM) {
+            if (values.type === GODATA_CONTACT) {
                 await saveClickatellGateway(values)
             }
 
