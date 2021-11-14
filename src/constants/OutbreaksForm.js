@@ -16,15 +16,9 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 
-
-
-
 const { Form } = ReactFinalForm
 
-
 var metaObjects;
-
-
 
 export const OutbreaksForm = ({
     onCancelClick,

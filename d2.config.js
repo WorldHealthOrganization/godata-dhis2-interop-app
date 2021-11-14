@@ -3,7 +3,7 @@ const config = {
     name: 'interop-configuration',
     title: 'GoData Configuration',
     description: 'Configure GoData server and manage DHIS2 interoperability',
-    coreApp: true,
+    coreApp: false,
 
     entryPoints: {
         app: './src/App',
