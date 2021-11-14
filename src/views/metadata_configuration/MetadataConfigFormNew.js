@@ -9,13 +9,17 @@ import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
-    GatewayBulkSMSForm,
-    GatewayClickatellForm,
-    GatewayGenericForm,
     useCreateBulkSMSGatewayMutation,
     useCreateClickatellGatewayMutation,
     useCreateGenericGatewayMutation,
 } from '../../gateways'
+import {
+    LocationsForm,
+    CasesForm,
+    ContactsForm,
+    ContactsOfContactForm,
+    OutbreaksForm,
+} from '../../constants'
 import i18n from '../../locales'
 import styles from './MetadataConfigFormNew.module.css'
 
@@ -126,14 +130,14 @@ export const MetadataConfigFormNew = () => {
 
             <FormRow>
                 {visibleForm === GODATA_OUTBREAK && (
-                    <GatewayGenericForm
+                    <OutbreaksForm
                         onSubmit={onSubmit}
                         onCancelClick={onCancelClick}
                     />
                 )}
 
                 {visibleForm === GODATA_CASE && (
-                    <GatewayBulkSMSForm
+                    <CasesForm
                         onSubmit={onSubmit}
                         passwordRequired={true}
                         onCancelClick={onCancelClick}
@@ -141,7 +145,23 @@ export const MetadataConfigFormNew = () => {
                 )}
 
                 {visibleForm === GODATA_CONTACT && (
-                    <GatewayClickatellForm
+                    <ContactsForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+                
+                {visibleForm === GODATA_CONTACT_OF_CONTACT && (
+                    <ContactsOfContactForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+                
+                {visibleForm === GODATA_ORG_UNIT && (
+                    <LocationsForm
                         onSubmit={onSubmit}
                         passwordRequired={true}
                         onCancelClick={onCancelClick}

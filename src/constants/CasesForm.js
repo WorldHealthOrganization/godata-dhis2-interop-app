@@ -1,7 +1,7 @@
 import { Button, ButtonStrip, ReactFinalForm, CircularLoader } from '@dhis2/ui'
 import React from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig} from '../constants'
+import {useReadMappingConfigConstantsQueryForConfig} from '.'
 
 import axios from 'axios'
 
@@ -9,8 +9,8 @@ import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 
 import {
-    FieldGatewayName,
-} from '../gateways'
+    FieldConstantName,
+} from '../constants'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
@@ -24,9 +24,9 @@ const { Form } = ReactFinalForm
 
 var metaObjects;
 
+var outbreakId
 
-
-export const GatewayGenericForm = ({
+export const CasesForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
@@ -64,16 +64,37 @@ export const GatewayGenericForm = ({
           //const data = response.data.results;
           //this.setState({ data });
           axios
-          .get(data.urlTemplate+"/api/locations", {
+          .get(data.urlTemplate+"/api/outbreaks", {
             headers : {
                 Authorization: response.data.id,
               }
           }, 
           
           ).then(response => {
+            outbreakId = response.data[0].id
+            axios
+            .post(data.urlTemplate+"/api/users/login", {
+              email: 'mlatifov@gmail.com',
+              password: 'Rabota@2021murod',
+            }
+            )
+            .then(response => {
+            axios
+            .get(data.urlTemplate+"/api/outbreaks/"+outbreakId+"/cases", {
+              headers : {
+                  Authorization: response.data.id,
+                }
+            }, 
+            
+            ).then(response => {
+             // Editor.set(response.data)  
+              //  console.log(response.data)
+                metaObjects=response.data
+            })
+        })
            // Editor.set(response.data)  
             //  console.log(response.data)
-              metaObjects=response.data
+             // metaObjects=response.data
           })
         })
         .catch(error => {
@@ -100,7 +121,7 @@ export const GatewayGenericForm = ({
                     <PageSubHeadline>{i18n.t('Mappings setup')}</PageSubHeadline>
 
                     <FormRow>
-                        <FieldGatewayName />
+                        <FieldConstantName />
                     </FormRow>
 
 
@@ -132,13 +153,13 @@ export const GatewayGenericForm = ({
     )
 }
 
-GatewayGenericForm.defaultProps = {
+CasesForm.defaultProps = {
     initialValues: {
         parameters: [],
     },
 }
 
-GatewayGenericForm.propTypes = {
+CasesForm.propTypes = {
     onCancelClick: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,

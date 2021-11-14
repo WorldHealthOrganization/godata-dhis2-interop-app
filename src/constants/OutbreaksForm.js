@@ -1,7 +1,7 @@
 import { Button, ButtonStrip, ReactFinalForm, CircularLoader } from '@dhis2/ui'
 import React from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig} from '../constants'
+import {useReadMappingConfigConstantsQueryForConfig} from '.'
 
 import axios from 'axios'
 
@@ -9,8 +9,8 @@ import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 
 import {
-    FieldGatewayName,
-} from '../gateways'
+    FieldConstantName,
+} from '.'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
@@ -26,7 +26,7 @@ var metaObjects;
 
 
 
-export const GatewayGenericForm = ({
+export const OutbreaksForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
@@ -64,7 +64,7 @@ export const GatewayGenericForm = ({
           //const data = response.data.results;
           //this.setState({ data });
           axios
-          .get(data.urlTemplate+"/api/locations", {
+          .get(data.urlTemplate+"/api/outbreaks", {
             headers : {
                 Authorization: response.data.id,
               }
@@ -73,7 +73,7 @@ export const GatewayGenericForm = ({
           ).then(response => {
            // Editor.set(response.data)  
             //  console.log(response.data)
-              metaObjects=response.data
+              metaObjects=response.data[0]
           })
         })
         .catch(error => {
@@ -100,7 +100,7 @@ export const GatewayGenericForm = ({
                     <PageSubHeadline>{i18n.t('Mappings setup')}</PageSubHeadline>
 
                     <FormRow>
-                        <FieldGatewayName />
+                        <FieldConstantName />
                     </FormRow>
 
 
@@ -132,13 +132,13 @@ export const GatewayGenericForm = ({
     )
 }
 
-GatewayGenericForm.defaultProps = {
+OutbreaksForm.defaultProps = {
     initialValues: {
         parameters: [],
     },
 }
 
-GatewayGenericForm.propTypes = {
+OutbreaksForm.propTypes = {
     onCancelClick: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
