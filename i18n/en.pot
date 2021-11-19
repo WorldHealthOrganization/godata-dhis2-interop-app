@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-14T15:23:14.459Z\n"
-"PO-Revision-Date: 2021-11-14T15:23:14.459Z\n"
+"POT-Creation-Date: 2021-11-15T09:19:31.545Z\n"
+"PO-Revision-Date: 2021-11-15T09:19:31.545Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -72,6 +72,12 @@ msgid "Save"
 msgstr ""
 
 msgid "Add"
+msgstr ""
+
+msgid "Add New"
+msgstr ""
+
+msgid "Something went wrong whilst loading gateways"
 msgstr ""
 
 msgid "Data set"
@@ -343,9 +349,6 @@ msgid "Add and manage GoData and DHIS2 Metadata for data exchange."
 msgstr ""
 
 msgid "Map Metadata"
-msgstr ""
-
-msgid "Something went wrong whilst loading gateways"
 msgstr ""
 
 msgid "Edit gateway"

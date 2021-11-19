@@ -10,11 +10,12 @@ import {
     METADATA_CONFIG_FORM_NEW_PATH,
     METADATA_CONFIG_FORM_EDIT_PATH,
     //GODATA_CALL_FORM_PATH,
+    SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     MetadataConfigFormNew,
     MetadataConfigFormEdit,
     MetadataConfigList,
-    GoDataCallForm,
+    ScheduleTaskForm,
     GoDataConfigForm,
     HOME_PATH,
     Home,
@@ -59,6 +60,12 @@ const App = () => (
                             exact
                             path={METADATA_CONFIG_FORM_NEW_PATH}
                             component={MetadataConfigFormNew}
+                        />
+
+                        <Route
+                            exact
+                            path={SCHEDULED_TASK_FORM_PATH}
+                            component={ScheduleTaskForm}
                         />
 
                         <Redirect from="*" to={HOME_PATH} />

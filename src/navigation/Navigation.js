@@ -2,6 +2,8 @@ import { Menu } from '@dhis2/ui'
 import React from 'react'
 
 import {
+    SCHEDULED_TASK_FORM_PATH,
+    SCHEDULED_TASK_FORM_LABEL,
     METADATA_CONFIG_LIST_PATH,
     METADATA_CONFIG_LIST_LABEL,
     META_DATA_MAPPING_LIST_PATH,
@@ -30,6 +32,11 @@ export const Navigation = () => (
         <NavigationItem
             path={METADATA_CONFIG_LIST_PATH}
             label={METADATA_CONFIG_LIST_LABEL}
+        />
+
+        <NavigationItem
+            path={SCHEDULED_TASK_FORM_PATH}
+            label={SCHEDULED_TASK_FORM_LABEL}
         />
 
     </Menu>
