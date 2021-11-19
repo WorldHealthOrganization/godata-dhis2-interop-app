@@ -83,10 +83,7 @@ export const OutbreaksForm = ({
 
     const submitText = initialValues
         ? i18n.t('Save mappings')
-        : i18n.t('Add mappings')
-
-       // const [instanceObject, setInstanceData] = useState({});
-     
+        : i18n.t('Add mappings')     
 
 
           const getData = async () => {
@@ -201,7 +198,7 @@ export const OutbreaksForm = ({
 
 iterate2(DHIS_PROGRAM_MODEL)
 
-    
+
 
 
 //to be used for storing mapping in a database
@@ -260,35 +257,34 @@ Object.setByPath = function(path, obj, value) {
   }, obj);
 }
           */
+
         const editNode = ({bool})=>{
             console.log('editjsoneditor')
             return true
         }
 
-        const copyFromPop  = (instance)=>{
+        const copyFromPopup  = (instance)=>{
             console.log(instance.src)
-            //setDhisValue(instance.src),
-            //read fromuseStore instance initial values and replace with seleccted value
-            instance.namespace.forEach(function(item, index, array) {
-               // console.log(index, item)
-              })
-             // console.log('ns1 ' + JSON.stringify(mappings[dhisValue[1]]))
-              var val = dot.pick('dhis2', mappings[dhisValue[1]]);
-            console.log('dot val ' + val);
-            dot.str('dhis2', instance.src, mappings[dhisValue[1]]);
-            console.log('dot val ' + JSON.stringify(mappings[dhisValue[1]]));
+//read and replace dhuis2 placeholder and update ui
+              var ths = dot.str('dhis2', instance.src, godataValue[dhisValue[1]])
+              console.log('str ths: ' + JSON.stringify(ths))
+              setGodataValue(godataValue => {
+                  const Outbreak = [...godataValue];
+                  Outbreak[dhisValue[1]] = ths;
+                  return Outbreak
+                })
             setOpen(false)
-            //console.log('clicked name ' + instance.name + ' Node ' + JSON.stringify(instance))
             return true
         }
+
         const selectedNode = (instance)=>{
-            //store initial values into useStore
+            //store initial values into useStore, we need this to replace placeholder next
             setDhisValue(instance.namespace),
             instance.name == 'dhis2'
             ? setOpen(true)
             : console.log('wrong element selected'), 
 
-            console.log('select Node with popup name ' + JSON.stringify(instance.namespace[1] ))
+            console.log('select Node with popup:  ' + JSON.stringify(instance.namespace ))
             return true
         }
 
@@ -296,7 +292,7 @@ Object.setByPath = function(path, obj, value) {
         const addNode = () => {console.log('editjsoneditor')}
 
         const deleteNode = () => {console.log('deletejsoneditor')}
-        const selectedNode2 = (instance) => {console.log('selectedjsoneditor name ' + instance.name + ' namespace ' + JSON.stringify(instance))}
+
         const onSourceClick = () => {
             setGodataValue(mappings)
             setDhisValue([])
@@ -307,13 +303,14 @@ Object.setByPath = function(path, obj, value) {
             var ths = dot.str('dhis2', 'instance.src', godataValue[1])
             console.log(JSON.stringify(ths))
             setGodataValue(godataValue => {
-                const newItems = [...godataValue];
-                newItems[1] = ths;
-                return {items: newItems};
+                const Outbreak = [...godataValue];
+                Outbreak[1] = ths;
+                return Outbreak;
             })
             
             console.log('onSourceChangeClick')
         }
+
     return (
         <Form
             keepDirtyOnReinitialize
@@ -336,12 +333,9 @@ Object.setByPath = function(path, obj, value) {
             onAdd={addNode}
             onEdit={editNode}
             onDelete={deleteNode}
-            //onPopup={selectedNode}
             enableClipboard={selectedNode}
             theme="apathy:inverted"
             name={'Outbreak'}
-            //groupArraysAfterLength={10}
-            //collapseStringsAfterLength={5}
             displayArrayKey={true}
             />
             </div>
@@ -362,16 +356,11 @@ Object.setByPath = function(path, obj, value) {
                         </Button>
     <Modal open={open} onClose={onCloseModal} center>
         <h2>Select DHIS2 metadata</h2>
-        <div><ReactJson 
+        <div><ReactJson
             src={dhismappings}
-            //onAdd={addNode}
-            //onEdit={editNode}
-            //onDelete={deleteNode}
-            //onSelect={selectedNode2}
-            enableClipboard={copyFromPop}
+            enableClipboard={copyFromPopup}
             theme="apathy:inverted"
             name={'Program'}
-            //collapseStringsAfterLength={5}
             displayArrayKey={true}
             />
             </div>
@@ -403,3 +392,4 @@ OutbreaksForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
 }
+
