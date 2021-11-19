@@ -44,10 +44,7 @@ export const CasesForm = ({
        jsonData && jsonData.constants.constants.length >0
        ? JSON.parse(jsonData.constants.constants[0].description)
                : {}
-          //     console.log(data.constants.constants[0].description+ "Data")
-      // console.log("Data "+JSON.parse(jsonData?.constants?.constants[0]?.description))
 
-      // const URL_ADDRESS = jsonData?.constants?.constants[0]?.description
         console.log(data.urlTemplate)
     const submitText = initialValues
         ? i18n.t('Save mappings')
@@ -55,8 +52,8 @@ export const CasesForm = ({
 
         axios
         .post(data.urlTemplate+"/api/users/login", {
-          email: 'mlatifov@gmail.com',
-          password: 'Rabota@2021murod',
+            email: data.username,
+            password: data.password,
         }
         )
         .then(response => {
@@ -74,8 +71,8 @@ export const CasesForm = ({
             outbreakId = response.data[0].id
             axios
             .post(data.urlTemplate+"/api/users/login", {
-              email: 'mlatifov@gmail.com',
-              password: 'Rabota@2021murod',
+                email: data.username,
+                password: data.password,
             }
             )
             .then(response => {

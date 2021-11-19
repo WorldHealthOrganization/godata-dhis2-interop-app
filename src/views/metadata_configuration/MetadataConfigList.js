@@ -1,6 +1,15 @@
 import { useHistory } from 'react-router-dom'
 import React, { useState } from 'react'
-import { NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
+import { NoticeBox, CenteredContent, CircularLoader,    Button,
+    ButtonStrip,
+    Checkbox,
+    Table,
+    TableHead,
+    TableBody,
+    TableRowHead,
+    TableCellHead,
+    TableRow,
+    TableCell, } from '@dhis2/ui'
 
 import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
 
@@ -33,6 +42,8 @@ export const MetadataConfigList = () => {
         data,
         refetch: refetchReadConstants,
     } = useReadMappingConfigConstantsQueryForMappings()
+
+    const constants = data?.constants?.constants
 
     const [
         deleteCheckedConstants,
@@ -85,7 +96,37 @@ export const MetadataConfigList = () => {
         )
     }
 
+    const allConstantsChecked = checkedConstants.length === constants.length
+
+    const toggleConstant = id => {
+        if (checkedConstants.includes(id)) {
+            const index = checkedConstants.findIndex(curId => curId === id)
+
+            const newCheckedConstants =
+                index === 0
+                    ? checkedConstants.slice(1)
+                    : [
+                          ...checkedConstants.slice(0, index),
+                          ...checkedConstants.slice(index + 1),
+                      ]
+
+            setCheckedConstants(newCheckedConstants)
+        } else {
+            setCheckedConstants([...checkedConstants, id])
+        }
+    }
+
+    const toggleAll = () => {
+        if (!allConstantsChecked) {
+            const allConstantIds = constants.map(({ id }) => id)
+            setCheckedConstants(allConstantIds)
+        } else {
+            setCheckedConstants([])
+        }
+    }
+    
     const hasMappings = !!data?.constants?.constants?.length
+    
 
     return (
         <div
@@ -111,13 +152,95 @@ export const MetadataConfigList = () => {
             />
 
             {hasMappings ? (
-                <ConstantList
-                    processing={loading}
-                    checkedConstants={checkedConstants}
-                    setCheckedConstants={setCheckedConstants}
-                    constants={data.constants.constants}
-                    onMakeDefaultClick={onMakeDefaultClick}
-                />
+        <div
+        className={styles.container}
+        data-test={dataTest('constants-gatewaylist')}
+    >
+        {loading && (
+            <div className={styles.processingMessage}>
+                <div className={styles.loadingContainer}>
+                    <CircularLoader />
+                </div>
+            </div>
+        )}
+
+<Table dataTest={dataTest('constants-constantstable')}>
+            <TableHead>
+                <TableRowHead>
+                    <TableCellHead
+                        dataTest={dataTest('constants-constantstable-checkall')}
+                    >
+                        <Checkbox
+                            onChange={toggleAll}
+                            checked={allConstantsChecked}
+                        />
+                    </TableCellHead>
+                    <TableCellHead>{i18n.t('Name')}</TableCellHead>
+                    <TableCellHead>{i18n.t('Type')}</TableCellHead>
+                    <TableCellHead />
+                    <TableCellHead />
+                </TableRowHead>
+            </TableHead>
+
+            <TableBody>
+                {constants.map(constant => (
+                    <TableRow
+                        key={constant.id}
+                        dataTest={dataTest('constants-constantstable-row')}
+                    >
+                        <TableCell
+                            className={styles.checkboxCell}
+                            dataTest={dataTest(
+                                'constants-constantstable-checkbox'
+                            )}
+                        >
+                            <Checkbox
+                                value={constant.id}
+                                onChange={() => toggleConstant(constant.id)}
+                                checked={checkedConstants.includes(constant.id)}
+                                dataTest={dataTest('constants-constantstable-id')}
+                            />
+                        </TableCell>
+
+                        <TableCell
+                            dataTest={dataTest('constants-constantstable-name')}
+                        >
+                            {constant.displayName}
+                        </TableCell>
+
+                        <TableCell
+                            className={styles.typeCell}
+                            dataTest={dataTest('constants-constantstable-type')}
+                        >
+                            {constant.id}
+                        </TableCell>
+
+                        <TableCell
+                            dataTest={dataTest(
+                                'constants-constantstable-actions'
+                            )}
+                            className={styles.editCell}
+                        >
+                            <ButtonStrip className={styles.rowActions}>
+                                <Button
+                                    dataTest={dataTest(
+                                        'constants-constantstable-edit'
+                                    )}
+                                    onClick={() => {
+                                        history.push(
+                                            `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/${constant.id}`
+                                        )
+                                    }}
+                                >
+                                    {i18n.t('Edit')}
+                                </Button>
+                            </ButtonStrip>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    </div>
             ) : (
                 <NoticeBox info title={i18n.t('No mappings found')}>
                     {i18n.t(

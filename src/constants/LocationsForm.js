@@ -1,4 +1,4 @@
-import { Button, ButtonStrip, ReactFinalForm, CircularLoader } from '@dhis2/ui'
+import { Button, ButtonStrip, ReactFinalForm, CircularLoader, CenteredContent } from '@dhis2/ui'
 import React from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import {useReadMappingConfigConstantsQueryForConfig} from '.'
@@ -44,11 +44,8 @@ export const LocationsForm = ({
        jsonData && jsonData.constants.constants.length >0
        ? JSON.parse(jsonData.constants.constants[0].description)
                : {}
-          //     console.log(data.constants.constants[0].description+ "Data")
-      // console.log("Data "+JSON.parse(jsonData?.constants?.constants[0]?.description))
-
-      // const URL_ADDRESS = jsonData?.constants?.constants[0]?.description
         console.log(data.urlTemplate)
+
     const submitText = initialValues
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
@@ -56,14 +53,15 @@ export const LocationsForm = ({
         const { loginLoading, loginError: loginLoadError, data: loginResponse } = 
         axios
         .post(data.urlTemplate+"/api/users/login", {
-          email: 'mlatifov@gmail.com',
-          password: 'Rabota@2021murod',
+          email: data.username,
+          password: data.password,
         }
         )
         .then(response => {
             //https://godata-r5.who.int
           //const data = response.data.results;
           //this.setState({ data });
+          //"urlTemplate": "https://godata-r12.who.int", "username": "mlatifov@gmail.com", "password": "adminadmin@711"
           axios
           .get(data.urlTemplate+"/api/locations", {
             headers : {
@@ -82,10 +80,9 @@ export const LocationsForm = ({
         });
  
 
-        if (loginLoading) {
+        if (loading) {
             return (
                 <>
-                    <PageHeadline>{i18n.t('Add New')}</PageHeadline>
                     <CenteredContent>
                         <CircularLoader />
                     </CenteredContent>
@@ -93,12 +90,11 @@ export const LocationsForm = ({
             )
         }
     
-        if (loginLoadError) {
+        if (loadError) {
             const msg = i18n.t('Something went wrong whilst loading gateways')
     
             return (
                 <>
-                    <PageHeadline>{i18n.t('Edit')}</PageHeadline>
                     <NoticeBox error title={msg}>
                         {loadError.message}
                     </NoticeBox>

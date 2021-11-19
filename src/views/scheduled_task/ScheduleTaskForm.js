@@ -67,13 +67,6 @@ export const ScheduleTaskForm = () => {
 
                 //Scheduler START
                 const [open, setOpen] = React.useState(false)
-
-                const styles = {
-                    text: {
-                      margin: '70px',
-                      color: 'skyblue'
-                    }
-                  }
                   
                   const HelloMsg = () => {
                     return <h1 style={styles.text}>Hello! {Date.now()} </h1>
@@ -90,14 +83,15 @@ export const ScheduleTaskForm = () => {
     {
       fn: sayHello,
       id: '1',
-      schedule: '* * * * *'
+      schedule: '* * * * *',
+      name: 'Print Hello'
       // this runs every minutes
     },
     {
       fn: queryGoData,
       id: '1',
       schedule: '* * * * *',
-      // Execute In November, December At 3PM and 7PM every minute
+      // this runs every minutes
       name: 'Call Go.Data'
     }
   ]

@@ -150,7 +150,7 @@ export const MetadataConfigFormEdit = () => {
             data-test={dataTest('views-gatewayconfigformedit')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Edit gateway')}</PageHeadline>
+            <PageHeadline>{i18n.t('Edit mapping')}</PageHeadline>
 
             {gatewayType ? (
                 <div

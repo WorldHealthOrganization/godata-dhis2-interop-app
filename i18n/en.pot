@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-15T09:19:31.545Z\n"
-"PO-Revision-Date: 2021-11-15T09:19:31.545Z\n"
+"POT-Creation-Date: 2021-11-19T09:45:02.020Z\n"
+"PO-Revision-Date: 2021-11-19T09:45:02.020Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -74,10 +74,13 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-msgid "Add New"
+msgid "Something went wrong whilst loading gateways"
 msgstr ""
 
-msgid "Something went wrong whilst loading gateways"
+msgid "Change Source"
+msgstr ""
+
+msgid "Change Source Instance"
 msgstr ""
 
 msgid "Data set"
@@ -351,7 +354,7 @@ msgstr ""
 msgid "Map Metadata"
 msgstr ""
 
-msgid "Edit gateway"
+msgid "Edit mapping"
 msgstr ""
 
 msgid "Something went wrong whilst saving gateways"

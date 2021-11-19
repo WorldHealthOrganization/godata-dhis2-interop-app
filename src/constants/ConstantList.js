@@ -74,7 +74,7 @@ ConstantList.propTypes = {
             displayName: PropTypes.string.isRequired,
            // type: PropTypes.string.isRequired,
             id: PropTypes.string.isRequired,
-            isDefault: PropTypes.bool,
+            //isDefault: PropTypes.bool,
         })
     ).isRequired,
     setCheckedConstants: PropTypes.func.isRequired,
