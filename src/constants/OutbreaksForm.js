@@ -49,7 +49,6 @@ export const OutbreaksForm = ({
        ? JSON.parse(data.constants.constants[0].description)
                : {}
 
-
             const { lloading, lerror, progData } = useReadProgramsQueryForMappings()
            console.log('progData ' + progData)
 
@@ -106,7 +105,7 @@ export const OutbreaksForm = ({
 
           };
          // getData();
-      
+
           //console.log('Object.keys: ' + Object.keys(GODATA_OUTBREAK_MODEL))
 
           function iterate(obj) {
@@ -299,7 +298,6 @@ Object.setByPath = function(path, obj, value) {
             console.log('onSourceClick')
         }
         const onSourceChangeClick = () => {
-
             var ths = dot.str('dhis2', 'instance.src', godataValue[1])
             console.log(JSON.stringify(ths))
             setGodataValue(godataValue => {
@@ -307,14 +305,19 @@ Object.setByPath = function(path, obj, value) {
                 Outbreak[1] = ths;
                 return Outbreak;
             })
-            
             console.log('onSourceChangeClick')
         }
+
+
+        useEffect(() => {
+            // Update the document title using the browser API
+            console.log( `You clicked 14 times`);
+          })
 
     return (
         <Form
             keepDirtyOnReinitialize
-            onSubmit={onSubmit}
+            onSubmit={() =>onSubmit}
             initialValues={initialValues}
         >
             {({ handleSubmit, values, submitting, pristine }) => (

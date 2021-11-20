@@ -98,10 +98,6 @@ export const CasesForm = ({
           console.log(error);
         });
  
-
-
-
-
         const handleChange = () => console.log('jsontreechanges')        
 
     return (
