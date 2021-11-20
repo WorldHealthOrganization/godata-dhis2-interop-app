@@ -26,8 +26,9 @@ export const CasesForm = ({
     onSubmit,
     initialValues,
 }) => {
-    
+
     const [open, setOpen] = useState(false);
+    const [valueHolder, setValueHolder] = useState({});
     const [dhisValue, setDhisValue] = useState({});
     const [godataValue, setGodataValue] = useState([]);
     const [loginData, setLoginDetails] = useState([])
@@ -35,13 +36,13 @@ export const CasesForm = ({
     var mappings, dhismappings
     var instanceObject
 
+    const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
+    //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
+
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
-    const { lloading, progData, lerror } = useReadProgramsQueryForMappings()
-    console.log(JSON.stringify(progData))
-    const programInstance = 
-    progData && progData.programs.programs.length >0
-    ? JSON.parse(progData.programs.programs[0])
-            : {}
+
+
+
 
     useEffect(() => {
  
@@ -49,6 +50,12 @@ export const CasesForm = ({
         data && data.constants.constants.length >0
         ? JSON.parse(data.constants.constants[0].description)
                 : {}
+
+                const programInstance = 
+                progData && progData.programs.programs.length >0
+                ? progData.programs.programs[0]
+                        : {}
+                        console.log('programInstance ' + programInstance)                
 
         if(data) {
             async function login() {
@@ -119,6 +126,49 @@ export const CasesForm = ({
                             iterate(instanceObject.data[0])
                             setGodataValue(mappings)
 
+                            function iterate2(obj) {
+                                var walked = [];
+                                var stack = [{obj: obj, stack: ''}];
+                                dhismappings = [];
+                                while(stack.length > 0)
+                                {
+                                    var item = stack.pop();
+                                    var obj = item.obj;
+                                    for (var property in obj) {
+                                        if (obj.hasOwnProperty(property)) {
+                                            if (typeof obj[property] == "object") {
+                                              var alreadyFound = false;
+                                              for(var i = 0; i < walked.length; i++)
+                                              {
+                                                if (walked[i] === obj[property])
+                                                {
+                                                  alreadyFound = true;
+                                                  break;
+                                                }
+                                              }
+                                              if (!alreadyFound)
+                                              {
+                                                walked.push(obj[property]);
+                                                stack.push({obj: obj[property], stack: item.stack + '.' + property});
+                                              }
+                                            }
+                                            else
+                                            {
+                                                dhismappings.push(
+                                                    {
+                                                        "dhis2": (item.stack + '.' + property).substr(1) 
+                                                    })
+                                                //mappings.set(item.stack + '.' + property , 'to be other stuff');
+                                                //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
+                                            }
+                                        }
+                                    }
+                                }
+                                console.log('dhis2 mappings length ' + dhismappings.length)
+                            }
+                        
+                        iterate2(programInstance)
+                setDhisValue(dhismappings)
 
 
                       };
@@ -134,49 +184,7 @@ export const CasesForm = ({
             }
 
             
-            function iterate2(obj) {
-                var walked = [];
-                var stack = [{obj: obj, stack: ''}];
-                dhismappings = [];
-                while(stack.length > 0)
-                {
-                    var item = stack.pop();
-                    var obj = item.obj;
-                    for (var property in obj) {
-                        if (obj.hasOwnProperty(property)) {
-                            if (typeof obj[property] == "object") {
-                              var alreadyFound = false;
-                              for(var i = 0; i < walked.length; i++)
-                              {
-                                if (walked[i] === obj[property])
-                                {
-                                  alreadyFound = true;
-                                  break;
-                                }
-                              }
-                              if (!alreadyFound)
-                              {
-                                walked.push(obj[property]);
-                                stack.push({obj: obj[property], stack: item.stack + '.' + property});
-                              }
-                            }
-                            else
-                            {
-                                dhismappings.push(
-                                    {
-                                        "dhis2": (item.stack + '.' + property).substr(1) 
-                                    })
-                                //mappings.set(item.stack + '.' + property , 'to be other stuff');
-                                //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
-                            }
-                        }
-                    }
-                }
-                console.log('dhis2 mappings length ' + dhismappings.length)
-            }
-        
-        iterate2(programInstance)
-setDhisValue(dhismappings)
+ 
         return () => {
             
             console.log("This will be logged on unmount");
@@ -233,11 +241,11 @@ setDhisValue(dhismappings)
     const copyFromPopup  = (instance)=>{
         console.log(instance.src)
 //read and replace dhuis2 placeholder and update ui
-          var ths = dot.str('dhis2', instance.src, godataValue[dhisValue[1]])
+          var ths = dot.str('dhis2', instance.src, godataValue[valueHolder[1]])
           console.log('str ths: ' + JSON.stringify(ths))
           setGodataValue(godataValue => {
               const Outbreak = [...godataValue];
-              Outbreak[dhisValue[1]] = ths;
+              Outbreak[valueHolder[1]] = ths;
               return Outbreak
             })
         setOpen(false)
@@ -246,7 +254,7 @@ setDhisValue(dhismappings)
 
     const selectedNode = (instance)=>{
         //store initial values into useStore, we need this to replace placeholder next
-        setDhisValue(instance.namespace),
+        setValueHolder(instance.namespace),
         instance.name == 'dhis2'
         ? setOpen(true)
         : console.log('wrong element selected'), 
@@ -293,7 +301,7 @@ setDhisValue(dhismappings)
             <Modal open={open} onClose={onCloseModal} center>
         <h2>Select DHIS2 metadata</h2>
         <div><ReactJson
-            src={dhismappings}
+            src={dhisValue}
             enableClipboard={copyFromPopup}
             theme="apathy:inverted"
             name={'Program'}
