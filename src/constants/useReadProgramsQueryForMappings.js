@@ -11,4 +11,4 @@ export const PROGRAM_QUERY_MAPPINGS_CODE = {
 }
 
 export const useReadProgramsQueryForMappings = value =>
-    useDataQuery(PROGRAM_QUERY_MAPPINGS_CODE, { variables: { value } })
+    useDataQuery(PROGRAM_QUERY_MAPPINGS_CODE, {})

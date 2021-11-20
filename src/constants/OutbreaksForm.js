@@ -38,6 +38,9 @@ export const OutbreaksForm = ({
     var instanceObject
     var mappings, dhismappings
 
+
+
+
        const { code } = 'godataserverconf'
 
        const { loading, data, error } = useReadMappingConfigConstantsQueryForConfig(
@@ -308,11 +311,10 @@ Object.setByPath = function(path, obj, value) {
             console.log('onSourceChangeClick')
         }
 
-
-        useEffect(() => {
+ /*       useEffect(() => {
             // Update the document title using the browser API
             console.log( `You clicked 14 times`);
-          })
+          })*/
 
     return (
         <Form
