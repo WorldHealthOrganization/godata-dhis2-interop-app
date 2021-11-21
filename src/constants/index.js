@@ -22,4 +22,5 @@ export * from './OutbreaksForm'
 export * from './FieldConstantName'
 export * from './GodataMetaModels'
 export * from './useCreateCasesConstantMutation'
+export * from './useReadMappingConfigConstantsQueryById'
 

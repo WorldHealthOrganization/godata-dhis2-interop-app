@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-20T18:01:25.218Z\n"
-"PO-Revision-Date: 2021-11-20T18:01:25.218Z\n"
+"POT-Creation-Date: 2021-11-21T07:59:31.766Z\n"
+"PO-Revision-Date: 2021-11-21T07:59:31.766Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -23,12 +23,6 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-msgid "Save mappings"
-msgstr ""
-
-msgid "Add mappings"
-msgstr ""
-
 msgid "Mappings setup"
 msgstr ""
 
@@ -42,6 +36,12 @@ msgid "Name"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Save mappings"
+msgstr ""
+
+msgid "Add mappings"
 msgstr ""
 
 msgid "Confirm deletion"
@@ -357,16 +357,7 @@ msgstr ""
 msgid "Map Metadata"
 msgstr ""
 
-msgid "Edit mapping"
-msgstr ""
-
-msgid "Something went wrong whilst saving gateways"
-msgstr ""
-
-msgid "Gateway not found"
-msgstr ""
-
-msgid "The requested gateway could not be loaded"
+msgid "Something went wrong whilst loading constants"
 msgstr ""
 
 msgid "Something went wrong whilst saving the gateway"

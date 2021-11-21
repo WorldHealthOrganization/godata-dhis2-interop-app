@@ -5,7 +5,7 @@ export const CONSTANT_QUERY_MAPPINGS_CODE = {
         resource: 'constants',
         params: {
             paging: false,
-            fields: ['id', 'displayName', 'code', 'description'],
+            fields: ['id', 'displayName', 'code', 'description', 'shortName'],
             filter: ['value:eq:-1000000'],
         },
     },

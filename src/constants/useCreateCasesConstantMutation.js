@@ -8,7 +8,7 @@ export const CREATE_CASES_CONSTANT_MUTATION = {
         shortName: 'Go.Data 1',
         code: 'cases1',
         name: 'Cases mapping',
-        description: '{"godataValue": ' + JSON.stringify(godataValue) ,
+        description: JSON.stringify(godataValue) ,
         createdBy: {
             code: 'admin', 
             displayName: 'admin admin',

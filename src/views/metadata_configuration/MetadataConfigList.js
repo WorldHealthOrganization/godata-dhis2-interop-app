@@ -12,6 +12,7 @@ import { NoticeBox, CenteredContent, CircularLoader,    Button,
     TableCell, } from '@dhis2/ui'
 
 import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
+import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from './MetadataConfigFormEdit'
 
 import {
     useSetDefaultConstantMutation,
@@ -44,6 +45,23 @@ export const MetadataConfigList = () => {
     } = useReadMappingConfigConstantsQueryForMappings()
 
     const constants = data?.constants?.constants
+
+/*    const constss = consts && consts.length>0
+    ? consts.forEach((item,index)=>{
+        console.log(item)
+        var inst = JSON.parse(item.description)
+        consts[index].shortName =  inst[0]
+    })
+    : consts
+*/
+    /*.forEach((item,index)=>{
+        console.log(item)
+        //var inst = JSON.stringify(item.description)
+       // data.constants.constants[index].shortName =  inst[0]
+       {}
+     })
+     */
+    
 
     const [
         deleteCheckedConstants,
@@ -212,7 +230,7 @@ export const MetadataConfigList = () => {
                             className={styles.typeCell}
                             dataTest={dataTest('constants-constantstable-type')}
                         >
-                            {constant.id}
+                            {constant.shortName}
                         </TableCell>
 
                         <TableCell

@@ -1,90 +1,63 @@
+import { SingleSelectField, SingleSelectOption, NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
-import { NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
-import {
-    GODATA_OUTBREAK,
-    GODATA_CASE,
-    GODATA_CONTACT,
-    GODATA_CONTACT_OF_CONTACT,
-    GODATA_ORG_UNIT,
-    FIELD_GATEWAY_PASSWORD_CONFIRMATION_NAME,
-    FIELD_GATEWAY_PASSWORD_NAME,
-    GatewayBulkSMSForm,
-    GatewayClickatellForm,
-    GatewayGenericForm,
-    useReadGatewayQuery,
-    useUpdateGenericGatewayMutation,
-    useUpdateBulkSMSGatewayMutation,
-    useUpdateClickatellGatewayMutation,
-} from '../../gateways'
-import { CancelDialog } from '../../cancelDialog'
+import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
+    GODATA_ORG_UNIT } from '../../constants'
+import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
+import {
+    LocationsForm,
+    CasesForm,
+    ContactsForm,
+    ContactsOfContactForm,
+    OutbreaksForm,
+    useReadMappingConfigConstantsQueryById,
+} from '../../constants'
 import i18n from '../../locales'
-import styles from './MetadataConfigFormEdit.module.css'
+import styles from './MetadataConfigFormNew.module.css'
 
 export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
 export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
 
-const getFormComponent = gatewayType => {
-    if (gatewayType === GODATA_OUTBREAK) {
-        return GatewayGenericForm
-    }
 
-    if (gatewayType === GODATA_CASE) {
-        return GatewayBulkSMSForm
-    }
-
-    if (gatewayType === GODATA_CONTACT) {
-        return GatewayClickatellForm
-    }
-
-    throw new Error(`The gateway type does not exist, got "${gatewayType}"`)
+const getInitialValues = jsonData => {
+    return jsonData
 }
 
-const getInitialValues = gateway => {
-    if (gateway.type === GODATA_CASE) {
-        return {
-            ...gateway,
-            [FIELD_GATEWAY_PASSWORD_CONFIRMATION_NAME]:
-                gateway[FIELD_GATEWAY_PASSWORD_NAME],
+    const getFormComponent = selectedForm => {
+        if (GODATA_OUTBREAK === selectedForm) {
+            return OutbreakForm
         }
+    
+        if (GODATA_CASE === selectedForm) {
+            return CasesForm
+        }
+    
+        if (GODATA_CONTACT === selectedForm) {
+            return ContactsForm
+        }
+    
+        throw new Error(`The conversion type does not exist, got "${selectedForm}"`)
     }
 
-    return gateway
-}
 
 export const MetadataConfigFormEdit = () => {
     const history = useHistory()
     const { id } = useParams()
-    const [showCancelDialog, setShowCancelDialog] = useState(false)
+    const [visibleForm, setVisibleForm] = useState()
 
-    const { loading, error: loadError, data: jsonData } = useReadGatewayQuery(
+    const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryById(
         id
     )
-
-    const [
-        saveGenericGateway,
-        { error: saveGenericGatewayError },
-    ] = useUpdateGenericGatewayMutation()
-
-    const [
-        saveBulkSMSGateway,
-        { error: saveBulkSMSGatewayError },
-    ] = useUpdateBulkSMSGatewayMutation()
-
-    const [
-        saveClickatellGateway,
-        { error: saveClickatellGatewayError },
-    ] = useUpdateClickatellGatewayMutation()
-
-    const saveError =
-        saveGenericGatewayError ||
-        saveBulkSMSGatewayError ||
-        saveClickatellGatewayError
-
+    
+    const conversionType =
+    jsonData
+        ? JSON.parse(jsonData.constant.description)[0][0].conversionType
+        : {}
+    
     if (loading) {
         return (
             <>
@@ -97,7 +70,7 @@ export const MetadataConfigFormEdit = () => {
     }
 
     if (loadError) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
+        const msg = i18n.t('Something went wrong whilst loading constants')
 
         return (
             <>
@@ -109,91 +82,77 @@ export const MetadataConfigFormEdit = () => {
         )
     }
 
-    const data =
-        /**
-         * @TODO:
-         *   * The response does not contain the right content type header
-         *     -> https://jira.dhis2.org/browse/DHIS2-9252
-         */
-        jsonData && typeof jsonData.gateway === 'string'
-            ? { gateway: JSON.parse(jsonData.gateway) }
-            : jsonData
-
-    const gatewayType = data?.gateway?.type
-    const onSubmit = async formValues => {
-        const values = { ...formValues, id: data.gateway.uid }
-
+    const onSubmit = async values => {
         try {
-            if (values.type === GODATA_OUTBREAK) {
-                await saveGenericGateway(values)
-            }
-
-            if (values.type === GODATA_CASE) {
-                await saveBulkSMSGateway(values)
-            }
-
-            if (values.type === GODATA_CONTACT) {
-                await saveClickatellGateway(values)
-            }
-
             history.push(METADATA_CONFIG_LIST_PATH)
         } catch (e) {
             return Promise.reject(e)
         }
     }
 
-    const FormComponent = getFormComponent(gatewayType)
-    const initialValues = gatewayType && getInitialValues(data.gateway)
+    const onCancelClick = () => history.push(METADATA_CONFIG_LIST_PATH)
+
+//console.log(JSON.parse(jsonData.constant.description)[0][0].conversionType)
+
+    const FormComponent = getFormComponent(conversionType)
+    const initialValues = conversionType && getInitialValues(jsonData)
 
     return (
         <div
-            data-test={dataTest('views-gatewayconfigformedit')}
+            data-test={dataTest('views-constantconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Edit mapping')}</PageHeadline>
+            <PageHeadline>{i18n.t('Add mappings')}</PageHeadline>
 
-            {gatewayType ? (
-                <div
-                    data-test={dataTest(
-                        'views-gatewayconfigformedit-formcontainer'
-                    )}
-                    data-gateway-id={data.gateway.uid}
-                >
-                    {saveError && (
-                        <NoticeBox
-                            error
-                            title={i18n.t(
-                                'Something went wrong whilst saving gateways'
-                            )}
-                        >
-                            {saveError.message}
-                        </NoticeBox>
-                    )}
+            <FormRow>
+                {visibleForm === GODATA_OUTBREAK && (
+                    <OutbreaksForm
+                        onSubmit={onSubmit}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
 
-                    <FormComponent
+                {visibleForm === GODATA_CASE && (
+                    <CasesForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+
+                {visibleForm === GODATA_CONTACT && (
+                    <ContactsForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+                
+                {visibleForm === GODATA_CONTACT_OF_CONTACT && (
+                    <ContactsOfContactForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+                
+                {visibleForm === GODATA_ORG_UNIT && (
+                    <LocationsForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
+            </FormRow>
+            <FormComponent
                         initialValues={initialValues}
                         onSubmit={onSubmit}
                         onCancelClick={pristine =>
                             pristine
-                                ? history.push(METADATA_CONFIG_LIST_PATH)
+                                ? history.push(GATEWAY_CONFIG_LIST_PATH)
                                 : setShowCancelDialog(true)
                         }
                     />
-                </div>
-            ) : (
-                <NoticeBox error title={i18n.t('Gateway not found')}>
-                    {i18n.t('The requested gateway could not be loaded')}
-                </NoticeBox>
-            )}
-
-            {showCancelDialog && (
-                <CancelDialog
-                    onConfirmCancel={() =>
-                        history.push(METADATA_CONFIG_LIST_PATH)
-                    }
-                    onAbortCancel={() => setShowCancelDialog(false)}
-                />
-            )}
         </div>
     )
 }

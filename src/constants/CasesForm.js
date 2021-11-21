@@ -128,7 +128,10 @@ export const CasesForm = ({
                                             }      
                                         }          
                             iterate(instanceObject.data[0])
-                            setGodataValue(mappings)
+                            const caseMeta = []
+                            caseMeta.push([{conversionType: "Go.Data Case"}])
+                            caseMeta.push(mappings)
+                            setGodataValue(caseMeta)
 
                             function iterate2(obj) {
                                 var walked = [];
@@ -187,7 +190,7 @@ export const CasesForm = ({
               console.log('outbreaks: ' + JSON.stringify(instanceObject))
             }
 
-            
+
  
         return () => {
             
@@ -247,11 +250,11 @@ export const CasesForm = ({
         {
         console.log(instance.src)
 //read and replace dhuis2 placeholder and update ui
-          var ths = dot.str('dhis2', instance.src, godataValue[valueHolder[1]])
+          var ths = dot.str('dhis2', instance.src, godataValue[1][valueHolder[2]])
           console.log('str ths: ' + JSON.stringify(ths))
           setGodataValue(godataValue => {
               const Outbreak = [...godataValue];
-              Outbreak[valueHolder[1]] = ths;
+              Outbreak[1][valueHolder[2]] = ths;
               return Outbreak
             })
         setOpen(false)
@@ -260,11 +263,7 @@ export const CasesForm = ({
         }
     
         return true
-    }
-
-    const submitText = initialValues
-        ? i18n.t('Save mappings')
-        : i18n.t('Add mappings')     
+    }   
 
     const selectedNode = (instance)=>{
         //store initial values into useStore, we need this to replace placeholder next
@@ -284,6 +283,7 @@ export const CasesForm = ({
 
     
     const saveConstant = async godataValue => {
+        
         await saveCasesConstant(godataValue)
         history.push(METADATA_CONFIG_LIST_PATH)
     }
