@@ -9,10 +9,12 @@ import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
-    useCreateBulkSMSGatewayMutation,
     useCreateClickatellGatewayMutation,
     useCreateGenericGatewayMutation,
 } from '../../gateways'
+import {
+    useCreateCasesConstantMutation,
+} from '../../constants'
 import {
     LocationsForm,
     CasesForm,
@@ -35,9 +37,9 @@ export const MetadataConfigFormNew = () => {
     ] = useCreateGenericGatewayMutation()
 
     const [
-        saveBulkSMSGateway,
-        { error: saveBulkSMSGatewayError },
-    ] = useCreateBulkSMSGatewayMutation()
+        saveCasesConstant,
+        { error: saveCasesConstantError },
+    ] = useCreateCasesConstantMutation()
 
     const [
         saveClickatellGateway,
@@ -46,7 +48,7 @@ export const MetadataConfigFormNew = () => {
 
     const error =
         saveGenericGatewayError ||
-        saveBulkSMSGatewayError ||
+        saveCasesConstantError ||
         saveClickatellGatewayError
 
     if (error) {
@@ -54,7 +56,7 @@ export const MetadataConfigFormNew = () => {
 
         return (
             <div data-test={dataTest('views-gatewayconfigformnew')}>
-                <PageHeadline>{i18n.t('Add gateway')}</PageHeadline>
+                <PageHeadline>{i18n.t('Add constant')}</PageHeadline>
                 <NoticeBox error title={msg}>
                     {error.message}
                 </NoticeBox>
@@ -69,7 +71,7 @@ export const MetadataConfigFormNew = () => {
             }
 
             if (visibleForm === GODATA_CASE) {
-                await saveBulkSMSGateway(values)
+                await saveCasesConstant(values)
             }
 
             if (visibleForm === GODATA_CONTACT) {

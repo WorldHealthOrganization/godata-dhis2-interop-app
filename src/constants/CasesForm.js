@@ -1,7 +1,9 @@
 import { Button, ButtonStrip, ReactFinalForm, CenteredContent, CircularLoader } from '@dhis2/ui'
+import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useMemo } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import {useReadMappingConfigConstantsQueryForConfig, useReadProgramsQueryForMappings} from '.'
+import { METADATA_CONFIG_LIST_PATH } from '../views'
 
 import axios from 'axios'
 
@@ -12,6 +14,7 @@ import { Modal } from 'react-responsive-modal';
 import dot from 'dot-object';
 
 import {
+    useCreateCasesConstantMutation,
     FieldConstantName,
 } from '../constants'
 import { FormRow } from '../forms'
@@ -26,7 +29,7 @@ export const CasesForm = ({
     onSubmit,
     initialValues,
 }) => {
-
+    const history = useHistory()
     const [open, setOpen] = useState(false);
     const [valueHolder, setValueHolder] = useState({});
     const [dhisValue, setDhisValue] = useState({});
@@ -42,6 +45,7 @@ export const CasesForm = ({
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
 
+    const [ saveCasesConstant ] = useCreateCasesConstantMutation()
 
 
     useEffect(() => {
@@ -239,6 +243,8 @@ export const CasesForm = ({
     }
 
     const copyFromPopup  = (instance)=>{
+        if(instance.name == 'dhis2')
+        {
         console.log(instance.src)
 //read and replace dhuis2 placeholder and update ui
           var ths = dot.str('dhis2', instance.src, godataValue[valueHolder[1]])
@@ -249,8 +255,16 @@ export const CasesForm = ({
               return Outbreak
             })
         setOpen(false)
+        }else{
+            console.log('Wrong element selected')
+        }
+    
         return true
     }
+
+    const submitText = initialValues
+        ? i18n.t('Save mappings')
+        : i18n.t('Add mappings')     
 
     const selectedNode = (instance)=>{
         //store initial values into useStore, we need this to replace placeholder next
@@ -266,8 +280,13 @@ export const CasesForm = ({
     const onCloseModal = () => {setOpen(false)}
     const addNode = () => {console.log('editjsoneditor')}
 
-    const deleteNode = () => {console.log('deletejsoneditor')}
+    const deleteNode = () => {console.log('deletejsoneditor')}     
 
+    
+    const saveConstant = async godataValue => {
+        await saveCasesConstant(godataValue)
+        history.push(METADATA_CONFIG_LIST_PATH)
+    }
 
     return (
         <Form
@@ -311,7 +330,9 @@ export const CasesForm = ({
     </Modal>
                     <ButtonStrip>
 
-
+                        <Button primary onClick={() => saveConstant({godataValue})}>
+                            {i18n.t('Add constant')}
+                        </Button>
                         <Button onClick={() => onCancelClick(pristine)}>
                             {i18n.t('Cancel')}
                         </Button>
