@@ -1,6 +1,6 @@
 import { SingleSelectField, SingleSelectOption, NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
 import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
@@ -24,7 +24,7 @@ export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_
 
 
 const getInitialValues = jsonData => {
-    return jsonData
+    return jsonData.constant
 }
 
     const getFormComponent = selectedForm => {
@@ -48,6 +48,9 @@ export const MetadataConfigFormEdit = () => {
     const history = useHistory()
     const { id } = useParams()
     const [visibleForm, setVisibleForm] = useState()
+    const [showCancelDialog, setShowCancelDialog] = useState(false)
+    const onCancel = pristine =>
+        pristine ? history.goBack() : setShowCancelDialog(true)
 
     const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryById(
         id

@@ -3,11 +3,11 @@ import { useDataMutation } from '@dhis2/app-runtime'
 export const CREATE_CASES_CONSTANT_MUTATION = {
     resource: 'constants',
     type: 'create',
-    data: ({ godataValue }) => ({
+    data: ({ godataValue, inpu }) => ({
         displayName: 'Go.Data (URL)1',
         shortName: 'Go.Data 1',
         code: 'cases1',
-        name: 'Cases mapping',
+        name: inpu,
         description: JSON.stringify(godataValue) ,
         createdBy: {
             code: 'admin', 

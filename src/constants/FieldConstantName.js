@@ -11,13 +11,16 @@ import i18n from '../locales'
 
 const { Field } = ReactFinalForm
 
-export const FieldConstantName = () => (
+export const FieldConstantName = () => (   
     <Field
         required
         dataTest={dataTest('gateways-fieldgatewayname')}
         name="name"
         label={i18n.t('Name')}
         component={InputFieldFF}
+        //onInput={(e) => setInput(e)}
         validate={composeValidators(string, hasValue)}
+        onChange={ev => onInput(ev)}
     />
 )
+

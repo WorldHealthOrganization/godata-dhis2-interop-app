@@ -1,9 +1,12 @@
-import { Button, ButtonStrip, ReactFinalForm, CenteredContent, CircularLoader } from '@dhis2/ui'
+import { Button, ButtonStrip, ReactFinalForm, CenteredContent, CircularLoader, composeValidators, hasValue,
+    string, InputField } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import {useReadMappingConfigConstantsQueryForConfig, useReadProgramsQueryForMappings} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
+
+const { Field } = ReactFinalForm
 
 import axios from 'axios'
 
@@ -22,7 +25,7 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 
-const { Form } = ReactFinalForm
+const { Form, InputFieldFF } = ReactFinalForm
 
 export const CasesForm = ({
     onCancelClick,
@@ -34,7 +37,7 @@ export const CasesForm = ({
     const [valueHolder, setValueHolder] = useState({});
     const [dhisValue, setDhisValue] = useState({});
     const [godataValue, setGodataValue] = useState([]);
-    const [loginData, setLoginDetails] = useState([])
+    const [inpu, setInput] = useState('')
 
     var mappings, dhismappings
     var instanceObject
@@ -263,7 +266,7 @@ export const CasesForm = ({
         }
     
         return true
-    }   
+    }
 
     const selectedNode = (instance)=>{
         //store initial values into useStore, we need this to replace placeholder next
@@ -280,11 +283,11 @@ export const CasesForm = ({
     const addNode = () => {console.log('editjsoneditor')}
 
     const deleteNode = () => {console.log('deletejsoneditor')}     
-
-    
+    const onInput = (ev) => { setInput(ev)}
+    console.log(inpu)
     const saveConstant = async godataValue => {
-        
-        await saveCasesConstant(godataValue)
+        console.log('input ' + inpu)
+        await saveCasesConstant({godataValue,inpu})
         history.push(METADATA_CONFIG_LIST_PATH)
     }
 
@@ -302,7 +305,23 @@ export const CasesForm = ({
                     <PageSubHeadline>{i18n.t('Mappings setup')}</PageSubHeadline>
 
                     <FormRow>
-                        <FieldConstantName />
+                        <Field 
+                        required
+                        name='name'
+                        value=''
+                        //component={InputFieldFF}
+                        render={() =>
+                        <InputField
+                        id="name" 
+                        label={i18n.t('Name')}
+                        className="" 
+                        type="text" 
+                        value={inpu}
+                        //component={InputField}
+                        onChange={ev => onInput(ev.value)}
+                        required/>}
+                        validate={composeValidators(string, hasValue)}
+                        />
                     </FormRow>
 
                     <div><ReactJson 

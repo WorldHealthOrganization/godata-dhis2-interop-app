@@ -4,6 +4,9 @@ export const CONSTANT_QUERY_CONSTANT_BY_ID = {
     constant: {
         resource: 'constants',
         id: ({ id }) => id,
+        params: {
+            fields: ['id', 'displayName', 'code', 'description', 'shortName', 'name'],
+        },
     },
 }
 
