@@ -4,9 +4,9 @@ export const CREATE_CASES_CONSTANT_MUTATION = {
     resource: 'constants',
     type: 'create',
     data: ({ godataValue, inpu }) => ({
-        displayName: 'Go.Data (URL)1',
-        shortName: 'Go.Data 1',
-        code: 'cases1',
+        //displayName: 'Go.Data (URL)1',
+        shortName: inpu,
+        //code: 'cases1',
         name: inpu,
         description: JSON.stringify(godataValue) ,
         createdBy: {

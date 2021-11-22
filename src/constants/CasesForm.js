@@ -18,7 +18,6 @@ import dot from 'dot-object';
 
 import {
     useCreateCasesConstantMutation,
-    FieldConstantName,
 } from '../constants'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
@@ -129,12 +128,19 @@ export const CasesForm = ({
                           //  console.log('mappings length ' + mappings.length)
                         }
                                             }      
-                                        }          
+                                        } 
+                                        console.log(initialValues)  
+                           /* if(initialValues !== "undefined"){
+                               var initv =  JSON.parse(initialValues.description)
+                               console.log(initialValues.description)
+                                setGodataValue(initv)
+                            }else{ */               
                             iterate(instanceObject.data[0])
                             const caseMeta = []
                             caseMeta.push([{conversionType: "Go.Data Case"}])
                             caseMeta.push(mappings)
                             setGodataValue(caseMeta)
+                        //}  
 
                             function iterate2(obj) {
                                 var walked = [];
@@ -180,6 +186,17 @@ export const CasesForm = ({
                         iterate2(programInstance)
                 setDhisValue(dhismappings)
 
+
+
+
+                if(initialValues.name != 'undefined'){
+                    setGodataValue(JSON.parse(initialValues.description).godataValue)
+                    setInput(initialValues.name)
+                }
+
+
+
+                
 
                       };
                       getInstanceData();
@@ -243,6 +260,10 @@ export const CasesForm = ({
         )
     }
 
+    const submitText = initialValues.name
+    ? i18n.t('Save mappings')
+    : i18n.t('Add mappings')
+
     const editNode = ({})=>{
         console.log('editjsoneditor')
         return true
@@ -286,7 +307,7 @@ export const CasesForm = ({
     const onInput = (ev) => { setInput(ev)}
     console.log(inpu)
     const saveConstant = async godataValue => {
-        console.log('input ' + inpu)
+        console.log('input ' + JSON.stringify(godataValue))
         await saveCasesConstant({godataValue,inpu})
         history.push(METADATA_CONFIG_LIST_PATH)
     }
@@ -308,7 +329,7 @@ export const CasesForm = ({
                         <Field 
                         required
                         name='name'
-                        value=''
+                        //value=''
                         //component={InputFieldFF}
                         render={() =>
                         <InputField
@@ -319,6 +340,7 @@ export const CasesForm = ({
                         value={inpu}
                         //component={InputField}
                         onChange={ev => onInput(ev.value)}
+                        validate={composeValidators(string, hasValue)}
                         required/>}
                         validate={composeValidators(string, hasValue)}
                         />
@@ -350,7 +372,7 @@ export const CasesForm = ({
                     <ButtonStrip>
 
                         <Button primary onClick={() => saveConstant({godataValue})}>
-                            {i18n.t('Add constant')}
+                        {submitText}
                         </Button>
                         <Button onClick={() => onCancelClick(pristine)}>
                             {i18n.t('Cancel')}

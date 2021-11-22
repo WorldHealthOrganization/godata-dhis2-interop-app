@@ -58,7 +58,7 @@ export const MetadataConfigFormEdit = () => {
     
     const conversionType =
     jsonData
-        ? JSON.parse(jsonData.constant.description)[0][0].conversionType
+        ? JSON.parse(jsonData.constant.description).godataValue[0][0].conversionType
         : {}
     
     if (loading) {
@@ -152,7 +152,7 @@ export const MetadataConfigFormEdit = () => {
                         onSubmit={onSubmit}
                         onCancelClick={pristine =>
                             pristine
-                                ? history.push(GATEWAY_CONFIG_LIST_PATH)
+                                ? history.push(METADATA_CONFIG_LIST_PATH)
                                 : setShowCancelDialog(true)
                         }
                     />
