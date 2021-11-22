@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-21T15:21:34.307Z\n"
-"PO-Revision-Date: 2021-11-21T15:21:34.307Z\n"
+"POT-Creation-Date: 2021-11-22T07:33:03.969Z\n"
+"PO-Revision-Date: 2021-11-22T07:33:03.969Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -23,25 +23,28 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+msgid "Save mappings"
+msgstr ""
+
+msgid "Add mappings"
+msgstr ""
+
 msgid "Mappings setup"
 msgstr ""
 
 msgid "Name"
 msgstr ""
 
-msgid "Add constant"
+msgid "Go.Data Case Model"
+msgstr ""
+
+msgid "DHIS Case Model"
 msgstr ""
 
 msgid "Cancel"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Save mappings"
-msgstr ""
-
-msgid "Add mappings"
 msgstr ""
 
 msgid "Confirm deletion"
@@ -361,6 +364,9 @@ msgid "Something went wrong whilst loading constants"
 msgstr ""
 
 msgid "Something went wrong whilst saving the gateway"
+msgstr ""
+
+msgid "Add constant"
 msgstr ""
 
 msgid "Something went wrong whilst performing the requested operation"

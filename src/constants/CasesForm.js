@@ -1,5 +1,5 @@
-import { Button, ButtonStrip, ReactFinalForm, CenteredContent, CircularLoader, composeValidators, hasValue,
-    string, InputField } from '@dhis2/ui'
+import { Button, ButtonStrip, ReactFinalForm, TextArea, CenteredContent, CircularLoader, composeValidators, hasValue,
+    string, InputField, TextAreaField } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
@@ -25,7 +25,7 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 
-const { Form, InputFieldFF } = ReactFinalForm
+const { Form } = ReactFinalForm
 
 export const CasesForm = ({
     onCancelClick,
@@ -37,7 +37,14 @@ export const CasesForm = ({
     const [valueHolder, setValueHolder] = useState({});
     const [dhisValue, setDhisValue] = useState({});
     const [godataValue, setGodataValue] = useState([]);
-    const [inpu, setInput] = useState('')
+
+    const [godataModel, setGodataModel] = useState([]);
+    const [dhisModel, setDhisModel] = useState([]);
+    const [descriptionModel, setDescriptionModel] = useState([]);
+
+    const [nameInput, setNameInput] = useState('')
+    const [dhisModelInput, setDhisModelInput] = useState('')
+    const [godataModelInput, setGodataModelInput] = useState('')
 
     var mappings, dhismappings
     var instanceObject
@@ -192,7 +199,7 @@ export const CasesForm = ({
 
                 if(initialValues.name != 'undefined'){
                     setGodataValue(JSON.parse(initialValues.description).godataValue)
-                    setInput(initialValues.name)
+                    setNameInput(initialValues.name)
                 }
 
 
@@ -265,8 +272,14 @@ export const CasesForm = ({
     ? i18n.t('Save mappings')
     : i18n.t('Add mappings')
 
-    const editNode = ({})=>{
-        console.log('editjsoneditor')
+    const editNode = (instance)=>{
+        setGodataValue(godataValue => {
+            const Outbreak = [...godataValue];
+            var tmp =  Outbreak[1][instance.namespace[1]]
+            tmp.dhis2 = instance.new_value
+            return Outbreak
+          })
+
         return true
     }
 
@@ -302,18 +315,33 @@ export const CasesForm = ({
     }
 
     const onCloseModal = () => {setOpen(false)}
-    const addNode = () => {console.log('editjsoneditor')}
+    const addNode = () => {console.log('addjsoneditor')}
 
-    const deleteNode = () => {console.log('deletejsoneditor')}     
-    const onInput = (ev) => { setInput(ev)}
-    console.log(inpu)
+    const deleteNode = (instance) => {
+        console.log('deletejsoneditor '+ JSON.stringify(instance.namespace))
+            const wanted = godataValue[1][instance.namespace[1]]
+            console.log('wanted ' + JSON.stringify(wanted))
+            const newgodata = godataValue[1].filter(item => item !== wanted)
+            let Outbreak = [...godataValue];
+            Outbreak[1] = newgodata
+            setGodataValue(Outbreak)
+
+            return true
+    }
+
+    const onNameInput = (ev) => { setNameInput(ev)}
+    const onDhisModelInput = (ev) => { setDhisModelInput(ev)}
+    const onGodataModelInput = (ev) => { setGodataModelInput(ev)}
+    
+    
+    //console.log(nameInput)
     const saveConstant = async godataValue => {
-        console.log('input ' + JSON.stringify(godataValue))
+        //console.log('nameInputt ' + JSON.stringify(godataValue))
         if(initialValues.name){
             var id = initialValues.id
-            await saveCasesConstant({godataValue,inpu, id})
+            await saveCasesConstant({godataValue,nameInput, id})
         }else{
-            await addCasesConstant({godataValue,inpu})
+            await addCasesConstant({godataValue,nameInput})
         }
         
         history.push(METADATA_CONFIG_LIST_PATH)
@@ -344,15 +372,18 @@ export const CasesForm = ({
                         label={i18n.t('Name')}
                         className="" 
                         type="text" 
-                        value={inpu}
+                        value={nameInput}
                         //component={InputField}
-                        onChange={ev => onInput(ev.value)}
+                        onChange={ev => onNameInput(ev.value)}
                         validate={composeValidators(string, hasValue)}
                         required/>}
                         validate={composeValidators(string, hasValue)}
                         />
                     </FormRow>
 
+
+
+                    <FormRow>
                     <div><ReactJson 
             src={godataValue}
             onAdd={addNode}
@@ -364,6 +395,54 @@ export const CasesForm = ({
             displayArrayKey={true}
             />
             </div>
+                    </FormRow>    
+
+
+                    <FormRow>
+                        <Field 
+                        required
+                        name='godataModel'
+                        //value=''
+                        //component={InputFieldFF}
+                        render={() =>
+                        <TextAreaField
+                        id="godataModel" 
+                        label={i18n.t('Go.Data Case Model')}
+                        className="" 
+                        type="text" 
+                        value={godataModelInput}
+                        helpText="Please copy and paste valid Go.Data Case Model in above text area."
+                        //component={InputField}
+                        onChange={ev => onGodataModelInput(ev.value)}
+                        validate={composeValidators(string, hasValue)}
+                        autoGrow
+                        required/>}
+                        validate={composeValidators(string, hasValue)}
+                        />
+                    </FormRow>
+
+                    <FormRow>
+                        <Field 
+                        required
+                        name='dhisModel'
+                        //value=''
+                        //component={InputFieldFF}
+                        render={() =>
+                        <TextAreaField
+                        id="dhisModel" 
+                        label={i18n.t('DHIS Case Model')}
+                        className="" 
+                        type="text" 
+                        value={dhisModelInput}
+                        helpText="Please copy and paste valid DHIS2 Case Model in above text area."
+                        //component={InputField}
+                        onChange={ev => onDhisModelInput(ev.value)}
+                        validate={composeValidators(string, hasValue)}
+                        autoGrow
+                        required/>}
+                        validate={composeValidators(string, hasValue)}
+                        />
+                    </FormRow>
 
             <Modal open={open} onClose={onCloseModal} center>
         <h2>Select DHIS2 metadata</h2>
