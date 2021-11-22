@@ -18,6 +18,7 @@ import dot from 'dot-object';
 
 import {
     useCreateCasesConstantMutation,
+    useUpdateCasesConstantMutation,
 } from '../constants'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
@@ -47,8 +48,8 @@ export const CasesForm = ({
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
 
-    const [ saveCasesConstant ] = useCreateCasesConstantMutation()
-
+    const [ addCasesConstant ] = useCreateCasesConstantMutation()
+    const [ saveCasesConstant ] = useUpdateCasesConstantMutation()
 
     useEffect(() => {
  
@@ -308,7 +309,13 @@ export const CasesForm = ({
     console.log(inpu)
     const saveConstant = async godataValue => {
         console.log('input ' + JSON.stringify(godataValue))
-        await saveCasesConstant({godataValue,inpu})
+        if(initialValues.name){
+            var id = initialValues.id
+            await saveCasesConstant({godataValue,inpu, id})
+        }else{
+            await addCasesConstant({godataValue,inpu})
+        }
+        
         history.push(METADATA_CONFIG_LIST_PATH)
     }
 
