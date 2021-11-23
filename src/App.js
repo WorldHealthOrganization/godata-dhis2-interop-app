@@ -9,12 +9,17 @@ import {
     METADATA_CONFIG_LIST_PATH,
     METADATA_CONFIG_FORM_NEW_PATH,
     METADATA_CONFIG_FORM_EDIT_PATH,
-    //GODATA_CALL_FORM_PATH,
+    INTEROP_LIST_PATH,
+    INTEROP_FORM_NEW_PATH,
+    INTEROP_FORM_EDIT_PATH,
     SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     MetadataConfigFormNew,
     MetadataConfigFormEdit,
     MetadataConfigList,
+    InteropList,
+    InteropFormNew,
+    InteropFormEdit,
     ScheduleTaskForm,
     GoDataConfigForm,
     HOME_PATH,
@@ -60,6 +65,24 @@ const App = () => (
                             exact
                             path={METADATA_CONFIG_FORM_NEW_PATH}
                             component={MetadataConfigFormNew}
+                        />
+
+                        <Route
+                            exact
+                            path={INTEROP_LIST_PATH}
+                            component={InteropList}
+                        />
+                        
+                        <Route
+                            exact
+                            path={INTEROP_FORM_NEW_PATH}
+                            component={InteropFormNew}
+                        />
+
+                        <Route
+                            exact
+                            path={INTEROP_FORM_EDIT_PATH}
+                            component={InteropFormEdit}
                         />
 
                         <Route

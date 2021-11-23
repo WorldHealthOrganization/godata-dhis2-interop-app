@@ -17,7 +17,7 @@ import {
     useReadMappingConfigConstantsQueryById,
 } from '../../constants'
 import i18n from '../../locales'
-import styles from './MetadataConfigFormNew.module.css'
+import styles from './MetadataConfigFormEdit.module.css'
 
 export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
 export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
