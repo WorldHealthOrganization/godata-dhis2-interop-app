@@ -4,12 +4,12 @@ export const UPDATE_CASES_CONSTANT_MUTATION = {
     resource: 'constants',
     id: ({ id }) => id,
     type: 'update',
-    data: ({ godataValue, nameInput }) => ({
+    data: ({ allValues, nameInput }) => ({
         //displayName: 'Go.Data (URL)1',
         shortName: nameInput,
         //code: 'cases1',
         name: nameInput,
-        description: JSON.stringify(godataValue) ,
+        description: JSON.stringify(allValues) ,
         createdBy: {
             code: 'admin', 
             displayName: 'admin admin',

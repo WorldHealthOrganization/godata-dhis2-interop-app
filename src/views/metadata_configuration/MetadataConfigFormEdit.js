@@ -58,7 +58,7 @@ export const MetadataConfigFormEdit = () => {
     
     const conversionType =
     jsonData
-        ? JSON.parse(jsonData.constant.description).godataValue[0][0].conversionType
+        ? JSON.parse(jsonData.constant.description)[0].godataValue[0][0].conversionType
         : {}
     
     if (loading) {

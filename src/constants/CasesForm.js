@@ -38,9 +38,7 @@ export const CasesForm = ({
     const [dhisValue, setDhisValue] = useState({});
     const [godataValue, setGodataValue] = useState([]);
 
-    const [godataModel, setGodataModel] = useState([]);
-    const [dhisModel, setDhisModel] = useState([]);
-    const [descriptionModel, setDescriptionModel] = useState([]);
+    const [descriptionModels, setDescriptionModels] = useState({});
 
     const [nameInput, setNameInput] = useState('')
     const [dhisModelInput, setDhisModelInput] = useState('')
@@ -137,18 +135,12 @@ export const CasesForm = ({
                         }
                                             }      
                                         } 
-                                        console.log(initialValues)  
-                           /* if(initialValues !== "undefined"){
-                               var initv =  JSON.parse(initialValues.description)
-                               console.log(initialValues.description)
-                                setGodataValue(initv)
-                            }else{ */               
+                                        console.log(initialValues)              
                             iterate(instanceObject.data[0])
                             const caseMeta = []
                             caseMeta.push([{conversionType: "Go.Data Case"}])
                             caseMeta.push(mappings)
                             setGodataValue(caseMeta)
-                        //}  
 
                             function iterate2(obj) {
                                 var walked = [];
@@ -198,8 +190,10 @@ export const CasesForm = ({
 
 
                 if(initialValues.name != 'undefined'){
-                    setGodataValue(JSON.parse(initialValues.description).godataValue)
+                    setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
                     setNameInput(initialValues.name)
+                    setGodataModelInput(JSON.stringify(JSON.parse(initialValues.description)[1]))
+                    setDhisModelInput(JSON.stringify(JSON.parse(initialValues.description)[2]))
                 }
 
 
@@ -336,12 +330,27 @@ export const CasesForm = ({
     
     //console.log(nameInput)
     const saveConstant = async godataValue => {
-        //console.log('nameInputt ' + JSON.stringify(godataValue))
+        
+        const godataModelJson = Object.keys(godataModelInput).length != 0
+        ? JSON.parse(godataModelInput)
+        : {}
+
+        const dhisModelJson = Object.keys(dhisModelInput).length != 0
+        ? JSON.parse(dhisModelInput)
+        : {}
+        const allValues = []
+        allValues.push(godataValue)
+        console.log('allValues godataValue ' + JSON.stringify(allValues))
+        allValues.push(godataModelJson)
+        console.log('allValues godataModelJson ' + JSON.stringify(allValues))
+        allValues.push(dhisModelJson)
+        console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
+
         if(initialValues.name){
             var id = initialValues.id
-            await saveCasesConstant({godataValue,nameInput, id})
+            await saveCasesConstant({allValues,nameInput, id})
         }else{
-            await addCasesConstant({godataValue,nameInput})
+            await addCasesConstant({allValues,nameInput})
         }
         
         history.push(METADATA_CONFIG_LIST_PATH)
@@ -430,11 +439,11 @@ export const CasesForm = ({
                         render={() =>
                         <TextAreaField
                         id="dhisModel" 
-                        label={i18n.t('DHIS Case Model')}
+                        label={i18n.t('DHIS Program Model')}
                         className="" 
                         type="text" 
                         value={dhisModelInput}
-                        helpText="Please copy and paste valid DHIS2 Case Model in above text area."
+                        helpText="Please copy and paste valid DHIS2 Program Model in above text area."
                         //component={InputField}
                         onChange={ev => onDhisModelInput(ev.value)}
                         validate={composeValidators(string, hasValue)}
