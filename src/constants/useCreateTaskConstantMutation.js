@@ -18,7 +18,7 @@ export const CREATE_TASK_CONSTANT_MUTATION = {
             },
             created: Date.now(),
             lastUpdated: Date.now(),
-        value: '-1000000',
+        value: '-1000002',
     }),
 }
 

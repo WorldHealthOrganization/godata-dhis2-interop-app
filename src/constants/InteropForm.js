@@ -1,5 +1,6 @@
-import { SingleSelectField, SingleSelectOption, Button, ButtonStrip, ReactFinalForm, TextArea, CenteredContent, CircularLoader, composeValidators, hasValue,
-    string, InputField, TextAreaField } from '@dhis2/ui'
+import { CheckboxField, SingleSelectField, SingleSelect, SingleSelectOption, Button, ButtonStrip, 
+    ReactFinalForm,  SingleSelectFieldFF, CenteredContent, CircularLoader, composeValidators, hasValue,
+    string, InputField } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
@@ -14,12 +15,10 @@ import axios from 'axios'
 
 import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
-import ReactJson from 'react-json-view'
 import 'react-responsive-modal/styles.css';
-import { Modal } from 'react-responsive-modal';
-import dot from 'dot-object';
 
 import {
+    useReadMappingConfigConstantsQueryForMappings,
     useCreateTaskConstantMutation,
     useUpdateTaskConstantMutation,
 } from '.'
@@ -27,6 +26,7 @@ import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
+import { eachItem } from 'ajv/dist/compile/util'
 
 const { Form } = ReactFinalForm
 
@@ -36,36 +36,39 @@ export const InteropForm = ({
     initialValues,
 }) => {
     const history = useHistory()
-    const [open, setOpen] = useState(false);
-    const [valueHolder, setValueHolder] = useState({});
-    const [dhisValue, setDhisValue] = useState({});
-    const [godataValue, setGodataValue] = useState([]);
-    
 
     const [nameInput, setNameInput] = useState('')
     const [senderEndpointInput, setSenderEndpointInput] = useState('')
     const [receiverEndpointInput, setReceiverEndpointInput] = useState('')
     const [senderParamsInput, setSenderParamsInput] = useState('')
-    
-    const [dhisModelInput, setDhisModelInput] = useState('')
-    const [godataModelInput, setGodataModelInput] = useState('')
+    const [payloadInput, setPayloadInput] = useState({})
+    const [dhisReceiver, setDhisReceiver] = useState(false)
 
-    const [visibleForm, setVisibleForm] = useState(GODATA_CASE)
+    const [converters, setConverters] = useState([])
+    const [converter, setConverter] = useState('')
 
-    var mappings, dhismappings
+    const [taskType, setTaskType] = useState('')
+
     var instanceObject
 
-    const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
-    //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
+    const { loading: loadingReadConstants, data: convt,  error: errorReadConstants } = useReadMappingConfigConstantsQueryForMappings()
 
-    const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
+    const { loading : loadingData, data: progData, error: loadError } = useReadProgramsQueryForMappings()
+ 
+    const { loading : laodingConf, data: data, error: confError  } = useReadMappingConfigConstantsQueryForConfig()
 
+    const loading  = loadingReadConstants || loadingData || laodingConf
+    const error  = errorReadConstants || loadError || confError
 
     const [ addTaskConstant ] = useCreateTaskConstantMutation()
     const [ saveTaskConstant ] = useUpdateTaskConstantMutation()
 
+
+
+
     useEffect(() => {
  
+            
         const loginDetails = 
         data && data.constants.constants.length >0
         ? JSON.parse(data.constants.constants[0].description)
@@ -75,7 +78,37 @@ export const InteropForm = ({
                 progData && progData.programs.programs.length >0
                 ? progData.programs.programs[0]
                         : {}
-                        console.log('programInstance ' + programInstance)                
+                       // console.log('programInstance ' + JSON.stringify(programInstance))
+                        
+                        const convts = 
+                        convt && convt.constants.constants.length >0
+                        ? convt.constants.constants
+                                : []
+                                //console.log('constants.constants ' + JSON.stringify(convts))   
+
+                                
+                                setConverters( 
+                                    convts.map(({ id, displayName }) => ({
+                                    label: displayName,
+                                    value: id,
+                                }))           
+                                )
+                                //console.log('converters '+JSON.stringify(converters))
+                                if(initialValues && initialValues.name != 'undefined'){
+                                    console.log('initialValues called ' + initialValues.name)
+                                    setNameInput(initialValues.name)
+                            
+                                    const paramsJson = JSON.parse(initialValues.description)
+                            
+                                    setSenderEndpointInput(paramsJson[0])
+                                    setReceiverEndpointInput(paramsJson[1])
+                                    setSenderParamsInput(paramsJson[2])
+                                    setPayloadInput(paramsJson[3])
+                                    setDhisReceiver(paramsJson[4])
+                                    setConverter(paramsJson[5])
+                                    setTaskType(paramsJson[6])
+                                    
+                                }
 
         if(data) {
             async function login() {
@@ -99,15 +132,11 @@ export const InteropForm = ({
                                     Authorization: res.data.id,
                                   }
                                 });
+                                console.log('initval name ' + initialValues.name)
 
-                if(initialValues.name != 'undefined'){
-                    setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
-                    setNameInput(initialValues.name)
-                    setGodataModelInput(JSON.stringify(JSON.parse(initialValues.description)[1]))
-                    setDhisModelInput(JSON.stringify(JSON.parse(initialValues.description)[2]))
-                }
+
                       };
-                      getInstanceData();
+                      getInstanceData()
                   };
                 }
                 catch (error) {
@@ -118,13 +147,11 @@ export const InteropForm = ({
               console.log('outbreaks: ' + JSON.stringify(instanceObject))
             }
 
-
- 
         return () => {
             
             console.log("This will be logged on unmount");
           }
-      }, [data, progData])
+      }, [ data, progData, convt ])
 
     if (loading) {
         return (
@@ -147,63 +174,41 @@ export const InteropForm = ({
         )
     }
 
-    if (lloading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-    if (lerror) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
 
     const submitText = initialValues.name
     ? i18n.t('Save task')
     : i18n.t('Add task')
 
     const onNameInput = (ev) => { setNameInput(ev)}
-    const onDhisModelInput = (ev) => { setDhisModelInput(ev)}
-    const onGodataModelInput = (ev) => { setGodataModelInput(ev)}
-    
-    const saveConstant = async godataValue => {
-        
-        const godataModelJson = Object.keys(godataModelInput).length != 0
-        ? JSON.parse(godataModelInput)
-        : {}
+    const onSenderEndpointInput = (ev) => { setSenderEndpointInput(ev)}
+    const onReceiverEndpointInput = (ev) => { setReceiverEndpointInput(ev)}
+    const onPayloadInput = (ev) => { setPayloadInput(ev)}
+    const onSenderParamsInput = (ev) => { setSenderParamsInput(ev)}
+    const onReceiverInput = (ev) => { setDhisReceiver( ev.value==true ? false : true)}
+    const onConvertorInput = (ev) => { setConverter(ev)}
+    const onTaskTypeInput = (ev) => { setTaskType(ev)}
 
-        const dhisModelJson = Object.keys(dhisModelInput).length != 0
-        ? JSON.parse(dhisModelInput)
-        : {}
+    const saveConstant = async () => {
+
         const allValues = []
-        allValues.push(godataValue)
-        console.log('allValues godataValue ' + JSON.stringify(allValues))
-        allValues.push(godataModelJson)
-        console.log('allValues godataModelJson ' + JSON.stringify(allValues))
-        allValues.push(dhisModelJson)
+        allValues.push(senderEndpointInput)
+        allValues.push(receiverEndpointInput)
+        allValues.push(senderParamsInput)
+        allValues.push(payloadInput)
+        allValues.push(dhisReceiver) 
+        allValues.push(converter)
+        allValues.push(taskType)
         console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
 
         if(initialValues.name){
             var id = initialValues.id
-            await saveTaskConstant({allValues,nameInput, id})
+            await saveTaskConstant({ allValues, nameInput, id })
         }else{
-            await addTaskConstant({allValues,nameInput})
+            await addTaskConstant({ allValues, nameInput })
         }
         
         history.push(INTEROP_LIST_PATH)
     }
-
-    const handleChange = () => console.log('jsontreechanges')        
 
     return (
         <Form
@@ -211,7 +216,7 @@ export const InteropForm = ({
             onSubmit={onSubmit}
             initialValues={initialValues}
         >
-            {({ handleSubmit, values, submitting, pristine }) => (
+            {({ handleSubmit, pristine }) => (
                 <form
                     onSubmit={handleSubmit}
                     data-test={dataTest('gateways-gatewaygenericform')}
@@ -221,8 +226,8 @@ export const InteropForm = ({
                     <FormRow>
                 <SingleSelectField
                     label={i18n.t('Type')}
-                    onChange={({ selected }) => setVisibleForm(selected)}
-                    selected={visibleForm}
+                    onChange={({ selected }) => onTaskTypeInput(selected)}
+                    selected={taskType}
                     dataTest={dataTest(
                         'views-gatewayconfigformnew-gatewaytype'
                     )}
@@ -284,7 +289,7 @@ export const InteropForm = ({
                         type="text" 
                         helpText='Fully qualified URL of sender API endpoint (e.g. https://somesite.org/api/somevalues)'
                         value={senderEndpointInput}
-                        onChange={ev => onNameInput(ev.value)}
+                        onChange={ev => onSenderEndpointInput(ev.value)}
                         required
                         validate={composeValidators(string, hasValue)}
                         />}
@@ -303,19 +308,37 @@ export const InteropForm = ({
                         type="text"
                         helpText='Fully qualified URL of receiver API endpoint (e.g. https://somesite.org/api/somevalues)'
                         value={receiverEndpointInput}
-                        onChange={ev => onNameInput(ev.value)}
+                        onChange={ev => onReceiverEndpointInput(ev.value)}
                         validate={composeValidators(string, hasValue)}
                         required/>}
 
                         />
                     </FormRow>
 
+                    <FormRow>
+<SingleSelectField
+                    label={i18n.t('Converter')}
+                    onChange={({ selected }) => onConvertorInput(selected)}
+                    selected={converter}
+                    value={converters.filter(function(option) {
+                        return option.value === converter;
+                      })}
+                >
+
+                    {converters.map(function(object, i){
+        return <SingleSelectOption value={object.value} label={object.label} key={i}/>;
+    })}
+
+                    </SingleSelectField>
+                    
+                    
+                    </FormRow>
 
                     <FormRow>
                     <Editor
                         mode='text'
-                        value={{}}
-                        onChange={handleChange}
+                        value={payloadInput}
+                        onChange={ev => onPayloadInput(ev)}
                         />
                     </FormRow>
 
@@ -328,16 +351,35 @@ export const InteropForm = ({
                         label={i18n.t('Sender API parameters')}
                         className="" 
                         type="text" 
-                        helpText='E.g ?fields=id,name,description,[organisationunits]&pging=false'
+                        helpText='E.g ?fields=id,name,description,[organisationunits]&paging=false&filters=name.eq.blabla. DHIS2 API example'
                         value={senderParamsInput}
-                        onChange={ev => onNameInput(ev.value)}
+                        onChange={ev => onSenderParamsInput(ev.value)}
                         />}
                         />
                     </FormRow>
 
+                    <FormRow>
+                        <Field
+                        name="dhisReceiver"
+                        label={i18n.t('DHIS2 Receiving End')}
+                        helpText={i18n.t('If selected DHIS2 will receive data from Go.Data')}
+                        render={() =>
+                            <CheckboxField
+                            id="senderparams" 
+                            label={i18n.t('DHIS2 is Receiving End')}
+                            className="" 
+                            type="checkbox" 
+                            helpText={i18n.t('If selected, DHIS2 will receive data from Go.Data')}
+                            value={dhisReceiver}
+                            checked={dhisReceiver}
+                            onChange={ev => onReceiverInput(ev)}
+                            />}
+                    />
+                    </FormRow>
+                    
                     <ButtonStrip>
 
-                        <Button primary onClick={() => saveConstant({godataValue})}>
+                        <Button primary onClick={() => saveConstant()}>
                         {submitText}
                         </Button>
                         <Button onClick={() => onCancelClick(pristine)}>

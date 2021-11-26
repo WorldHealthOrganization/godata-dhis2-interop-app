@@ -18,7 +18,7 @@ import {
     useSetDefaultConstantMutation,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
-    useReadMappingConfigConstantsQueryForMappings
+    useReadTaskConstantsQueryForTasks
 } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
@@ -41,11 +41,11 @@ export const InteropList = () => {
         error: errorReadConstants,
         data,
         refetch: refetchReadConstants,
-    } = useReadMappingConfigConstantsQueryForMappings()
+    } = useReadTaskConstantsQueryForTasks()
 
     const constants = data?.constants?.constants
 
-    
+    const performExchangeTask = () => {}
 
     const [
         deleteCheckedConstants,
@@ -235,6 +235,17 @@ export const InteropList = () => {
                                     }}
                                 >
                                     {i18n.t('Edit')}
+                                </Button>
+                                <Button
+                                    dataTest={dataTest(
+                                        'constants-constantstable-edit'
+                                    )}
+                                    onClick={() => {
+                                        performExchangeTask(constant.id)
+                                        
+                                    }}
+                                >
+                                    {i18n.t('Run Task')}
                                 </Button>
                             </ButtonStrip>
                         </TableCell>

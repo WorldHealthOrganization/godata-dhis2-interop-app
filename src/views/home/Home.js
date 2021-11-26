@@ -3,6 +3,8 @@ import i18n from '../../locales'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
+    SCHEDULED_TASK_FORM_PATH,
+    INTEROP_LIST_PATH,
     METADATA_CONFIG_LIST_PATH,
     GODATA_CONFIG_FORM_PATH,
 } from '../'
@@ -44,6 +46,26 @@ export const Home = () => {
                         )}
                         linkText={i18n.t('Map Metadata')}
                         to={METADATA_CONFIG_LIST_PATH}
+                    />
+                </div>
+                <div className={s.gridItem}>
+                    <HomeCard
+                        titleText={i18n.t('Tasks Configuration')}
+                        bodyText={i18n.t(
+                            'Add and manage Tasks for data exchange.'
+                        )}
+                        linkText={i18n.t('Manage Tasks')}
+                        to={INTEROP_LIST_PATH}
+                    />
+                </div>
+                <div className={s.gridItem}>
+                    <HomeCard
+                        titleText={i18n.t('Scheduler')}
+                        bodyText={i18n.t(
+                            'Run scheduled tasks at given intervals.'
+                        )}
+                        linkText={i18n.t('Scheduler')}
+                        to={SCHEDULED_TASK_FORM_PATH}
                     />
                 </div>
             </div>

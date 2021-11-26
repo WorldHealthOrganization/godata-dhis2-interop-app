@@ -1,4 +1,4 @@
-import { NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
+import { ReactFinalForm, NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
 import React, { useState } from 'react'
 
@@ -9,10 +9,12 @@ import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
     InteropForm,
-    useReadMappingConfigConstantsQueryById,
+    useReadTaskConstantsQueryById,
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './InteropFormEdit.module.css'
+
+const { Form, useForm } = ReactFinalForm
 
 export const INTEROP_FORM_EDIT_PATH_STATIC = '/interop/edit'
 export const INTEROP_FORM_EDIT_PATH = `${INTEROP_FORM_EDIT_PATH_STATIC}/:id`
@@ -22,10 +24,6 @@ const getInitialValues = jsonData => {
     return jsonData.constant
 }
 
-    const getFormComponent = selectedForm => {
-            return InteropForm
-    }
-
 
 export const InteropFormEdit = () => {
     const history = useHistory()
@@ -34,13 +32,13 @@ export const InteropFormEdit = () => {
     const onCancel = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
 
-    const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryById(
+    const { loading, error: loadError, data: jsonData } = useReadTaskConstantsQueryById(
         id
     )
     
-    const conversionType =
+    const taskConfig =
     jsonData
-        ? JSON.parse(jsonData.constant.description)[0].godataValue[0][0].conversionType
+        ? JSON.parse(jsonData.constant.description)
         : {}
     
     if (loading) {
@@ -77,25 +75,24 @@ export const InteropFormEdit = () => {
 
     const onCancelClick = () => history.push(INTEROP_LIST_PATH)
 
-    const FormComponent = getFormComponent(conversionType)
-    const initialValues = conversionType && getInitialValues(jsonData)
+    //const FormComponent = getFormComponent(taskConfig)
+    const initialValues = taskConfig && getInitialValues(jsonData)
 
     return (
         <div
             data-test={dataTest('views-constantconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Add tasks')}</PageHeadline>
-            
-            <FormComponent
-                        initialValues={initialValues}
-                        onSubmit={onSubmit}
-                        onCancelClick={pristine =>
-                            pristine
-                                ? history.push(INTEROP_LIST_PATH)
-                                : setShowCancelDialog(true)
-                        }
+            <Form destroyOnUnregister onSubmit={onSubmit}>
+            {({ handleSubmit }) => (
+                    <InteropForm
+                    handleSubmit={handleSubmit}
+                    onSubmit={onSubmit}
+                    initialValues={initialValues}
+                    onCancelClick={onCancelClick}
                     />
+                    )}
+            </Form>
         </div>
     )
 }
