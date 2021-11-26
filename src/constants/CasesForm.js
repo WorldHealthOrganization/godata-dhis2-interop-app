@@ -126,7 +126,9 @@ export const CasesForm = ({
                                                     mappings.push(
                                                         {
                                                             "godata": (item.stack + '.' + property).substr(1) , 
-                                                            "dhis2": '',
+                                                            "dhis2": "","props":{
+                                                            "conversion": "true",
+                                                            "values":{"godata":"", "dhis2":""}}
                                                         })
                         
                                 }
@@ -267,10 +269,21 @@ export const CasesForm = ({
     : i18n.t('Add mappings')
 
     const editNode = (instance)=>{
+        console.log(JSON.stringify('inst ns ' + instance.namespace + ' name ' + instance.name))
         setGodataValue(godataValue => {
             const Outbreak = [...godataValue];
             var tmp =  Outbreak[1][instance.namespace[1]]
-            tmp.dhis2 = instance.new_value
+            console.log('tmp' + JSON.stringify(tmp))
+            var path = ''
+            instance.namespace.shift()
+            instance.namespace.shift()
+            instance.namespace.forEach(element => path = path + element +'.');
+            path = path+instance.name
+            //for(var p in instance.namespace){path+p+'.'}
+            console.log('path' + path)
+            dot.str(path, instance.new_value, tmp);
+
+            //tmp.dhis2 = instance.new_value
             return Outbreak
           })
 
