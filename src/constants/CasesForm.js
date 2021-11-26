@@ -128,7 +128,7 @@ export const CasesForm = ({
                                                             "godata": (item.stack + '.' + property).substr(1) , 
                                                             "dhis2": "","props":{
                                                             "conversion": "true",
-                                                            "values":{"godata":"", "dhis2":""}}
+                                                            "values":{}}
                                                         })
                         
                                 }
