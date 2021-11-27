@@ -149,6 +149,7 @@ export const MetadataConfigFormEdit = () => {
             </FormRow>
             <FormComponent
                         initialValues={initialValues}
+                        converterType={visibleForm}
                         onSubmit={onSubmit}
                         onCancelClick={pristine =>
                             pristine

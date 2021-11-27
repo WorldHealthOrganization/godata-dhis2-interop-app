@@ -32,6 +32,7 @@ export const InteropFormNew = () => {
             <Form destroyOnUnregister onSubmit={onSubmit}>
             {({ handleSubmit }) => (
                     <InteropForm
+                    initialValues={''}
                     handleSubmit={handleSubmit}
                     onSubmit={onSubmit}
                         onCancelClick={onCancelClick}

@@ -139,7 +139,7 @@ export const InteropList = () => {
 
             <Paragraph>
                 {i18n.t(
-                    'Tasks are used to perform GoData<->DHIS2 data sharing. Multiple tasks can be set up to process and handle data. Add and configure tasks below.'
+                    'Tasks are used to perform Go.Data<->DHIS2 data sharing. Multiple tasks can be set up to process and handle data. Add and configure tasks below.'
                 )}
             </Paragraph>
 

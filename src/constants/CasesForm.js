@@ -27,10 +27,101 @@ import i18n from '../locales'
 
 const { Form } = ReactFinalForm
 
+
+var mappings, dhismappings
+
+function iterate(obj) {
+    var walked = [];
+    var stack = [{obj: obj, stack: ''}];
+    mappings = [];
+    var i = 0
+    while(stack.length > 0)
+    {
+        var item = stack.pop();
+        var obj = item.obj;
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (typeof obj[property] == "object") {
+                  var alreadyFound = false;
+                  for(var i = 0; i < walked.length; i++)
+                  {
+                    if (walked[i] === obj[property])
+                    {
+                      alreadyFound = true;
+                      break;
+                    }
+                  }
+                  if (!alreadyFound)
+                  {
+                    walked.push(obj[property]);
+                    stack.push({obj: obj[property], stack: item.stack + '.' + property});
+                  }
+                }
+                else
+                {
+                    i++
+                    mappings.push(
+                        {
+                            "godata": (item.stack + '.' + property).substr(1) , 
+                            "dhis2": "","props":{
+                            "conversion": "true",
+                            "values":{}}
+                        })
+
+}
+}
+//  console.log('mappings length ' + mappings.length)
+}
+            }      
+        } 
+
+        function iterate2(obj) {
+            var walked = [];
+            var stack = [{obj: obj, stack: ''}];
+            dhismappings = [];
+            while(stack.length > 0)
+            {
+                var item = stack.pop();
+                var obj = item.obj;
+                for (var property in obj) {
+                    if (obj.hasOwnProperty(property)) {
+                        if (typeof obj[property] == "object") {
+                          var alreadyFound = false;
+                          for(var i = 0; i < walked.length; i++)
+                          {
+                            if (walked[i] === obj[property])
+                            {
+                              alreadyFound = true;
+                              break;
+                            }
+                          }
+                          if (!alreadyFound)
+                          {
+                            walked.push(obj[property]);
+                            stack.push({obj: obj[property], stack: item.stack + '.' + property});
+                          }
+                        }
+                        else
+                        {
+                            dhismappings.push(
+                                {
+                                    "dhis2": (item.stack + '.' + property).substr(1) 
+                                })
+                            //mappings.set(item.stack + '.' + property , 'to be other stuff');
+                            //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
+                        }
+                    }
+                }
+            }
+            console.log('dhis2 mappings length ' + dhismappings.length)
+        }
+
+
 export const CasesForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
+    converterType,
 }) => {
     const history = useHistory()
     const [open, setOpen] = useState(false);
@@ -44,7 +135,6 @@ export const CasesForm = ({
     const [dhisModelInput, setDhisModelInput] = useState('')
     const [godataModelInput, setGodataModelInput] = useState('')
 
-    var mappings, dhismappings
     var instanceObject
 
     const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
@@ -85,105 +175,40 @@ export const CasesForm = ({
                     console.log('res.data.id ' + res.data.id);
 
                     const getInstanceData = async () => {
-                        instanceObject = await axios.get(
+                       var outbreakObject = await axios.get(
                             loginDetails.urlTemplate +'/api/outbreaks', {
                                 headers : {
                                     Authorization: res.data.id,
                                   }
                                 });
 
+                                const outBreakId = outbreakObject.data[0].id
 
-                                function iterate(obj) {
-                                    var walked = [];
-                                    var stack = [{obj: obj, stack: ''}];
-                                    mappings = [];
-                                    var i = 0
-                                    while(stack.length > 0)
-                                    {
-                                        var item = stack.pop();
-                                        var obj = item.obj;
-                                        for (var property in obj) {
-                                            if (obj.hasOwnProperty(property)) {
-                                                if (typeof obj[property] == "object") {
-                                                  var alreadyFound = false;
-                                                  for(var i = 0; i < walked.length; i++)
-                                                  {
-                                                    if (walked[i] === obj[property])
-                                                    {
-                                                      alreadyFound = true;
-                                                      break;
-                                                    }
+                               const loginObject = await axios.post(
+                                    loginDetails.urlTemplate +'/api/users/login', {
+                                        
+                                            email: loginDetails.username,
+                                            password: loginDetails.password,
+                                        
+                                        });
+                                       
+
+                                        instanceObject = await axios.get(
+                                            loginDetails.urlTemplate +'/api/outbreaks/'+outBreakId+'/cases', {
+                                                headers : {
+                                                    Authorization: loginObject.data.id,
                                                   }
-                                                  if (!alreadyFound)
-                                                  {
-                                                    walked.push(obj[property]);
-                                                    stack.push({obj: obj[property], stack: item.stack + '.' + property});
-                                                  }
-                                                }
-                                                else
-                                                {
-                                                    i++
-                                                    mappings.push(
-                                                        {
-                                                            "godata": (item.stack + '.' + property).substr(1) , 
-                                                            "dhis2": "","props":{
-                                                            "conversion": "true",
-                                                            "values":{}}
-                                                        })
-                        
-                                }
-                            }
-                          //  console.log('mappings length ' + mappings.length)
-                        }
-                                            }      
-                                        } 
-                                        console.log(initialValues)              
+                                                });
+
+
+                                console.log(initialValues)  
+            
                             iterate(instanceObject.data[0])
                             const caseMeta = []
                             caseMeta.push([{conversionType: "Go.Data Case"}])
                             caseMeta.push(mappings)
                             setGodataValue(caseMeta)
 
-                            function iterate2(obj) {
-                                var walked = [];
-                                var stack = [{obj: obj, stack: ''}];
-                                dhismappings = [];
-                                while(stack.length > 0)
-                                {
-                                    var item = stack.pop();
-                                    var obj = item.obj;
-                                    for (var property in obj) {
-                                        if (obj.hasOwnProperty(property)) {
-                                            if (typeof obj[property] == "object") {
-                                              var alreadyFound = false;
-                                              for(var i = 0; i < walked.length; i++)
-                                              {
-                                                if (walked[i] === obj[property])
-                                                {
-                                                  alreadyFound = true;
-                                                  break;
-                                                }
-                                              }
-                                              if (!alreadyFound)
-                                              {
-                                                walked.push(obj[property]);
-                                                stack.push({obj: obj[property], stack: item.stack + '.' + property});
-                                              }
-                                            }
-                                            else
-                                            {
-                                                dhismappings.push(
-                                                    {
-                                                        "dhis2": (item.stack + '.' + property).substr(1) 
-                                                    })
-                                                //mappings.set(item.stack + '.' + property , 'to be other stuff');
-                                                //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
-                                            }
-                                        }
-                                    }
-                                }
-                                console.log('dhis2 mappings length ' + dhismappings.length)
-                            }
                         
                         iterate2(programInstance)
                 setDhisValue(dhismappings)
@@ -198,12 +223,10 @@ export const CasesForm = ({
                     setDhisModelInput(JSON.stringify(JSON.parse(initialValues.description)[2]))
                 }
 
-
-
-                
-
                       };
                       getInstanceData();
+                      
+                console.log('converterType ' + converterType)
                   };
                 }
                 catch (error) {
@@ -217,7 +240,6 @@ export const CasesForm = ({
 
  
         return () => {
-            
             console.log("This will be logged on unmount");
           }
       }, [data, progData])
@@ -380,7 +402,7 @@ export const CasesForm = ({
                     onSubmit={handleSubmit}
                     data-test={dataTest('gateways-gatewaygenericform')}
                 >
-                    <PageSubHeadline>{i18n.t('Mappings setup')}</PageSubHeadline>
+                    <PageSubHeadline>{i18n.t('Case mappings setup')}</PageSubHeadline>
 
                     <FormRow>
                         <Field 
@@ -413,58 +435,13 @@ export const CasesForm = ({
             onDelete={deleteNode}
             enableClipboard={selectedNode}
             theme="apathy:inverted"
-            name={'Outbreak'}
+            name={'Case'}
             displayArrayKey={true}
             />
             </div>
                     </FormRow>    
 
 
-                    <FormRow>
-                        <Field 
-                        required
-                        name='godataModel'
-                        //value=''
-                        //component={InputFieldFF}
-                        render={() =>
-                        <TextAreaField
-                        id="godataModel" 
-                        label={i18n.t('Go.Data Case Model')}
-                        className="" 
-                        type="text" 
-                        value={godataModelInput}
-                        helpText="Please copy and paste valid Go.Data Case Model in above text area."
-                        //component={InputField}
-                        onChange={ev => onGodataModelInput(ev.value)}
-                        validate={composeValidators(string, hasValue)}
-                        autoGrow
-                        required/>}
-                        validate={composeValidators(string, hasValue)}
-                        />
-                    </FormRow>
-
-                    <FormRow>
-                        <Field 
-                        required
-                        name='dhisModel'
-                        //value=''
-                        //component={InputFieldFF}
-                        render={() =>
-                        <TextAreaField
-                        id="dhisModel" 
-                        label={i18n.t('DHIS Program Model')}
-                        className="" 
-                        type="text" 
-                        value={dhisModelInput}
-                        helpText="Please copy and paste valid DHIS2 Program Model in above text area."
-                        //component={InputField}
-                        onChange={ev => onDhisModelInput(ev.value)}
-                        validate={composeValidators(string, hasValue)}
-                        autoGrow
-                        required/>}
-                        validate={composeValidators(string, hasValue)}
-                        />
-                    </FormRow>
 
             <Modal open={open} onClose={onCloseModal} center>
         <h2>Select DHIS2 metadata</h2>
@@ -496,10 +473,12 @@ CasesForm.defaultProps = {
     initialValues: {
         parameters: [],
     },
+    converterType: ''
 }
 
 CasesForm.propTypes = {
     onCancelClick: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
+    converterType: PropTypes.string
 }

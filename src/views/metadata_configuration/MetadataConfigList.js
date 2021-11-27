@@ -18,7 +18,6 @@ import {
     useSetDefaultConstantMutation,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
-    ConstantList,
     useReadMappingConfigConstantsQueryForMappings
 } from '../../constants'
 import { ListActions } from '../../dataList'
@@ -155,7 +154,7 @@ export const MetadataConfigList = () => {
 
             <Paragraph>
                 {i18n.t(
-                    'Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple mappings can be set up to process and handle data in multiple ways. Add and configure mappings below.'
+                    'Mapping are used to integrate Go.Data<->DHIS2 data sharing. Multiple mappings can be set up to process and handle data in multiple ways. Add and configure mappings below.'
                 )}
             </Paragraph>
 

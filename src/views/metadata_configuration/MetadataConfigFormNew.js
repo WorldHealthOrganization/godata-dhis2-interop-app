@@ -4,14 +4,11 @@ import React, { useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
 import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
-    GODATA_ORG_UNIT } from '../../gateways'
+    GODATA_ORG_UNIT, GODATA_CUSTOM } from '../../constants'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
-import {
-    useCreateClickatellGatewayMutation,
-    useCreateGenericGatewayMutation,
-} from '../../gateways'
+
 import {
     useCreateCasesConstantMutation,
 } from '../../constants'
@@ -21,6 +18,7 @@ import {
     ContactsForm,
     ContactsOfContactForm,
     OutbreaksForm,
+    CustomForm,
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './MetadataConfigFormNew.module.css'
@@ -29,27 +27,12 @@ export const METADATA_CONFIG_FORM_NEW_PATH = '/metadata/new'
 
 export const MetadataConfigFormNew = () => {
     const history = useHistory()
+    
     const [visibleForm, setVisibleForm] = useState(GODATA_OUTBREAK)
 
-    const [
-        saveGenericGateway,
-        { error: saveGenericGatewayError },
-    ] = useCreateGenericGatewayMutation()
+    const [saveCasesConstant,{ error: saveCasesConstantError },] = useCreateCasesConstantMutation()
 
-    const [
-        saveCasesConstant,
-        { error: saveCasesConstantError },
-    ] = useCreateCasesConstantMutation()
-
-    const [
-        saveClickatellGateway,
-        { error: saveClickatellGatewayError },
-    ] = useCreateClickatellGatewayMutation()
-
-    const error =
-        saveGenericGatewayError ||
-        saveCasesConstantError ||
-        saveClickatellGatewayError
+    const error = saveCasesConstantError
 
     if (error) {
         const msg = i18n.t('Something went wrong whilst saving the gateway')
@@ -66,23 +49,16 @@ export const MetadataConfigFormNew = () => {
 
     const onSubmit = async values => {
         try {
-            if (visibleForm === GODATA_OUTBREAK) {
-                await saveGenericGateway(values)
-            }
-
             if (visibleForm === GODATA_CASE) {
                 await saveCasesConstant(values)
             }
-
-            if (visibleForm === GODATA_CONTACT) {
-                await saveClickatellGateway(values)
-            }
-
             history.push(METADATA_CONFIG_LIST_PATH)
         } catch (e) {
             return Promise.reject(e)
         }
     }
+
+
 
     const onCancelClick = () => history.push(METADATA_CONFIG_LIST_PATH)
 
@@ -169,7 +145,7 @@ export const MetadataConfigFormNew = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-            </FormRow>
+            </FormRow>            
         </div>
     )
 }

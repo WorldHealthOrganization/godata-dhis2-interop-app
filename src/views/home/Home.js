@@ -30,9 +30,9 @@ export const Home = () => {
             <div className={s.grid}>
                 <div className={s.gridItem}>
                     <HomeCard
-                        titleText={i18n.t('GoData Configuration')}
+                        titleText={i18n.t('Go.Data Configuration')}
                         bodyText={i18n.t(
-                            'Add and manage GoData server credntials for sending and receiving to DHIS2.'
+                            'Add and manage Go.Data server credntials for sending and receiving to DHIS2.'
                         )}
                         linkText={i18n.t('Set up server')}
                         to={GODATA_CONFIG_FORM_PATH}
@@ -42,7 +42,7 @@ export const Home = () => {
                     <HomeCard
                         titleText={i18n.t('Metadata Configuration')}
                         bodyText={i18n.t(
-                            'Add and manage GoData and DHIS2 Metadata for data exchange.'
+                            'Add and manage Go.Data and DHIS2 Metadata for data exchange.'
                         )}
                         linkText={i18n.t('Map Metadata')}
                         to={METADATA_CONFIG_LIST_PATH}

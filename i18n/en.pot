@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-25T17:10:25.220Z\n"
-"PO-Revision-Date: 2021-11-25T17:10:25.220Z\n"
+"POT-Creation-Date: 2021-11-27T15:42:32.122Z\n"
+"PO-Revision-Date: 2021-11-27T15:42:32.122Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -29,22 +29,19 @@ msgstr ""
 msgid "Add mappings"
 msgstr ""
 
-msgid "Mappings setup"
+msgid "Case mappings setup"
 msgstr ""
 
 msgid "Name"
-msgstr ""
-
-msgid "Go.Data Case Model"
-msgstr ""
-
-msgid "DHIS Program Model"
 msgstr ""
 
 msgid "Cancel"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Mappings setup"
 msgstr ""
 
 msgid "Confirm deletion"
@@ -116,10 +113,7 @@ msgstr ""
 msgid "If selected, DHIS2 will receive data from Go.Data"
 msgstr ""
 
-msgid "Change Source"
-msgstr ""
-
-msgid "Change Source Instance"
+msgid "Outbreaks mappings setup"
 msgstr ""
 
 msgid "Data set"
@@ -375,10 +369,10 @@ msgid ""
 "registration and more."
 msgstr ""
 
-msgid "GoData Configuration"
+msgid "Go.Data Configuration"
 msgstr ""
 
-msgid "Add and manage GoData server credntials for sending and receiving to DHIS2."
+msgid "Add and manage Go.Data server credntials for sending and receiving to DHIS2."
 msgstr ""
 
 msgid "Set up server"
@@ -387,7 +381,7 @@ msgstr ""
 msgid "Metadata Configuration"
 msgstr ""
 
-msgid "Add and manage GoData and DHIS2 Metadata for data exchange."
+msgid "Add and manage Go.Data and DHIS2 Metadata for data exchange."
 msgstr ""
 
 msgid "Map Metadata"
@@ -415,7 +409,7 @@ msgid "Something went wrong whilst performing the requested operation"
 msgstr ""
 
 msgid ""
-"Tasks are used to perform GoData<->DHIS2 data sharing. Multiple tasks can "
+"Tasks are used to perform Go.Data<->DHIS2 data sharing. Multiple tasks can "
 "be set up to process and handle data. Add and configure tasks below."
 msgstr ""
 
@@ -438,7 +432,7 @@ msgid "Add constant"
 msgstr ""
 
 msgid ""
-"Mapping are used to integrate GoData<->DHIS2 data sharing. Multiple "
+"Mapping are used to integrate Go.Data<->DHIS2 data sharing. Multiple "
 "mappings can be set up to process and handle data in multiple ways. Add and "
 "configure mappings below."
 msgstr ""
