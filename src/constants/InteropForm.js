@@ -133,8 +133,6 @@ export const InteropForm = ({
                                   }
                                 });
                                 console.log('initval name ' + initialValues.name)
-
-
                       };
                       getInstanceData()
                   };

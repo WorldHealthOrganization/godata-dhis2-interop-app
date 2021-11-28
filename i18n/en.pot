@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-27T15:42:32.122Z\n"
-"PO-Revision-Date: 2021-11-27T15:42:32.122Z\n"
+"POT-Creation-Date: 2021-11-28T04:47:54.334Z\n"
+"PO-Revision-Date: 2021-11-28T04:47:54.334Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -41,7 +41,13 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-msgid "Mappings setup"
+msgid "Contact of Contact mappings setup"
+msgstr ""
+
+msgid "Select Go.Data Model"
+msgstr ""
+
+msgid "Select DHIS2 Model"
 msgstr ""
 
 msgid "Confirm deletion"
@@ -71,7 +77,7 @@ msgstr ""
 msgid "Go.Data Contact of Contact"
 msgstr ""
 
-msgid "Go.Data Organisation Unit"
+msgid "Go.Data Location"
 msgstr ""
 
 msgid "Save"
@@ -111,6 +117,9 @@ msgid "DHIS2 is Receiving End"
 msgstr ""
 
 msgid "If selected, DHIS2 will receive data from Go.Data"
+msgstr ""
+
+msgid "Location mappings setup"
 msgstr ""
 
 msgid "Outbreaks mappings setup"
@@ -170,6 +179,9 @@ msgid "Save gateway"
 msgstr ""
 
 msgid "Add gateway"
+msgstr ""
+
+msgid "Mappings setup"
 msgstr ""
 
 msgid "Key"
@@ -425,10 +437,13 @@ msgstr ""
 msgid "It looks like there aren't any configured task, or they couldn't be loaded."
 msgstr ""
 
-msgid "Something went wrong whilst saving the gateway"
+msgid "Something went wrong whilst saving the constant"
 msgstr ""
 
 msgid "Add constant"
+msgstr ""
+
+msgid "Form"
 msgstr ""
 
 msgid ""

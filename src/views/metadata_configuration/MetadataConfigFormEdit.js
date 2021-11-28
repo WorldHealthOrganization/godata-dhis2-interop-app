@@ -39,7 +39,14 @@ const getInitialValues = jsonData => {
         if (GODATA_CONTACT === selectedForm) {
             return ContactsForm
         }
-    
+            
+        if (GODATA_CONTACT_OF_CONTACT === selectedForm) {
+            return ContactsOfContactForm
+        }
+            
+        if (GODATA_ORG_UNIT === selectedForm) {
+            return LocationsForm
+        }
         throw new Error(`The conversion type does not exist, got "${selectedForm}"`)
     }
 

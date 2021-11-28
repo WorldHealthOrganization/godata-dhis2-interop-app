@@ -35,7 +35,7 @@ export const MetadataConfigFormNew = () => {
     const error = saveCasesConstantError
 
     if (error) {
-        const msg = i18n.t('Something went wrong whilst saving the gateway')
+        const msg = i18n.t('Something went wrong whilst saving the constant')
 
         return (
             <div data-test={dataTest('views-gatewayconfigformnew')}>
@@ -71,7 +71,7 @@ export const MetadataConfigFormNew = () => {
 
             <FormRow>
                 <SingleSelectField
-                    label={i18n.t('Type')}
+                    label={i18n.t('Form')}
                     onChange={({ selected }) => setVisibleForm(selected)}
                     selected={visibleForm}
                     dataTest={dataTest(
@@ -102,7 +102,11 @@ export const MetadataConfigFormNew = () => {
                         value={GODATA_ORG_UNIT}
                         label={i18n.t(GODATA_ORG_UNIT)}
                     />
-
+                    
+                    <SingleSelectOption
+                        value={GODATA_CUSTOM}
+                        label={i18n.t(GODATA_CUSTOM)}
+                    />
                 </SingleSelectField>
             </FormRow>
 
@@ -145,6 +149,14 @@ export const MetadataConfigFormNew = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
+                
+                {visibleForm === GODATA_CUSTOM && (
+                    <CustomForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}                
             </FormRow>            
         </div>
     )
