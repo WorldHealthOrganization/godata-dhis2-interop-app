@@ -5,7 +5,6 @@ export const UPDATE_GODATA_SERVER_CONSTANT_MUTATION = {
     id: ({ id }) => id,
     type: 'update',
     data: ({ urlTemplate, username, password, id }) => ({
-        id: id,
         displayName: 'Go.Data Server configs (URL)',
         shortName: 'Go.Data Server configs',
         code: 'godataserverconf',

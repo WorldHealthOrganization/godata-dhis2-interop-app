@@ -14,6 +14,7 @@ import {
     INTEROP_FORM_EDIT_PATH,
     SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
+    DHIS_CONFIG_FORM_PATH,
     MetadataConfigFormNew,
     MetadataConfigFormEdit,
     MetadataConfigList,
@@ -22,6 +23,7 @@ import {
     InteropFormEdit,
     ScheduleTaskForm,
     GoDataConfigForm,
+    DhisConfigForm,
     HOME_PATH,
     Home,
 } from './views'
@@ -40,13 +42,19 @@ const App = () => (
                     <Switch>
                         <Route exact path={HOME_PATH} component={Home} />
 
-                        {/* GoData configuration */ ''}
+                        {/* Go.Data configuration */ ''}
                         <Route
                             exact
                             path={GODATA_CONFIG_FORM_PATH}
                             component={GoDataConfigForm}
                         />
 
+                        {/* Dhis2 configuration */ ''}
+                        <Route
+                            exact
+                            path={DHIS_CONFIG_FORM_PATH}
+                            component={DhisConfigForm}
+                        />
 
                         {/* MetaData configuration */ ''}
                         <Route

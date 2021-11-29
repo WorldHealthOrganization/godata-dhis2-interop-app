@@ -27,7 +27,6 @@ import i18n from '../locales'
 
 const { Form } = ReactFinalForm
 
-
 var mappings, dhismappings
 
 function iterate(obj) {
@@ -141,7 +140,6 @@ export const CasesForm = ({
     //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
 
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
-
 
     const [ addCasesConstant ] = useCreateCasesConstantMutation()
     const [ saveCasesConstant ] = useUpdateCasesConstantMutation()

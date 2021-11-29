@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-28T04:47:54.334Z\n"
-"PO-Revision-Date: 2021-11-28T04:47:54.334Z\n"
+"POT-Creation-Date: 2021-11-28T06:46:05.374Z\n"
+"PO-Revision-Date: 2021-11-28T06:46:05.374Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -56,6 +56,12 @@ msgstr ""
 msgid "Are you sure you want to delete the selected constants?"
 msgstr ""
 
+msgid "Save"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
@@ -78,12 +84,6 @@ msgid "Go.Data Contact of Contact"
 msgstr ""
 
 msgid "Go.Data Location"
-msgstr ""
-
-msgid "Save"
-msgstr ""
-
-msgid "Add"
 msgstr ""
 
 msgid "Save task"
@@ -355,16 +355,19 @@ msgstr ""
 msgid "User group"
 msgstr ""
 
-msgid "Something went wrong whilst saving configs"
-msgstr ""
-
-msgid "Metadata Mapping"
-msgstr ""
-
 msgid "Something went wrong whilst saving server configs"
 msgstr ""
 
 msgid "Edit Server Config"
+msgstr ""
+
+msgid "Configure DHIS2 server"
+msgstr ""
+
+msgid "Something went wrong whilst saving configs"
+msgstr ""
+
+msgid "Metadata Mapping"
 msgstr ""
 
 msgid "Configure Go.Data server"
@@ -384,10 +387,23 @@ msgstr ""
 msgid "Go.Data Configuration"
 msgstr ""
 
-msgid "Add and manage Go.Data server credntials for sending and receiving to DHIS2."
+msgid ""
+"Add and manage Go.Data server base URI and credntials for sending and "
+"receiving to and from DHIS2 Instance."
 msgstr ""
 
-msgid "Set up server"
+msgid "Set up Go.Data server instance"
+msgstr ""
+
+msgid "DHIS2 Configuration"
+msgstr ""
+
+msgid ""
+"Add and manage DHIS2 server base URI and credntials for sending and "
+"receiving to and from Go.Data Instance."
+msgstr ""
+
+msgid "Set up DHIS2 server instance"
 msgstr ""
 
 msgid "Metadata Configuration"

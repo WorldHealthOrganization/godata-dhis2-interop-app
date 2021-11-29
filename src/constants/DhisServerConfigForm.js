@@ -7,19 +7,18 @@ import {
     FieldGoDataUrlTemplate,
     FieldGoDataUsername,
     FieldGoDataPassword
-} from '../constants'
+} from '.'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 
 const { Form } = ReactFinalForm
 
-export const GoDataServerConfigForm = ({
+export const DhisServerConfigForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
 }) => {
-    console.log('initialValues ' + JSON.stringify(initialValues))
-    const submitText = initialValues.id !=='undefined'
+    const submitText = initialValues
         ? i18n.t('Save')
         : i18n.t('Add')
 
@@ -69,11 +68,11 @@ export const GoDataServerConfigForm = ({
     )
 }
 
-GoDataServerConfigForm.defaultProps = {
+DhisServerConfigForm.defaultProps = {
     initialValues: {},
 }
 
-GoDataServerConfigForm.propTypes = {
+DhisServerConfigForm.propTypes = {
     onCancelClick: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,

@@ -9,22 +9,22 @@ import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
     GoDataServerConfigForm,
-    useCreateGoDataServerConfigConstantMutation,
-    useReadMappingConfigConstantsQueryForConfig,
-    useUpdateGoDataServerConfigConstantMutation,
+    useCreateDhisServerConfigConstantMutation,
+    useReadConstantsQueryForDhisConfig,
+    useUpdateDhisServerConfigConstantMutation,
 } from '../../constants'
 import i18n from '../../locales'
-import styles from './GoDataConfigForm.module.css'
+import styles from './DhisConfigForm.module.css'
 
-export const GODATA_CONFIG_FORM_PATH = '/godata-config'
-export const GODATA_CONFIG_FORM_LABEL = 'Go.Data Server Configuration'
+export const DHIS_CONFIG_FORM_PATH = '/dhis-config'
+export const DHIS_CONFIG_FORM_LABEL = 'DHIS2 Server Configuration'
 
-export const GoDataConfigForm = () => {
+export const DhisConfigForm = () => {
     const history = useHistory()
-    const { code } = 'godataserverconf'
+    const { code } = 'dhis2serverconf'
     //const [id, setId] = useState('')
 var id, exists
-const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
+const { loading, data, error  } = useReadConstantsQueryForDhisConfig()
 
 
         const loginDetails = 
@@ -50,8 +50,8 @@ console.log('exists assign ' + exists)
      const initialValues = vals
 
 
-    const [saveGoDataServerConfigConstant] = useCreateGoDataServerConfigConstantMutation()
-    const [updateGoDataServerConfigConstant] = useUpdateGoDataServerConfigConstantMutation()
+    const [saveDhisServerConfigConstant] = useCreateDhisServerConfigConstantMutation()
+    const [updateDhisServerConfigConstant] = useUpdateDhisServerConfigConstantMutation()
 
 
     const onSubmit = async values => {
@@ -61,10 +61,10 @@ console.log('exists assign ' + exists)
                 console.log('exists onsubmit ' + exists)
                 //setId(jsonData.constants.constants[0].id)
                 console.log('id : ' + id)
-                await updateGoDataServerConfigConstant(values, id)
+                await updateDhisServerConfigConstant(values, id)
             }else{
                 console.log('hre ')
-                await saveGoDataServerConfigConstant(values)
+                await saveDhisServerConfigConstant(values)
             }
             
             history.push(HOME_PATH)
@@ -80,7 +80,7 @@ console.log('exists assign ' + exists)
             data-test={dataTest('views-gatewayconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Configure Go.Data server')}</PageHeadline>
+            <PageHeadline>{i18n.t('Configure DHIS2 server')}</PageHeadline>
 
             <FormRow>
 

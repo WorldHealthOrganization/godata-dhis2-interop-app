@@ -6,7 +6,7 @@ export const CREATE_CASES_CONSTANT_MUTATION = {
     data: ({ allValues, nameInput }) => ({
         //displayName: 'Go.Data (URL)1',
         shortName: nameInput,
-        //code: 'cases1',
+        code: 'dhis2serverconf',
         name: nameInput,
         description: JSON.stringify(allValues) ,
         createdBy: {

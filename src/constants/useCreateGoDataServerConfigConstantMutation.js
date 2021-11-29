@@ -19,7 +19,7 @@ export const CREATE_GODATA_SERVER_CONFIG_CONSTANT_MUTATION = {
             },
             created: Date.now(),
             lastUpdated: Date.now(),
-        value: '1',
+        value: '-1000001',
     }),
 }
 
