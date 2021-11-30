@@ -12,10 +12,11 @@ import { NoticeBox, CenteredContent, CircularLoader,    Button,
     TableCell, } from '@dhis2/ui'
 
 import { INTEROP_FORM_NEW_PATH } from './InteropFormNew'
+import {INTEROP_RUN_TASK_FORM_PATH_STATIC} from './InteropRunTaskForm'
 import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 
 import {
-    useSetDefaultConstantMutation,
+    useReadTaskConstantsQueryById,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
     useReadTaskConstantsQueryForTasks
@@ -42,20 +43,13 @@ export const InteropList = () => {
         data,
         refetch: refetchReadConstants,
     } = useReadTaskConstantsQueryForTasks()
-
+            
     const constants = data?.constants?.constants
-
-    const performExchangeTask = () => {}
 
     const [
         deleteCheckedConstants,
         { loading: loadingDelete, error: errorDelete },
     ] = useDeleteConstantsMutation()
-
-    const [
-        makeConstantDefault,
-        { loading: loadingSetDefault, error: errorSetDefault },
-    ] = useSetDefaultConstantMutation()
 
     const onDeleteClick = () => {
         const variables = { ids: checkedConstants }
@@ -63,12 +57,7 @@ export const InteropList = () => {
         setShowDeleteDialog(false)
     }
 
-    const onMakeDefaultClick = id => {
-        const variables = { id }
-        makeConstantDefault(variables).then(refetchReadConstants)
-    }
-
-    const loading = loadingReadConstants || loadingDelete || loadingSetDefault
+    const loading = loadingReadConstants || loadingDelete 
 
     if (loading) {
         return (
@@ -81,7 +70,7 @@ export const InteropList = () => {
         )
     }
 
-    const error = errorReadConstants || errorDelete || errorSetDefault
+    const error = errorReadConstants || errorDelete
 
     if (error) {
         const msg = i18n.t(
@@ -129,7 +118,6 @@ export const InteropList = () => {
     
     const hasMappings = !!data?.constants?.constants?.length
     
-
     return (
         <div
             className={styles.container}
@@ -241,7 +229,9 @@ export const InteropList = () => {
                                         'constants-constantstable-edit'
                                     )}
                                     onClick={() => {
-                                        performExchangeTask(constant.id)
+                                        history.push(
+                                            `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/${constant.id}`
+                                        )
                                         
                                     }}
                                 >

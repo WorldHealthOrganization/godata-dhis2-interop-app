@@ -1,8 +1,8 @@
 const config = {
     type: 'app',
     name: 'interop-configuration',
-    title: 'GoData Configuration',
-    description: 'Configure GoData server and manage DHIS2 interoperability',
+    title: 'Go.Data Configuration',
+    description: 'Configure Go.Data server and manage DHIS2 interoperability',
     coreApp: false,
 
     entryPoints: {

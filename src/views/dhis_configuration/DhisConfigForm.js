@@ -17,7 +17,7 @@ import i18n from '../../locales'
 import styles from './DhisConfigForm.module.css'
 
 export const DHIS_CONFIG_FORM_PATH = '/dhis-config'
-export const DHIS_CONFIG_FORM_LABEL = 'DHIS2 Server Configuration'
+export const DHIS_CONFIG_FORM_LABEL = 'DHIS2 Server Credentials'
 
 export const DhisConfigForm = () => {
     const history = useHistory()

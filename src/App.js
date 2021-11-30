@@ -12,6 +12,7 @@ import {
     INTEROP_LIST_PATH,
     INTEROP_FORM_NEW_PATH,
     INTEROP_FORM_EDIT_PATH,
+    INTEROP_RUN_TASK_FORM_PATH,
     SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     DHIS_CONFIG_FORM_PATH,
@@ -21,6 +22,7 @@ import {
     InteropList,
     InteropFormNew,
     InteropFormEdit,
+    InteropRunTaskForm,
     ScheduleTaskForm,
     GoDataConfigForm,
     DhisConfigForm,
@@ -93,6 +95,12 @@ const App = () => (
                             component={InteropFormEdit}
                         />
 
+                        <Route
+                            exact
+                            path={INTEROP_RUN_TASK_FORM_PATH}
+                            component={InteropRunTaskForm}
+                        />
+                        
                         <Route
                             exact
                             path={SCHEDULED_TASK_FORM_PATH}

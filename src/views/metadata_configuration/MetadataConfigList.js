@@ -28,7 +28,7 @@ import i18n from '../../locales'
 import styles from './MetadataConfigList.module.css'
 
 export const METADATA_CONFIG_LIST_PATH = '/metadata'
-export const METADATA_CONFIG_LIST_LABEL = 'Metadata configuration'
+export const METADATA_CONFIG_LIST_LABEL = 'Metadata Mapping'
 
 export const MetadataConfigList = () => {
     const history = useHistory()
