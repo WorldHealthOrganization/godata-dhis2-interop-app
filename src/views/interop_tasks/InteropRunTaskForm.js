@@ -430,7 +430,7 @@ function iterate(obj) {
 
                       }
                   }
-                  console.log('payloadModel ' + JSON.stringify(payloadModel))
+                  //console.log('payloadModel ' + JSON.stringify(payloadModel))
                 //  console.log('mappings length ' + mappings.length)
                 }
             }      
@@ -450,6 +450,7 @@ function iterate(obj) {
                       // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
                       if(tmp.props.conversion==='true'){
                         //console.log('senderData' + senderData)
+                        console.log('selected object ' + JSON.stringify(checkedConstants))
                         let stmp = senderData[0] //TO BE DYNAMIC 
                         let val = dot.pick(tmp.dhis2, stmp)
                         //IN CASE OF GO.DATA, PROPERTY IS USED FOR SEARCHING CONVERSION VALUE
@@ -487,7 +488,9 @@ function iterate(obj) {
                         console.log('conv ' + tmp.props.conversion)
                         if(tmp.props.conversion==='true'){
                           //console.log('senderData' + senderData)
-                          let stmp = senderData[0] //TO BE DYNAMIC 
+                          console.log('selected object ' + JSON.stringify(checkedConstants))
+                          const senderObject = senderData.find(x => x.id === checkedConstants[0])
+                          let stmp = senderObject //TO BE DYNAMIC 
                           let val = dot.pick(tmp.dhis2, stmp)
                           var stringBoolean = ''
                           if (typeof val == "boolean") {
