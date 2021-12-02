@@ -372,7 +372,7 @@ const getTaskDone = () => {
     console.log('isDhis ' + isDhis)
     console.log('taskType ' + taskType)
     console.log('mappingModel ' + JSON.stringify(mappingModel))
-    console.log('senderData ' + senderData)
+    console.log('senderData ' + JSON.stringify(senderData))
     console.log('inst ' + JSON.stringify(inst))
 
     console.log('payloadModel ' + JSON.stringify(payloadModel))
@@ -418,6 +418,8 @@ function iterate(obj) {
                     //console.log('mappingModel dot.pick ' + dot.pick('godata'+item.stack + '.' + property, mappingModel))
                     console.log('getDotNotationByValue ' + getDotNotationByValue((item.stack + '.' + property).substr(1)))
                     //dot.copy('stuff.phone', 'wanna.haves.phone', src, tgt);
+                    dot.str((item.stack + '.' + property).substr(1).toString(), getDotNotationByValue((item.stack + '.' + property).substr(1)), payloadModel);
+
                     mappings.push(
                         {
                             "godata": (item.stack + '.' + property).substr(1) , 
@@ -428,6 +430,7 @@ function iterate(obj) {
 
                       }
                   }
+                  console.log('payloadModel ' + JSON.stringify(payloadModel))
                 //  console.log('mappings length ' + mappings.length)
                 }
             }      
@@ -445,15 +448,24 @@ function iterate(obj) {
                   if( tmp ){
                       //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
                       // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
-                      if(tmp.props.conversion=true){
+                      if(tmp.props.conversion==='true'){
                         //console.log('senderData' + senderData)
                         let stmp = senderData[0] //TO BE DYNAMIC 
                         let val = dot.pick(tmp.dhis2, stmp)
-                        //IN CASE OF GO.DATA PROPERTY IS USED FOR SEARCHING CONVERSION VALUE
-                        if(tmp.props.values.val){
-                        return tmp.props.values.val
+                        //IN CASE OF GO.DATA, PROPERTY IS USED FOR SEARCHING CONVERSION VALUE
+                        var stringBoolean = ''
+                        if (typeof val == "boolean") {
+                          stringBoolean = val ? "true": "false"
+                      }else{
+                          stringBoolean = val
+                      }
+                        console.log('false ' + JSON.stringify(tmp) +' props.values.false ' + JSON.stringify(tmp.props.values[stringBoolean]))
+                        
+                        if(tmp.props.values[stringBoolean]){
+                            //RETURN CONVERTED VALUE
+                        return tmp.props.values[stringBoolean]
                         }else{
-                            //RETURN RAW DATA IF NOT FOUND IN CONVERSION TABLE
+                            //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
                         return val
                         }
                       }else{
@@ -463,25 +475,39 @@ function iterate(obj) {
                   }else{return '1'}
                      
                   }else{
+
+
+
+
                     let tmp = dataArray.find(x => x.godata === dotnot)
                     //console.log(JSON.stringify(tmp))
                     if( tmp ){
                         //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
                         // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
-                        if(tmp.props.conversion=true){
+                        console.log('conv ' + tmp.props.conversion)
+                        if(tmp.props.conversion==='true'){
                           //console.log('senderData' + senderData)
                           let stmp = senderData[0] //TO BE DYNAMIC 
                           let val = dot.pick(tmp.dhis2, stmp)
+                          var stringBoolean = ''
+                          if (typeof val == "boolean") {
+                            stringBoolean = val ? "true": "false"
+                        }else{
+                            stringBoolean = val
+                        }
                           //IN CASE OF DHIS2 PROPERTY VALUE IS USED FOR SEARCHING CONVERSION VALUE
                           
-                          if(tmp.props.values.val){
+                          console.log('false ' + JSON.stringify(tmp) +' props.values.false ' + JSON.stringify(tmp.props.values[stringBoolean]))
+                          
+                          if(tmp.props.values[stringBoolean]){
                               //RETURN CONVERTED VALUE
-                          return tmp.props.values.val
+                          return tmp.props.values[stringBoolean]
                           }else{
                               //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
                           return val
                           }
                         }else{
+                            //console.log('tmp.dhis2 ' + tmp.dhis2)
                           return tmp.dhis2
                         }
                       
