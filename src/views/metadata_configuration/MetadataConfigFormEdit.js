@@ -29,7 +29,7 @@ const getInitialValues = jsonData => {
 
     const getFormComponent = selectedForm => {
         if (GODATA_OUTBREAK === selectedForm) {
-            return OutbreakForm
+            return OutbreaksForm
         }
     
         if (GODATA_CASE === selectedForm) {

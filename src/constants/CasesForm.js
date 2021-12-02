@@ -137,8 +137,7 @@ export const CasesForm = ({
     var instanceObject
 
     const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
-    //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
-
+    
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
     const [ addCasesConstant ] = useCreateCasesConstantMutation()
@@ -233,7 +232,7 @@ export const CasesForm = ({
               }
               login()
               console.log('outbreaks: ' + JSON.stringify(instanceObject))
-            }
+        }
 
 
  
