@@ -42,6 +42,7 @@ export const InteropRunTaskForm = () => {
 
     const [task, setTask] = useState()
     const [mappings, setMappings] = useState()
+    const [godataLogn, setGodataLogin] = useState()
     const [token, setToken] = useState()
     const [inst, setInst] = useState([])
     const [open, setOpen] = useState(false)
@@ -87,7 +88,7 @@ useEffect(()=>{
                         : {}
                         console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis))
                         console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata)   )
-
+                        setGodataLogin(loginDetailsGodata)
 if(data){
 
     //GET GO.DATA LOGIN TOKEN
@@ -517,8 +518,58 @@ function iterate(obj) {
                     }else{return '1'}
                   }
           }
-
+console.log('payloadModel ' + JSON.stringify(payloadModel))
 //SEND PAYLOAD TO RECIEVER
+
+async function login() {
+    try {
+      let res = await axios({
+        method: 'POST',
+        data: {
+            email: godataLogn.username,
+            password: godataLogn.password,
+        },
+        url: godataLogn.urlTemplate+"/api/users/login",
+  
+      });
+      if (res.status == 200) {
+        console.log('res.data.id ' + res.data.id);
+
+        setToken(JSON.parse(JSON.stringify(res.data.id)))
+/*
+        axios.post(receiver + '?access_token=' + res.data.id, payloadModel, { headers : {'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+        'Content-Type':'application/json', 
+            crossDomain:true,
+            //Authorization: res.data.id,
+          } })
+    .then(response => console.log(response.data.id));*/
+
+    console.log('payloadModel ' + JSON.stringify(payloadModel))
+                let ans = await axios({
+                    method: 'POST',
+                    data: payloadModel
+                    ,
+                    headers : {'Access-Control-Allow-Origin' : '*',
+                'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                'Content-Type':'application/json',
+                    crossDomain:true,
+                    //Authorization: `bearer ${res.data.id}` ,
+                  },
+                    url: receiver+'?access_token=' + res.data.id,
+              
+                  });
+                  if (res.status == 200) {
+                    console.log('res.data ' + ans.data);
+                  }
+
+            }
+    }catch(error) {
+        console.log(error);
+    }
+}
+login()
+
 }
 
 
