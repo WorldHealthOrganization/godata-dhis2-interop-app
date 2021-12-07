@@ -12570,6 +12570,11 @@ react-spinners@^0.11.0:
   dependencies:
     "@emotion/react" "^11.1.4"
 
+react-status-alert@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-status-alert/-/react-status-alert-1.1.2.tgz#5d39187cc62036c6aab9315155579dbfdffe6899"
+  integrity sha512-zed7EJLKpcXteJU1WRb4gbus+IrlSlOR8PftZcXRcX8QO8awV9PwZ7Ys3NjX2Fgy/Hb9QTs5vXy9vx1guwYWtg==
+
 react-test-renderer@^16.13.1:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-16.13.1.tgz"

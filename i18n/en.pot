@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-30T11:08:30.709Z\n"
-"PO-Revision-Date: 2021-11-30T11:08:30.709Z\n"
+"POT-Creation-Date: 2021-12-07T01:53:24.095Z\n"
+"PO-Revision-Date: 2021-12-07T01:53:24.095Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -453,6 +453,27 @@ msgid "No task found"
 msgstr ""
 
 msgid "It looks like there aren't any configured task, or they couldn't be loaded."
+msgstr ""
+
+msgid "Start reading task configurations."
+msgstr ""
+
+msgid "Loging to Go.Data Instance Success."
+msgstr ""
+
+msgid "Reading mappings config."
+msgstr ""
+
+msgid "DHIS2 is receiving endpoint."
+msgstr ""
+
+msgid "Reading sender data."
+msgstr ""
+
+msgid "Start sending data"
+msgstr ""
+
+msgid "Data send successfully"
 msgstr ""
 
 msgid "Proceed"

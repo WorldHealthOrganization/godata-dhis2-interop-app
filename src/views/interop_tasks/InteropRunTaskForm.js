@@ -22,9 +22,13 @@ import styles from './InteropFormNew.module.css'
 import { css } from "@emotion/react";
 import ClipLoader from "react-spinners/ClipLoader";
 
+import StatusAlert, { StatusAlertService } from 'react-status-alert'
+import 'react-status-alert/dist/status-alert.css'
+
 import { Modal } from 'react-responsive-modal';
 import dot from 'dot-object';
 import {useReadMappingConfigConstantsQueryForConfig, useReadConstantsQueryForDhisConfig} from '../../constants'
+import { classImplements } from '@babel/types'
 
 const { Form, useForm } = ReactFinalForm
 
@@ -40,13 +44,15 @@ export const InteropRunTaskForm = () => {
 
     const [checkedConstants, setCheckedConstants] = useState([])
 
+    const [alertId, setAlertId] = useState('')
+
     const [task, setTask] = useState()
     const [mappings, setMappings] = useState()
     const [godataLogn, setGodataLogin] = useState()
     const [token, setToken] = useState()
     const [inst, setInst] = useState([])
     const [open, setOpen] = useState(false)
-    var instanceObject, instance
+    var instanceObject, instance, messg
 
     const [sender, setSender] = useState()
     const [receiver, setReceiver] = useState()
@@ -66,17 +72,22 @@ export const InteropRunTaskForm = () => {
 let [sloading, setLoading] = useState(false);
 let [color, setColor] = useState("#ffffff");
 
+
+
     const createAuthenticationHeader = (username, password) => {
         return 'Basic ' + new Buffer( username + ':' + password ).toString( 'base64' );        
         };
 
         const { lloading, data: progData, lerror } = useReadConstantsQueryForDhisConfig()
-    
+
         const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
 useEffect(()=>{
 
     setLoading(true)
+    messg = StatusAlertService.showInfo(i18n.t('Start reading task configurations.'));
+    setAlertId({ messg });
+
         const loginDetailsGodata = 
         data && data.constants.constants.length >0
         ? JSON.parse(data.constants.constants[0].description)
@@ -89,8 +100,13 @@ useEffect(()=>{
                         console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis))
                         console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata)   )
                         setGodataLogin(loginDetailsGodata)
+
+                        messg = StatusAlertService.showSuccess(i18n.t('Reading task configurations: Success.'));
+                        setAlertId({ messg });
 if(data){
 
+    messg = StatusAlertService.showInfo(i18n.t('Loging in to Go.Data Instance.' + loginDetailsGodata.urlTemplate));
+    setAlertId({ messg });
     //GET GO.DATA LOGIN TOKEN
  async function loginGodata() {
     try {
@@ -108,7 +124,8 @@ if(data){
         //setToken(res.data.id)//in promise??
         console.log('token ' + token) 
 
-
+        messg = StatusAlertService.showSuccess(i18n.t('Loging to Go.Data Instance Success.'));
+        setAlertId({ messg });
 
 
 
@@ -124,9 +141,13 @@ if(data){
                      const taskObjectMeta = JSON.parse(taskObject.data.description)
                      console.log('taskObjectId ' + JSON.stringify(taskObjectMeta))
                      
-                    
+                     messg = StatusAlertService.showSuccess(i18n.t('Read Task config: Success.'));
+                     setAlertId({ messg });                    
 
 //GET TASK'S MAPPINGS DEFINITIONS
+messg = StatusAlertService.showInfo(i18n.t('Reading mappings config.'));
+setAlertId({ messg }); 
+
                      const getMappings = async (id) => {
                         var mappingObject = await axios.get(
                              loginDetailsDhis.urlTemplate +'/dhis/api/constants/'+id+'?paging=false&fields=id,displayName,code,description,shortName,name', {
@@ -141,7 +162,8 @@ if(data){
                                    setMappings(JSON.parse(JSON.stringify(mappingObjectMeta)))
                                    console.log('usemapping ' + mappings)
                                }
-
+                               messg = StatusAlertService.showSuccess(i18n.t('Read mappings config: Success.'));
+                               setAlertId({ messg }); 
                                 //setTask(JSON.parse(taskObject.data))//in promise
                                 //setMappings(JSON.parse(mappingObject.data)) //in promise
 
@@ -172,13 +194,22 @@ if(data){
 
         //if DHIS2 is receiving end
         if(isDhis){
+
+            messg = StatusAlertService.showInfo(i18n.t('DHIS2 is receiving endpoint.'));
+            setAlertId({ messg });
+            messg = StatusAlertService.showInfo(i18n.t('Login in to Go.Data Instance.' + loginDetailsGodata.urlTemplate));
+            setAlertId({ messg });
 //get Go.Data security token
             const loginObject = await axios.post(
                 loginDetailsGodata.urlTemplate +'/api/users/login', {
                         email: loginDetailsGodata.username,
                         password: loginDetailsGodata.password,
                     });
-                   
+
+                    messg = StatusAlertService.showSuccess(i18n.t('Login in to Go.Data Instance: Success.'));
+                    setAlertId({ messg });
+                    messg = StatusAlertService.showInfo(i18n.t('Reading sender data.'));
+                    setAlertId({ messg });
 //GET GO.DATA INSTANCES AS PER API ENDPOINT
                     instanceObject = await axios.get(
                         taskObjectMeta[0] + taskObjectMeta[2], {
@@ -189,7 +220,8 @@ if(data){
                                 Authorization: loginObject.data.id,
                               }
                             });
-
+                            messg = StatusAlertService.showSuccess(i18n.t('Reading sender data: Success.'));
+                            setAlertId({ messg });
                             console.log(JSON.stringify(instanceObject.data))
                             var tmp = JSON.parse(JSON.stringify(instanceObject.data))
                             setSenderData(tmp)
@@ -216,7 +248,8 @@ if(data){
 
 
 
-       
+            messg = StatusAlertService.showInfo(i18n.t('Reading sender data.'));
+            setAlertId({ messg });
 //GET DHIS2 INSTANCES AS PER API ENDPOINT
         instanceObject = await axios.get(
             taskObjectMeta[0] + taskObjectMeta[2], {
@@ -226,7 +259,8 @@ if(data){
                     crossDomain:true,
                   }
                 });
-
+                messg = StatusAlertService.showSuccess(i18n.t('Reading sender data: Success.'));
+                setAlertId({ messg });
                 console.log('instanceObject.data' + JSON.stringify(instanceObject.data))
                 var tmp = JSON.parse(JSON.stringify(instanceObject.data.programs))
                 setSenderData(tmp)
@@ -276,6 +310,9 @@ if(data){
 
       }
     } catch (error) {
+        
+        messg = StatusAlertService.showError(i18n.t('Loging to Go.Data Instance Failed.'+ error), options);
+        setAlertId({ messg });
         console.log(error);
     }}
     loginGodata()
@@ -521,6 +558,8 @@ function iterate(obj) {
 console.log('payloadModel ' + JSON.stringify(payloadModel))
 //SEND PAYLOAD TO RECIEVER
 
+messg = StatusAlertService.showInfo(i18n.t('Start sending data'));
+setAlertId({ messg });
 async function login() {
     try {
       let res = await axios({
@@ -530,7 +569,7 @@ async function login() {
             password: godataLogn.password,
         },
         url: godataLogn.urlTemplate+"/api/users/login",
-  
+
       });
       if (res.status == 200) {
         console.log('res.data.id ' + res.data.id);
@@ -561,11 +600,17 @@ async function login() {
                   });
                   if (res.status == 200) {
                     console.log('res.data ' + ans.data);
+                    messg = StatusAlertService.showSuccess(i18n.t('Data send successfully' + JSON.stringify(ans.data)), {autoHideTime: 10000000});
+                    setAlertId({ messg });
                   }
 
             }
     }catch(error) {
-        console.log(error);
+        console.log('error: ' + error);
+        console.log('error message ' + error.response.data);
+      console.log(error.response.status);
+        messg = StatusAlertService.showError(i18n.t('Data sending failed: ' + JSON.stringify(error.response.data)), {autoHideTime: 10000000});
+        setAlertId({ messg });
     }
 }
 login()
@@ -584,6 +629,7 @@ const onCloseModal = () => {setOpen(false)}
             data-test={dataTest('views-gatewayconfigformnew')}
             className={styles.container}
         >
+            <StatusAlert/>
             <Form destroyOnUnregister onSubmit={onSubmit}>
             {({ handleSubmit, pristine }) => (
 <form>
@@ -592,7 +638,7 @@ const onCloseModal = () => {setOpen(false)}
         <h2>Select item(s)</h2>
         <p>{task}</p>
                                     <ButtonStrip>
-                                        <Button primary onClick={() => getTaskDone()}>
+                                        <Button primary disabled={!checkedConstants.length>0} onClick={() => getTaskDone()}>
                                         {i18n.t('Proceed')}
                                         </Button>
                                         <Button onClick={() => onCancelClick(pristine)}>
