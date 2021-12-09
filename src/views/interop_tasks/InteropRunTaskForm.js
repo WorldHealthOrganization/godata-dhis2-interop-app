@@ -40,7 +40,7 @@ export const InteropRunTaskForm = () => {
   const [token, setToken] = useState();
   const [inst, setInst] = useState([]);
   const [open, setOpen] = useState(false);
-  var instanceObject, instance, messg, parentChiled;
+  var instanceObject, instance, messg, parentChiled, thisId;
   const [sender, setSender] = useState();
   const [receiver, setReceiver] = useState();
   const [filter, setFilter] = useState();
@@ -531,6 +531,7 @@ export const InteropRunTaskForm = () => {
             } //IN CASE OF DHIS2 PROPERTY VALUE IS USED FOR SEARCHING CONVERSION VALUE
                 if(tmp.dhis2==='id'){
                     console.log('existying val ' + val )
+                    thisId = val
                     setExistingId(val)
                 }
             //console.log('false/true ' + JSON.stringify(tmp) + ' props.values.false ' + JSON.stringify(tmp.props.values))
@@ -601,7 +602,7 @@ export const InteropRunTaskForm = () => {
           
           else if (tmp.props.conversion === 'pid'){
 
-            return 'bff6747a-3e59-43c3-964e-fd1559a9807b'
+            return '0391a098-bbc2-4435-adae-6910afa47a72'
           }
 
 
@@ -676,16 +677,16 @@ export const InteropRunTaskForm = () => {
 setParentChildRelations(parentChildRelations => {
                     let items = [...parentChildRelations];
 //set new id of this orgunit     
-console.log('existingId ' + existingId + 'ans.data.id ' + ans.data.id)               
+console.log('existingId ' + existingId + ' thisId ' + thisId + ' ans.data.id ' + ans.data.id)               
                     for (let i = 0, l = items.length; i < l; ++i) {
-                        if (items[i].id === existingId) {
+                        if (items[i].id === thisId) {
                           items[i].newId = ans.data.id;
                           break;
                         }
                       }
 //set new parentids for children of this location
                       for (let i = 0, l = items.length; i < l; ++i) {
-                        if (items[i].parentId === existingId) {
+                        if (items[i].parentId === thisId) {
                           items[i].newParentId = ans.data.id;
                           //break;
                         }
