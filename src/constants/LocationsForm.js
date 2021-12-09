@@ -3,7 +3,7 @@ import { Button, ButtonStrip, ReactFinalForm, TextArea, CenteredContent, Circula
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig, useReadProgramsQueryForMappings} from '.'
+import {useReadMappingConfigConstantsQueryForConfig, useReadOrgUnitsQueryForMappings} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 
 const { Field } = ReactFinalForm
@@ -48,7 +48,7 @@ export const LocationsForm = ({
     var mappings, dhismappings
     var instanceObject
 
-    const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
+    const { lloading, data: progData, lerror } = useReadOrgUnitsQueryForMappings()
     //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
 
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
@@ -65,10 +65,10 @@ export const LocationsForm = ({
                 : {}
 
                 const programInstance = 
-                progData && progData.programs.programs.length >0
-                ? progData.programs.programs[0]
+                progData && progData.programs.organisationUnits.length >0
+                ? progData.programs.organisationUnits[15]
                         : {}
-                        console.log('programInstance ' + programInstance)                
+                        console.log('organisationUnit ' + programInstance)                
 
         if(data) {
             async function login() {

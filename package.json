@@ -32,6 +32,8 @@
         "@dhis2/app-runtime": "^2.2.2",
         "@dhis2/prop-types": "^2.0.0",
         "@dhis2/ui": "^5.6.2",
+        "@turf/centroid": "^6.5.0",
+        "@turf/turf": "^6.5.0",
         "ajv": "^8.7.1",
         "axios": "^0.24.0",
         "classnames": "^2.2.6",
@@ -49,6 +51,7 @@
         "react-schedule-job": "^1.2.0",
         "react-spinners": "^0.11.0",
         "react-status-alert": "^1.1.2",
-        "traverse": "^0.6.6"
+        "traverse": "^0.6.6",
+        "turf-centroid": "^3.0.12"
     }
 }

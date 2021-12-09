@@ -49,6 +49,8 @@ export const InteropForm = ({
 
     const [taskType, setTaskType] = useState('')
 
+    const [jsonCollectionName, setJsonCollectionName] = useState('')
+
     var instanceObject
 
     const { loading: loadingReadConstants, data: convt,  error: errorReadConstants } = useReadMappingConfigConstantsQueryForMappings()
@@ -107,7 +109,7 @@ export const InteropForm = ({
                                     setDhisReceiver(paramsJson[4])
                                     setConverter(paramsJson[5])
                                     setTaskType(paramsJson[6])
-                                    
+                                    setJsonCollectionName(paramsJson[7])
                                 }
 
         if(data) {
@@ -185,6 +187,7 @@ export const InteropForm = ({
     const onReceiverInput = (ev) => { setDhisReceiver( ev.value==true ? false : true)}
     const onConvertorInput = (ev) => { setConverter(ev)}
     const onTaskTypeInput = (ev) => { setTaskType(ev)}
+    const onJsonCollectionNameInput  = (ev) => { setJsonCollectionName(ev)}
 
     const saveConstant = async () => {
 
@@ -196,6 +199,7 @@ export const InteropForm = ({
         allValues.push(dhisReceiver) 
         allValues.push(converter)
         allValues.push(taskType)
+        allValues.push(jsonCollectionName)
         console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
 
         if(initialValues.name){
@@ -293,7 +297,25 @@ export const InteropForm = ({
                         />}
                         />
                     </FormRow>
-
+                    
+                    
+                    <FormRow>
+                        <Field
+                        name='jsonobject'
+                        render={() =>
+                        <InputField
+                        id="senderendpoint" 
+                        label={i18n.t('Sender json object"s collection name')}
+                        className="" 
+                        type="text" 
+                        helpText='Name json objects collection, e.g. organisationUnits, programs, etc.'
+                        value={jsonCollectionName}
+                        onChange={ev => onJsonCollectionNameInput(ev.value)}
+                        required
+                        validate={composeValidators(string, hasValue)}
+                        />}
+                        />
+                    </FormRow>
 
                     <FormRow>
                         <Field

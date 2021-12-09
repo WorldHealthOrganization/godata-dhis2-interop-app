@@ -313,7 +313,7 @@ export const CasesForm = ({
         if(instance.name == 'dhis2')
         {
         console.log(instance.src)
-//read and replace dhuis2 placeholder and update ui
+//read and replace dhis2 placeholder and update ui
           var ths = dot.str('dhis2', instance.src, godataValue[1][valueHolder[2]])
           console.log('str ths: ' + JSON.stringify(ths))
           setGodataValue(godataValue => {
