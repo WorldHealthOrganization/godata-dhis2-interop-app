@@ -40,7 +40,7 @@ export const InteropRunTaskForm = () => {
   const [token, setToken] = useState();
   const [inst, setInst] = useState([]);
   const [open, setOpen] = useState(false);
-  var instanceObject, instance, messg, parentChiled, thisId;
+  var instanceObject, instance, messg, parentChild, thisId, stmp, orgUnitHolder
   const [sender, setSender] = useState();
   const [receiver, setReceiver] = useState();
   const [filter, setFilter] = useState();
@@ -50,7 +50,7 @@ export const InteropRunTaskForm = () => {
   const [jsonCollectionName, setJsonCollectionName] = useState();
   const [senderData, setSenderData] = useState();
   const [mappingModel, setMappingModel] = useState();
-  const [parentChildRelations, setParentChildRelations] = useState();
+  const [parentChildRelations, setParentChildRelations] = useState([]);
   const [existingId, setExistingId] = useState();
 
   const override = css`
@@ -86,7 +86,7 @@ export const InteropRunTaskForm = () => {
     console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis));
     console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata));
     setGodataLogin(loginDetailsGodata);
-    messg = StatusAlertService.showSuccess(i18n.t('Reading task configurations: Success.'));
+    messg = StatusAlertService.showSuccess(i18n.t('Reading task configurations - Success.'));
     setAlertId({
       messg
     });
@@ -129,7 +129,7 @@ export const InteropRunTaskForm = () => {
               });
               const taskObjectMeta = JSON.parse(taskObject.data.description);
               console.log('taskObjectId ' + JSON.stringify(taskObjectMeta));
-              messg = StatusAlertService.showSuccess(i18n.t('Read Task config: Success.'));
+              messg = StatusAlertService.showSuccess(i18n.t('Read Task config - Success.'));
               setAlertId({
                 messg
               }); //GET TASK'S MAPPINGS DEFINITIONS
@@ -157,7 +157,7 @@ export const InteropRunTaskForm = () => {
                   console.log('usemapping ' + mappings);
                 }
 
-                messg = StatusAlertService.showSuccess(i18n.t('Read mappings config: Success.'));
+                messg = StatusAlertService.showSuccess(i18n.t('Read mappings config - Success.'));
                 setAlertId({
                   messg
                 }); //setTask(JSON.parse(taskObject.data))//in promise
@@ -191,7 +191,7 @@ export const InteropRunTaskForm = () => {
                   setAlertId({
                     messg
                   });
-                  messg = StatusAlertService.showInfo(i18n.t('Login in to Go.Data Instance.' + loginDetailsGodata.urlTemplate));
+                  messg = StatusAlertService.showInfo(i18n.t('Login in to Go.Data Instance.') + loginDetailsGodata.urlTemplate);
                   setAlertId({
                     messg
                   }); //get Go.Data security token
@@ -200,7 +200,7 @@ export const InteropRunTaskForm = () => {
                     email: loginDetailsGodata.username,
                     password: loginDetailsGodata.password
                   });
-                  messg = StatusAlertService.showSuccess(i18n.t('Login in to Go.Data Instance: Success.'));
+                  messg = StatusAlertService.showSuccess(i18n.t('Login in to Go.Data Instance - Success.'));
                   setAlertId({
                     messg
                   });
@@ -218,7 +218,7 @@ export const InteropRunTaskForm = () => {
                       Authorization: loginObject.data.id
                     }
                   });
-                  messg = StatusAlertService.showSuccess(i18n.t('Reading sender data: Success.'));
+                  messg = StatusAlertService.showSuccess(i18n.t('Reading sender data - Success.'));
                   setAlertId({
                     messg
                   });
@@ -254,7 +254,7 @@ export const InteropRunTaskForm = () => {
                       crossDomain: true
                     }
                   });
-                  messg = StatusAlertService.showSuccess(i18n.t('Reading sender data: Success.'));
+                  messg = StatusAlertService.showSuccess(i18n.t('Reading sender data - Success.'));
                   setAlertId({
                     messg
                   });
@@ -262,46 +262,121 @@ export const InteropRunTaskForm = () => {
                   console.log('jsonCollectionName ' + taskObjectMeta[7]);
                   var tmp = JSON.parse(JSON.stringify(instanceObject.data[taskObjectMeta[7]]));
                   setSenderData(tmp);
+
+                  instanceObject.data[taskObjectMeta[7]].sort((a, b) => 
+                  (a.level > b.level) 
+                  ? 1 
+                  : (a.level === b.level) 
+                  ? ((a.size > b.size) 
+                  ? 1 
+                  : -1) : -1 )
+
+                  console.log('sortedObjs ' + JSON.stringify(instanceObject.data[taskObjectMeta[7]]))
+
                   instance = [];
-                  parentChiled = []
+                  parentChild = []
                   instanceObject.data[taskObjectMeta[7]].map(function (object, i) {
                     instance.push({
                       'name': object.name,
                       'id': object.id
                     }); 
+//compute lon/lat coordinates 
+                    var lon = 0, lat = 0
 
-                    parentChiled.push(
-                        {'id': object.id, 'parentId': object?.parent?.id, 'newId': '', 'newParentId': ''}
+                    if (object.geometry) {
+                      if (object.geometry.type === 'Polygon' || object.geometry.type === 'MultiPolygon') {
+                        //get centroid
+                        var centroidPoint = centroid(dot.pick('geometry', object));
+                        console.log('centroid latitude ' + centroidPoint.geometry.coordinates[0]);
+                        lon = centroidPoint.geometry.coordinates[0];
+                        lat = centroidPoint.geometry.coordinates[1];
+                        }else if (object.geometry.type = 'Point'){
+                        var point = dot.pick('geometry.coordinates', object);
+                       lat = point[0];
+                        lon = point[1];
+                        }else if(Number.isNaN(lon)){
+                          lon = 0;
+                        }
+                      }
+                  
+
+//create Go.Data format of each org unit
+                    parentChild.push(
+                        //{'id': object.id, 'parentId': object?.parent?.id }
+                       { "location": 
+                          { "name": object.name, 
+                            "synonyms": [object.displayName], 
+                            "identifiers": [object.code], 
+                            "active": true,                         
+                            "populationDensity": 0,
+                            "parentLocationId": object?.parent?.id,
+                            "geoLocation": {
+                              "lat": lat,
+                              "lng": lon,
+                            },
+                            "geographicalLevelId": "LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_"+(object.level-1),
+                            "id": object.id,
+                            "createdOn": "System API",
+                        }
+                      }
                     )
 
-                    // console.log('name ' +object.name + ' id ' + object.id +' key ' + i)
-                    //console.log('instance ' + JSON.stringify(instance))
                   }); //MAP AND SHOW MODAL FOR SELECTION
 
-                  instance = JSON.parse(JSON.stringify(instance)); // console.log('after modal opened')
-                    parentChiled = JSON.parse(JSON.stringify(parentChiled)); //get real copy from promise
+                  
+                  instance = JSON.parse(JSON.stringify(instance)); 
+                    parentChild = JSON.parse(JSON.stringify(parentChild)); //get real copy from promise
+console.log(parentChild.length + ' pc ' + JSON.stringify(parentChild))
+//reduce relationships of org units
+                    const idMapping = parentChild.reduce((acc, el, i) => {
+                      acc[el.location.id] = i;
+                      return acc;
+                    }, {});
+console.log(JSON.stringify(idMapping))
+//now link them together so we have one hierarchy 
+                    let root;
+                    parentChild.forEach((el) => {
+                        // Handle the root element
+                        if (el.location.parentLocationId===undefined) {
+                          root = el;
+                          console.log('root id ' + root.location.id)
+                          return;
+                        }
+                        // Use our mapping to locate the parent element in our data array
+                        const parentEl = parentChild[idMapping[el.location.parentLocationId]];
+                        // Add our current el to its parent's `children` array
+                        parentEl.children = [...(parentEl.children || []), el];
+                      });
+
+                      console.log('root ' + JSON.stringify(root))
+                      //send org units to the server
+                      
+                      const json = JSON.stringify(root);
+                      const file = new File([json], {
+                        type: 'application/json'
+                      });
+                      const data = new FormData();
+                      data.append("document", file);
+                      //sendOrgUnits(data)
 
                   setInst(instance)
-                  setParentChildRelations(parentChiled)
+                  setParentChildRelations([root])
                   setLoading(false)
                   setOpen(true)
                 }
               };
-
               getMappings(taskObjectMeta[5]);
             };
-
             getTask(id);
           }
         } catch (error) {
-          messg = StatusAlertService.showError(i18n.t('Loging to Go.Data Instance Failed.' + error), options);
+          messg = StatusAlertService.showError(i18n.t('Loging into the Go.Data Instance Failed.' + error), options);
           setAlertId({
             messg
           });
           console.log(error);
         }
       }
-
       loginGodata();
     }
 
@@ -369,8 +444,19 @@ export const InteropRunTaskForm = () => {
     }
   }; //NOW WE HAVE EVERYTHING TO PROCESS CONVERSION
 
+  orgUnitHolder = [] //holds json objects of all org units
 
-  const getTaskDone = () => {
+  const runAllTasks = () => {
+    for (var y = 0; y < checkedConstants.length; y++){
+      console.log('iofchecked ' + y)
+      if(taskType==='Go.Data Location' && y===1){
+        return
+      }
+      getTaskDone(y)
+    }
+  }
+
+  const getTaskDone = (y) => {
     setOpen(false);
     console.log('sender ' + sender);
     console.log('receiver ' + receiver);
@@ -378,19 +464,16 @@ export const InteropRunTaskForm = () => {
     console.log('payloadModel ' + payloadModel);
     console.log('isDhis ' + isDhis);
     console.log('taskType ' + taskType);
-    //console.log('mappingModel ' + JSON.stringify(mappingModel));
-    //console.log('senderData ' + JSON.stringify(senderData));
-    //console.log('inst ' + JSON.stringify(inst));
-    //console.log('payloadModel ' + JSON.stringify(payloadModel));
-    /*
-        traverse(payloadModel).forEach(function (x) {
-            this.update(x)
-            console.log(x)
-        });*/
+
+    var model = JSON.parse(JSON.stringify(payloadModel));
 
     var mappings;
 
-    function iterate(obj) {
+    const senderObject = senderData.find(x => x.id === checkedConstants[y]);
+    stmp = senderObject;
+    console.log('stmp ' + JSON.stringify(stmp))
+
+    const iterate = (obj) => {
       var walked = [];
       var stack = [{
         obj: obj,
@@ -424,29 +507,28 @@ export const InteropRunTaskForm = () => {
               }
             } else {
               i++;
-              console.log('payloadItem ' + item.stack + '.' + property); //console.log('mappingModel dot.pick ' + dot.pick('godata'+item.stack + '.' + property, mappingModel))
-
-              console.log('getDotNotationByValue ' + getDotNotationByValue((item.stack + '.' + property).substr(1))); //dot.copy('stuff.phone', 'wanna.haves.phone', src, tgt);
-
+              console.log('payloadItem ' + item.stack + '.' + property); 
               dot.str((item.stack + '.' + property).substr(1).toString(), getDotNotationByValue((item.stack + '.' + property).substr(1)), payloadModel);
-              /*  mappings.push(
-                    {
-                        "godata": (item.stack + '.' + property).substr(1) , 
-                        "dhis2": "","props":{
-                        "conversion": "true",
-                        "values":{}}
-                    })*/
             }
-          } //console.log('payloadModel ' + JSON.stringify(payloadModel))
-          //  console.log('mappings length ' + mappings.length)
-
+          } 
         }
       }
     }
 
     iterate(payloadModel);
 
-    function getDotNotationByValue(dotnot) {
+
+          //SEND PAYLOAD TO RECIEVER
+                messg = StatusAlertService.showInfo(i18n.t('Start sending data'));
+          setAlertId({
+            messg
+          });
+        login();
+        }
+    
+
+
+    const getDotNotationByValue = (dotnot) => {
         //set dotnot to string if its number
         if (typeof dotnot === 'number') {
             dotnot = dotnot.toString();
@@ -455,16 +537,15 @@ export const InteropRunTaskForm = () => {
       //GET MAPPING MODEL
       var dataArray = mappingModel[0].godataValue[1]; // console.log('dataArray ' + JSON.stringify(dataArray))
 
-      console.log('parentChildRelations ' + JSON.stringify(parentChildRelations))
+      //console.log('parentChildRelations ' + JSON.stringify(parentChildRelations))
 
-      let stmp = '';
 
       if (isDhis) {
            //IF DHIS2 IS RCEIVING END
         let tmp = dataArray.find(x => x.godata === dotnot); //console.log(JSON.stringify(tmp))
 
         if (tmp) {
-          //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
+          //IF MAPPING FOUND AND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
           // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
           if (tmp.props.conversion === 'true') {
             //console.log('senderData' + senderData)
@@ -491,7 +572,7 @@ export const InteropRunTaskForm = () => {
               return val;
             }
           } else if (tmp.props.conversion === 'geo') {
-            console.log('call a method here for geography');
+            console.log('call a method here for geometry');
           } else {
             return tmp.dhis2;
           }
@@ -500,13 +581,11 @@ export const InteropRunTaskForm = () => {
         }
       } else {
         //DHIS2 IS SENDER
-        
+
         let tmp = dataArray.find(x => x.godata === dotnot); //console.log(JSON.stringify(tmp))
 
         //console.log('selected object ' + JSON.stringify(checkedConstants[0]));
-        const senderObject = senderData.find(x => x.id === checkedConstants[0]); //TO BE DYNAMIC AND ITERATIVE
-        stmp = senderObject; //ITS DYNAMIC
-        console.log('stmp ' + JSON.stringify(stmp))
+
 
         if (tmp) {
           //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
@@ -542,7 +621,6 @@ export const InteropRunTaskForm = () => {
                 if(stringBoolean == tmp.props.values[keys[i]]){
                     return keys[i]
                 }
-                
             } 
               //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
               return val;
@@ -592,22 +670,10 @@ export const InteropRunTaskForm = () => {
                 return 0
               }
               console.log(JSON.stringify('geom ' + geom.type))
-            } //console.log('call a method here for geometry')
+            }
             //none of tries are successful, simply return 0
                 return 0
           }
-          
-          
-          
-          
-          else if (tmp.props.conversion === 'pid'){
-
-            return '0391a098-bbc2-4435-adae-6910afa47a72'
-          }
-
-
-
-
           else {
             //console.log('tmp.dhis2 ' + tmp.dhis2)
             return tmp.dhis2;
@@ -615,15 +681,9 @@ export const InteropRunTaskForm = () => {
         } else {
           //return 'VALUE NOT SET';
         }
-      }
     }
+  } //end of getTaskDone()
 
-    console.log('payloadModel ' + JSON.stringify(payloadModel)); //SEND PAYLOAD TO RECIEVER
-
-    messg = StatusAlertService.showInfo(i18n.t('Start sending data'));
-    setAlertId({
-      messg
-    });
 
     async function login() {
       try {
@@ -639,19 +699,18 @@ export const InteropRunTaskForm = () => {
         if (res.status == 200) {
           console.log('res.data.id ' + res.data.id);
           setToken(JSON.parse(JSON.stringify(res.data.id)));
-          /*
-                  axios.post(receiver + '?access_token=' + res.data.id, payloadModel, { headers : {'Access-Control-Allow-Origin' : '*',
-                  'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                  'Content-Type':'application/json', 
-                      crossDomain:true,
-                      //Authorization: res.data.id,
-                    } })
-              .then(response => console.log(response.data.id));*/
 
-          console.log('payloadModel ' + JSON.stringify(payloadModel));
+          var payload = ''
+          if(taskType==='Go.Data Location'){
+            payload = parentChildRelations
+          }else{
+            payload = payloadModel
+          }
+
+          console.log('payloadModel ' + JSON.stringify(payload));
           let ans = await axios({
             method: 'POST',
-            data: payloadModel,
+            data: payload,
             headers: {
               'Access-Control-Allow-Origin': '*',
               'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -663,42 +722,7 @@ export const InteropRunTaskForm = () => {
           });
 
           if (res.status == 200) {
-            console.log('res.data ' + ans.data);
-
-            //save location id into conversion table props of 'id' and 'parentLocationId'
-/*            setParentChildRelations(parentChildRelations => {
-                const location = [...parentChildRelations];
-                location[1][valueHolder[2]] = ths;
-                return location
-              })
-*/
-
-
-setParentChildRelations(parentChildRelations => {
-                    let items = [...parentChildRelations];
-//set new id of this orgunit     
-console.log('existingId ' + existingId + ' thisId ' + thisId + ' ans.data.id ' + ans.data.id)               
-                    for (let i = 0, l = items.length; i < l; ++i) {
-                        if (items[i].id === thisId) {
-                          items[i].newId = ans.data.id;
-                          break;
-                        }
-                      }
-//set new parentids for children of this location
-                      for (let i = 0, l = items.length; i < l; ++i) {
-                        if (items[i].parentId === thisId) {
-                          items[i].newParentId = ans.data.id;
-                          //break;
-                        }
-                      }
-//finally return modified array to back to state
-console.log('items ' +JSON.stringify(items));
-console.log('items parentChildRelations ' +JSON.stringify(parentChildRelations));
-                      return items
-                    })   
-                
-
-
+            console.log('res.data ' + JSON.stringify(ans.data));
 
             messg = StatusAlertService.showSuccess(i18n.t('Data send successfully' + JSON.stringify(ans.data)), {
               autoHideTime: 10000000
@@ -709,7 +733,7 @@ console.log('items parentChildRelations ' +JSON.stringify(parentChildRelations))
           }
         }
       } catch (error) {
-        console.log('error: ' + JSON.stringify(error));
+        console.log('outer error: ' + JSON.stringify(error));
         //console.log('error message ' + JSON.stringify(error.response.data));
         //console.log(error.response.status);
         messg = StatusAlertService.showError(i18n.t('Data sending failed: ' + JSON.stringify(error.response.data)), {
@@ -720,9 +744,7 @@ console.log('items parentChildRelations ' +JSON.stringify(parentChildRelations))
         });
       }
     }
-
-    login();
-  };
+  
 
   const onCloseModal = () => {
     setOpen(false);
@@ -744,7 +766,8 @@ console.log('items parentChildRelations ' +JSON.stringify(parentChildRelations))
         <h2>Select item(s)</h2>
         <p>{task}</p>
                                     <ButtonStrip>
-                                        <Button primary disabled={!checkedConstants.length > 0} onClick={() => getTaskDone()}>
+                                        <Button primary disabled={!checkedConstants.length > 0} 
+                                            onClick={() => runAllTasks()}>
                                         {i18n.t('Proceed')}
                                         </Button>
                                         <Button onClick={() => onCancelClick(pristine)}>
