@@ -62,7 +62,7 @@ export const MetadataConfigFormEdit = () => {
     const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryById(
         id
     )
-    
+    //console.log('jsonData ' + JSON.stringify(jsonData?.constant?.description))
     const conversionType =
     jsonData
         ? JSON.parse(jsonData.constant.description)[0].godataValue[0][0].conversionType

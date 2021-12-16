@@ -8,9 +8,11 @@ import styles from './ListActions.module.css'
 export const ListActions = ({
     addLabel,
     deleteLabel,
+    defaultLabel,
     dataTest: dataTestProp,
     onAddClick,
     onDeleteClick,
+    onDefaultsClick,
     disableAdd,
     disableDelete,
 }) => {
@@ -33,6 +35,14 @@ export const ListActions = ({
                     dataTest={dataTest(`${dataTestProp}-delete`)}
                 >
                     {deleteLabel}
+                </Button>
+                
+                <Button
+                    secondary
+                    onClick={onDefaultsClick}
+                    dataTest={dataTest(`${dataTestProp}-delete`)}
+                >
+                    {defaultLabel}
                 </Button>
             </ButtonStrip>
         </div>

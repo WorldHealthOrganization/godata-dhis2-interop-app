@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-09T02:36:36.880Z\n"
-"PO-Revision-Date: 2021-12-09T02:36:36.880Z\n"
+"POT-Creation-Date: 2021-12-16T03:29:58.418Z\n"
+"PO-Revision-Date: 2021-12-16T03:29:58.418Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -447,6 +447,9 @@ msgid ""
 msgstr ""
 
 msgid "Delete selected"
+msgstr ""
+
+msgid "Load default config"
 msgstr ""
 
 msgid "Run Task"

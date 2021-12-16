@@ -14,7 +14,11 @@ import { NoticeBox, CenteredContent, CircularLoader,    Button,
 import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
 import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from './MetadataConfigFormEdit'
 
+import { GODATA_DHIS_OUTBREAK_MODEL, 
+    GODATA_DHIS_LOCATION_MODEL } from '../../constants'
+
 import {
+    useCreateCasesConstantMutation,
     useSetDefaultConstantMutation,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
@@ -33,6 +37,7 @@ export const METADATA_CONFIG_LIST_LABEL = 'Metadata Mapping'
 export const MetadataConfigList = () => {
     const history = useHistory()
     const onAddConstantClick = () => history.push(METADATA_CONFIG_FORM_NEW_PATH)
+
     const [checkedConstants, setCheckedConstants] = useState([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -44,23 +49,6 @@ export const MetadataConfigList = () => {
     } = useReadMappingConfigConstantsQueryForMappings()
 
     const constants = data?.constants?.constants
-
-/*    const constss = consts && consts.length>0
-    ? consts.forEach((item,index)=>{
-        console.log(item)
-        var inst = JSON.parse(item.description)
-        consts[index].shortName =  inst[0]
-    })
-    : consts
-*/
-    /*.forEach((item,index)=>{
-        console.log(item)
-        //var inst = JSON.stringify(item.description)
-       // data.constants.constants[index].shortName =  inst[0]
-       {}
-     })
-     */
-    
 
     const [
         deleteCheckedConstants,
@@ -76,6 +64,18 @@ export const MetadataConfigList = () => {
         const variables = { ids: checkedConstants }
         deleteCheckedConstants(variables).then(refetchReadConstants)
         setShowDeleteDialog(false)
+    }
+
+    const [ addDefaultConstant ] = useCreateCasesConstantMutation()    
+
+    const onDefaultsClick = () => {
+        console.log('default clicked')
+        var allValues = GODATA_DHIS_OUTBREAK_MODEL
+        var nameInput = 'Default Go.Data DHIS2 Outbreak Mapping'
+        addDefaultConstant({allValues,nameInput})
+        allValues = GODATA_DHIS_LOCATION_MODEL
+        nameInput = 'Default Go.Data DHIS2 Location Mapping'
+        addDefaultConstant({allValues,nameInput}).then(refetchReadConstants)
     }
 
     const onMakeDefaultClick = id => {
@@ -161,8 +161,10 @@ export const MetadataConfigList = () => {
             <ListActions
                 addLabel={i18n.t('Add mappings')}
                 deleteLabel={i18n.t('Delete selected')}
+                defaultLabel={i18n.t('Load default config')}
                 dataTest="views-gatewayconfiglist"
                 onAddClick={onAddConstantClick}
+                onDefaultsClick = {onDefaultsClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
                 disableAdd={loadingDelete}
                 disableDelete={!checkedConstants.length || loadingDelete}

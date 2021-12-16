@@ -15,7 +15,11 @@ import { INTEROP_FORM_NEW_PATH } from './InteropFormNew'
 import {INTEROP_RUN_TASK_FORM_PATH_STATIC} from './InteropRunTaskForm'
 import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 
+import { GODATA_DHIS_OUTBREAK_TASK, 
+    GODATA_DHIS_LOCATION_TASK } from '../../constants'
+
 import {
+    useCreateTaskConstantMutation,
     useReadTaskConstantsQueryById,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
@@ -55,6 +59,17 @@ export const InteropList = () => {
         const variables = { ids: checkedConstants }
         deleteCheckedConstants(variables).then(refetchReadConstants)
         setShowDeleteDialog(false)
+    }
+    const [ addDefaultConstant ] = useCreateTaskConstantMutation()    
+
+    const onDefaultsClick = () => {
+        console.log('default clicked')
+        var allValues = GODATA_DHIS_OUTBREAK_TASK
+        var nameInput = 'Default Go.Data DHIS2 Outbreak Task'
+        addDefaultConstant({allValues,nameInput})
+        allValues = GODATA_DHIS_LOCATION_TASK
+        nameInput = 'Default Go.Data DHIS2 Location Task'
+        addDefaultConstant({allValues,nameInput}).then(refetchReadConstants)
     }
 
     const loading = loadingReadConstants || loadingDelete 
@@ -134,8 +149,10 @@ export const InteropList = () => {
             <ListActions
                 addLabel={i18n.t('Add task')}
                 deleteLabel={i18n.t('Delete selected')}
+                defaultLabel={i18n.t('Load default config')}
                 dataTest="views-gatewayconfiglist"
                 onAddClick={onAddConstantClick}
+                onDefaultsClick = {onDefaultsClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
                 disableAdd={loadingDelete}
                 disableDelete={!checkedConstants.length || loadingDelete}
