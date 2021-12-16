@@ -117,7 +117,7 @@ export const InteropRunTaskForm = () => {
               messg
             }); //GET TASK DEFINITION
 
-            const getTask = async id => {
+            const getTask = async (id) => {
               var taskObject = await axios.get(loginDetailsDhis.urlTemplate + '/dhis/api/constants/' + id + '?paging=false&fields=id,displayName,code,description,shortName,name', {
                 crossDomain: true,
                 headers: {
@@ -351,13 +351,22 @@ console.log(JSON.stringify(idMapping))
                       console.log('root ' + JSON.stringify(root))
                       //send org units to the server
                       
-                      const json = JSON.stringify(root);
-                      const file = new File([json], {
-                        type: 'application/json'
+                      const json = JSON.stringify([root]);
+                      const file = new File([json], "orgunits.json" , {
+                        type: 'application/json', lastModified: new Date()
                       });
                       const data = new FormData();
                       data.append("document", file);
                       //sendOrgUnits(data)
+
+//download json hierarchy of org units
+                      const link = document.createElement('a');
+                      link.href = URL.createObjectURL(file);
+                      link.download = 'orgunits.json'
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+
 
                   setInst(instance)
                   setParentChildRelations([root])

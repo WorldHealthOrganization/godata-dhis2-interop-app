@@ -304,7 +304,7 @@ export const InteropForm = ({
                         name='jsonobject'
                         render={() =>
                         <InputField
-                        id="senderendpoint" 
+                        id="senderendpointcolname" 
                         label={i18n.t('Sender json object"s collection name')}
                         className="" 
                         type="text" 

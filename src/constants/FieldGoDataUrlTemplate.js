@@ -18,6 +18,6 @@ export const FieldGoDataUrlTemplate = () => (
         name="urlTemplate"
         label={i18n.t('Url template')}
         component={InputFieldFF}
-        validate={composeValidators(url, hasValue)}
+        validate={composeValidators(hasValue)}
     />
 )
