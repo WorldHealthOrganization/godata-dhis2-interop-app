@@ -359,14 +359,16 @@ console.log(JSON.stringify(idMapping))
                       data.append("document", file);
                       //sendOrgUnits(data)
 
+
 //download json hierarchy of org units
+                if(taskType==='Go.Data Location'){
                       const link = document.createElement('a');
                       link.href = URL.createObjectURL(file);
                       link.download = 'orgunits.json'
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
-
+                }
 
                   setInst(instance)
                   setParentChildRelations([root])
@@ -745,7 +747,7 @@ console.log(JSON.stringify(idMapping))
         console.log('outer error: ' + JSON.stringify(error));
         //console.log('error message ' + JSON.stringify(error.response.data));
         //console.log(error.response.status);
-        messg = StatusAlertService.showError(i18n.t('Data sending failed: ' + JSON.stringify(error.response.data)), {
+        messg = StatusAlertService.showError(i18n.t('Data sending failed: ' + JSON.stringify(error?.response?.data)), {
           autoHideTime: 10000000
         });
         setAlertId({

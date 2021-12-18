@@ -3,7 +3,7 @@ import { Button, ButtonStrip, ReactFinalForm, TextArea, CenteredContent, Circula
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig, useReadProgramsQueryForMappings} from '.'
+import {useReadMappingConfigConstantsQueryForConfig, useReadTrackedEntityInstancesQueryForMappings} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 
 const { Field } = ReactFinalForm
@@ -24,98 +24,9 @@ import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
+import { JsonEditor } from 'jsoneditor-react/es'
 
 const { Form } = ReactFinalForm
-
-
-var mappings, dhismappings
-
-function iterate(obj) {
-    var walked = [];
-    var stack = [{obj: obj, stack: ''}];
-    mappings = [];
-    var i = 0
-    while(stack.length > 0)
-    {
-        var item = stack.pop();
-        var obj = item.obj;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (typeof obj[property] == "object") {
-                  var alreadyFound = false;
-                  for(var i = 0; i < walked.length; i++)
-                  {
-                    if (walked[i] === obj[property])
-                    {
-                      alreadyFound = true;
-                      break;
-                    }
-                  }
-                  if (!alreadyFound)
-                  {
-                    walked.push(obj[property]);
-                    stack.push({obj: obj[property], stack: item.stack + '.' + property});
-                  }
-                }
-                else
-                {
-                    i++
-                    mappings.push(
-                        {
-                            "godata": (item.stack + '.' + property).substr(1) , 
-                            "dhis2": "","props":{
-                            "conversion": "true",
-                            "values":{}}
-                        })
-
-}
-}
-//  console.log('mappings length ' + mappings.length)
-}
-            }      
-        } 
-
-        function iterate2(obj) {
-            var walked = [];
-            var stack = [{obj: obj, stack: ''}];
-            dhismappings = [];
-            while(stack.length > 0)
-            {
-                var item = stack.pop();
-                var obj = item.obj;
-                for (var property in obj) {
-                    if (obj.hasOwnProperty(property)) {
-                        if (typeof obj[property] == "object") {
-                          var alreadyFound = false;
-                          for(var i = 0; i < walked.length; i++)
-                          {
-                            if (walked[i] === obj[property])
-                            {
-                              alreadyFound = true;
-                              break;
-                            }
-                          }
-                          if (!alreadyFound)
-                          {
-                            walked.push(obj[property]);
-                            stack.push({obj: obj[property], stack: item.stack + '.' + property});
-                          }
-                        }
-                        else
-                        {
-                            dhismappings.push(
-                                {
-                                    "dhis2": (item.stack + '.' + property).substr(1) 
-                                })
-                            //mappings.set(item.stack + '.' + property , 'to be other stuff');
-                            //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
-                        }
-                    }
-                }
-            }
-            console.log('dhis2 mappings length ' + dhismappings.length)
-        }
-
 
 export const ContactsForm = ({
     onCancelClick,
@@ -135,10 +46,11 @@ export const ContactsForm = ({
     const [dhisModelInput, setDhisModelInput] = useState('')
     const [godataModelInput, setGodataModelInput] = useState('')
 
+    var mappings, dhismappings, reducedDhisMappings
     var instanceObject
 
-    const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
-    //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
+    const { lloading, data: progData, lerror } = useReadTrackedEntityInstancesQueryForMappings()
+    console.log('progData stringified ' + JSON.stringify(progData?.trackedEntityInstances?.trackedEntityInstances[0]))
 
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
@@ -154,10 +66,10 @@ export const ContactsForm = ({
                 : {}
 
                 const programInstance = 
-                progData && progData.programs.programs.length >0
-                ? progData.programs.programs[0]
+                progData && progData.trackedEntityInstances.trackedEntityInstances.length >0
+                ? progData.trackedEntityInstances.trackedEntityInstances[0]
                         : {}
-                        console.log('programInstance ' + programInstance)                
+                        console.log('entityInstance ' + JSON.stringify(programInstance))
 
         if(data) {
             async function login() {
@@ -175,42 +87,152 @@ export const ContactsForm = ({
                     console.log('res.data.id ' + res.data.id);
 
                     const getInstanceData = async () => {
-                       const outbreakObject = await axios.get(
+                        var outbreakObject = await axios.get(
                             loginDetails.urlTemplate +'/api/outbreaks', {
                                 headers : {
                                     Authorization: res.data.id,
                                   }
                                 });
+                            const outBreakId = outbreakObject.data[0].id
 
-                                const outBreakId = outbreakObject.data[0].id
+                            const loginObject = await axios.post(
+                                    loginDetails.urlTemplate +'/api/users/login', {
+                                        
+                                            email: loginDetails.username,
+                                            password: loginDetails.password,
+                                        
+                                        });
+                                       
 
-                               var loginObject = await axios.post(
-                                                     loginDetails.urlTemplate +'/api/users/login', {
-                                                         
-                                                             email: loginDetails.username,
-                                                             password: loginDetails.password,
-                                                         
-                                                         });
-                                                        
-                 
-                                                         instanceObject = await axios.get(
-                                                             loginDetails.urlTemplate +'/api/outbreaks/'+outBreakId+'/contacts', {
-                                                                 headers : {
-                                                                     Authorization: loginObject.data.id,
-                                                                   }
-                                                                 });
+                                        instanceObject = await axios.get(
+                                            loginDetails.urlTemplate +'/api/outbreaks/'+outBreakId+'/contacts', {
+                                                headers : {
+                                                    Authorization: loginObject.data.id,
+                                                  }
+                                                });
 
-                                console.log(initialValues)  
-            
+                                function iterate(obj) {
+                                    var walked = [];
+                                    var stack = [{obj: obj, stack: ''}];
+                                    mappings = [];
+                                    var i = 0
+                                    while(stack.length > 0)
+                                    {
+                                        var item = stack.pop();
+                                        var obj = item.obj;
+                                        for (var property in obj) {
+                                            if (obj.hasOwnProperty(property)) {
+                                                if (typeof obj[property] == "object") {
+                                                  var alreadyFound = false;
+                                                  for(var i = 0; i < walked.length; i++)
+                                                  {
+                                                    if (walked[i] === obj[property])
+                                                    {
+                                                      alreadyFound = true;
+                                                      break;
+                                                    }
+                                                  }
+                                                  if (!alreadyFound)
+                                                  {
+                                                    walked.push(obj[property]);
+                                                    stack.push({obj: obj[property], stack: item.stack + '.' + property});
+                                                  }
+                                                }
+                                                else
+                                                {
+                                                    i++
+                                                    mappings.push(
+                                                        {
+                                                            "godata": (item.stack + '.' + property).substr(1) , 
+                                                            "dhis2": "","props":{
+                                                            "conversion": "true",
+                                                            "values":{}}
+                                                        })
+                        
+                                }
+                            }
+                          //  console.log('mappings length ' + mappings.length)
+                        }
+                                            }      
+                                        } 
+                                        console.log(initialValues)
+                                        
+                                        
+
                             iterate(instanceObject.data[0])
                             const caseMeta = []
                             caseMeta.push([{conversionType: "Go.Data Contact"}])
                             caseMeta.push(mappings)
                             setGodataValue(caseMeta)
 
+                            function iterate2(obj) {
+                                var walked = [];
+                                var stack = [{obj: obj, stack: ''}];
+                                dhismappings = [];
+                                while(stack.length > 0)
+                                {
+                                    var item = stack.pop();
+                                    var obj = item.obj;
+                                    for (var property in obj) {
+                                        if (obj.hasOwnProperty(property)) {
+                                            if (typeof obj[property] == "object") {
+                                              var alreadyFound = false;
+                                              for(var i = 0; i < walked.length; i++)
+                                              {
+                                                if (walked[i] === obj[property])
+                                                {
+                                                  alreadyFound = true;
+                                                  break;
+                                                }
+                                              }
+                                              if (!alreadyFound)
+                                              {
+                                                walked.push(obj[property]);
+                                                stack.push({obj: obj[property], stack: item.stack + '.' + property});
+                                              }
+                                            }
+                                            else
+                                            {
+                                                console.log('subs ' + (item.stack + '.' + property).substr(1) + ' obj ' + JSON.stringify(obj))
+                                                const pattern = /\.\d*\./;
+                                                console.log('regex test ' + pattern.test(item.stack + '.' + property))
+                                                if(!pattern.test(item.stack + '.' + property)){
+                                                    dhismappings.push(
+                                                        {
+                                                            "dhis2": (item.stack + '.' + property).substr(1),
+                                                            "description": dot.pick((item.stack + '.' + property).substr(1),obj) === undefined
+                                                            ? JSON.stringify(obj) 
+                                                            : dot.pick((item.stack + '.' + property).substr(1),obj) 
+                                                        })
+                                                }else{
+                                                    if(property==='attribute'){
+                                                        dhismappings.push(
+                                                            {
+                                                                "dhis2": obj.attribute,
+                                                                "description": obj.displayName
+                                                            })    
+                                                    }else{
+                                                        dhismappings.push(
+                                                            {
+                                                                "dhis2": (item.stack + '.' + property).substr(1),
+                                                                "description": obj.displayName
+                                                            })
+                                                    }
+                                                }
+                                                //mappings.set(item.stack + '.' + property , 'to be other stuff');
+                                                //console.log('item.stack ' + item.stack + ' .property  ' + property /*+ "=" + obj[property]*/);
+                                            }
+                                        }
+                                    }
+                                }
+                                console.log('dhis2 mappings length before ' + dhismappings.length)
+                                const pattern = /\.\d*\./;
+                                reducedDhisMappings = dhismappings.filter(obj => !pattern.test(String(obj.dhis2)))
+                                console.log('dhis2 mappings length after ' + reducedDhisMappings.length)
+                            }
                         
                         iterate2(programInstance)
-                setDhisValue(dhismappings)
+                setDhisValue(reducedDhisMappings)
 
 
 
@@ -233,7 +255,7 @@ export const ContactsForm = ({
                 };
               }
               login()
-              console.log('outbreaks: ' + JSON.stringify(instanceObject))
+              console.log('contacts: ' + JSON.stringify(instanceObject))
             }
 
 
@@ -401,7 +423,7 @@ export const ContactsForm = ({
                     onSubmit={handleSubmit}
                     data-test={dataTest('gateways-gatewaygenericform')}
                 >
-                    <PageSubHeadline>{i18n.t('Case mappings setup')}</PageSubHeadline>
+                    <PageSubHeadline>{i18n.t('Contacts mappings setup')}</PageSubHeadline>
 
                     <FormRow>
                         <Field 
@@ -434,7 +456,7 @@ export const ContactsForm = ({
             onDelete={deleteNode}
             enableClipboard={selectedNode}
             theme="apathy:inverted"
-            name={'Case'}
+            name={'Contact'}
             displayArrayKey={true}
             />
             </div>
@@ -448,7 +470,7 @@ export const ContactsForm = ({
             src={dhisValue}
             enableClipboard={copyFromPopup}
             theme="apathy:inverted"
-            name={'Program'}
+            name={'Entity'}
             displayArrayKey={true}
             />
             </div>

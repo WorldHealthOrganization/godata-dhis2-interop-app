@@ -231,7 +231,7 @@ export const CasesForm = ({
                 };
               }
               login()
-              console.log('outbreaks: ' + JSON.stringify(instanceObject))
+              console.log('cases: ' + JSON.stringify(instanceObject))
         }
 
 

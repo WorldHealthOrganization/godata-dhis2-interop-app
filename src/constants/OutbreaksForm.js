@@ -45,7 +45,7 @@ export const OutbreaksForm = ({
     const [dhisModelInput, setDhisModelInput] = useState('')
     const [godataModelInput, setGodataModelInput] = useState('')
 
-    var mappings, dhismappings
+    var mappings, dhismappings, reducedGodataMappings
     var instanceObject
 
     const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
@@ -134,7 +134,10 @@ export const OutbreaksForm = ({
                         
                                 }
                             }
-                          //  console.log('mappings length ' + mappings.length)
+                            console.log('mappings length ' + mappings.length)
+                          const pattern = /\.\d*\./;
+                                reducedGodataMappings = mappings.filter(obj => !pattern.test(String(obj.godata)))
+
                         }
                                             }      
                                         } 
@@ -142,7 +145,7 @@ export const OutbreaksForm = ({
                             iterate(instanceObject.data[0])
                             const caseMeta = []
                             caseMeta.push([{conversionType: "Go.Data Outbreak"}])
-                            caseMeta.push(mappings)
+                            caseMeta.push(reducedGodataMappings)
                             setGodataValue(caseMeta)
 
                             function iterate2(obj) {

@@ -45,10 +45,5 @@ export const Navigation = () => (
             label={INTEROP_LIST_LABEL}
         />
 
-        <NavigationItem
-            path={SCHEDULED_TASK_FORM_PATH}
-            label={SCHEDULED_TASK_FORM_LABEL}
-        />
-
     </Menu>
 )

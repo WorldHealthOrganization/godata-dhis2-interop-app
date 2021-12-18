@@ -69,16 +69,6 @@ export const Home = () => {
                         to={INTEROP_LIST_PATH}
                     />
                 </div>
-                <div className={s.gridItem}>
-                    <HomeCard
-                        titleText={i18n.t('Scheduler')}
-                        bodyText={i18n.t(
-                            'Run scheduled tasks at given intervals.'
-                        )}
-                        linkText={i18n.t('Scheduler')}
-                        to={SCHEDULED_TASK_FORM_PATH}
-                    />
-                </div>
             </div>
         </div>
     )
