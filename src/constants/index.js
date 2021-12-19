@@ -38,3 +38,6 @@ export * from './useReadMappingConstantQueryById'
 export * from './useReadOrgUnitsQueryForMappings'
 export * from './GodataDhis2DefaultMappingModels'
 export * from './useReadTrackedEntityInstancesQueryForMappings'
+export * from './useReadProgramsWithStagesQueryForMappings'
+export * from './useReadRootOrgUnitMutation'
+

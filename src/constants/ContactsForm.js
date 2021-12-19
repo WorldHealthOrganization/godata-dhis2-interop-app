@@ -3,7 +3,9 @@ import { Button, ButtonStrip, ReactFinalForm, TextArea, CenteredContent, Circula
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig, useReadTrackedEntityInstancesQueryForMappings} from '.'
+import {useReadMappingConfigConstantsQueryForConfig, 
+    useReadProgramsWithStagesQueryForMappings,
+    useReadRootOrgUnitMutation} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 
 const { Field } = ReactFinalForm
@@ -49,8 +51,12 @@ export const ContactsForm = ({
     var mappings, dhismappings, reducedDhisMappings
     var instanceObject
 
-    const { lloading, data: progData, lerror } = useReadTrackedEntityInstancesQueryForMappings()
-    console.log('progData stringified ' + JSON.stringify(progData?.trackedEntityInstances?.trackedEntityInstances[0]))
+    const {oloading, data: rootUnit, oerror } = useReadRootOrgUnitMutation()
+
+    console.log('rootUnit ' + JSON.stringify(rootUnit))
+
+    const { lloading, data: progData, lerror } = useReadProgramsWithStagesQueryForMappings()
+    //console.log('progData stringified ' + JSON.stringify(progData?.trackedEntityInstances?.trackedEntityInstances[0]))
 
     const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
@@ -66,8 +72,8 @@ export const ContactsForm = ({
                 : {}
 
                 const programInstance = 
-                progData && progData.trackedEntityInstances.trackedEntityInstances.length >0
-                ? progData.trackedEntityInstances.trackedEntityInstances[0]
+                progData && progData.programs.programs.length >0
+                ? progData.programs.programs[0]
                         : {}
                         console.log('entityInstance ' + JSON.stringify(programInstance))
 
@@ -205,17 +211,17 @@ export const ContactsForm = ({
                                                             : dot.pick((item.stack + '.' + property).substr(1),obj) 
                                                         })
                                                 }else{
-                                                    if(property==='attribute'){
+                                                    if(property==='id'){
                                                         dhismappings.push(
                                                             {
-                                                                "dhis2": obj.attribute,
-                                                                "description": obj.displayName
+                                                                "dhis2": obj.id,
+                                                                "description: name": obj.name
                                                             })    
                                                     }else{
                                                         dhismappings.push(
                                                             {
                                                                 "dhis2": (item.stack + '.' + property).substr(1),
-                                                                "description": obj.displayName
+                                                                "description": obj.name
                                                             })
                                                     }
                                                 }
