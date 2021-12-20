@@ -6,7 +6,7 @@ export const ROOT_ORG_UNIT = {
         params: {
             paging: false,
             fields: ['id', 'displayName', 'code', 'description', 'shortName'],
-            filter: ['parentId:eq:NULL'],
+            level: '1',
         },
     },
 }

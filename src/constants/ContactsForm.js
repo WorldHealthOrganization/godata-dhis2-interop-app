@@ -208,20 +208,37 @@ export const ContactsForm = ({
                                                             "dhis2": (item.stack + '.' + property).substr(1),
                                                             "description": dot.pick((item.stack + '.' + property).substr(1),obj) === undefined
                                                             ? JSON.stringify(obj) 
-                                                            : dot.pick((item.stack + '.' + property).substr(1),obj) 
+                                                            : dot.pick((item.stack + '.' + property).substr(1),obj)
                                                         })
                                                 }else{
                                                     if(property==='id'){
-                                                        dhismappings.push(
-                                                            {
-                                                                "dhis2": obj.id,
-                                                                "description: name": obj.name
-                                                            })    
+                                                        if(item.stack.includes('dataElement')){
+                                                            dhismappings.push(
+                                                                {
+                                                                    "dhis2" : "delm " + obj.id,
+                                                                    "description: name" : obj.name,
+                                                                    "conversion" : "delm"
+                                                                })    
+                                                        }else if(item.stack.includes('trackedEntityAttribute')){
+                                                            dhismappings.push(
+                                                                {
+                                                                    "dhis2" : "attr " + obj.id,
+                                                                    "description: name" : obj.name,
+                                                                    "conversion" : "attr"
+                                                                })   
+                                                        }else{
+                                                            dhismappings.push(
+                                                                {
+                                                                    "dhis2" : "stage " + obj.id,
+                                                                    "description: name" : obj.name,
+                                                                    "conversion" : "stage"
+                                                                })    
+                                                        }
                                                     }else{
                                                         dhismappings.push(
                                                             {
-                                                                "dhis2": (item.stack + '.' + property).substr(1),
-                                                                "description": obj.name
+                                                                "dhis2" : (item.stack + '.' + property).substr(1),
+                                                                "description" : obj.name
                                                             })
                                                     }
                                                 }
@@ -342,10 +359,22 @@ export const ContactsForm = ({
     const copyFromPopup  = (instance)=>{
         if(instance.name == 'dhis2')
         {
-        console.log(instance.src)
-//read and replace dhuis2 placeholder and update ui
-          var ths = dot.str('dhis2', instance.src, godataValue[1][valueHolder[2]])
-          console.log('str ths: ' + JSON.stringify(ths))
+        console.log('instance src ' + instance.src)
+        //split instance src as it holds combovalue
+        const values = instance.src.split(' ');
+        var ths = ''
+        if(values.length===2){
+            console.log('val0 ' + values[0] + ' val1 ' + values[1]);
+            //read and replace dhis2 placeholder and update ui
+            ths = dot.str('props.conversion', values[0], godataValue[1][valueHolder[2]])
+            ths = dot.str('dhis2', values[1], ths)
+        }else{
+            ths = dot.str('dhis2', instance.src, godataValue[1][valueHolder[2]])
+        }
+
+
+
+          console.log('instance ' + JSON.stringify(instance) + ' str ths: ' + JSON.stringify(ths))
           setGodataValue(godataValue => {
               const Outbreak = [...godataValue];
               Outbreak[1][valueHolder[2]] = ths;

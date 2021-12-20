@@ -40,7 +40,7 @@ export const InteropRunTaskForm = () => {
   const [token, setToken] = useState();
   const [inst, setInst] = useState([]);
   const [open, setOpen] = useState(false);
-  var instanceObject, instance, messg, parentChild, thisId, stmp, orgUnitHolder
+  var instanceObject, instance, messg, parentChild, thisId, stmp, orgUnitHolder, instanceIds, instanceObjects
   const [sender, setSender] = useState();
   const [receiver, setReceiver] = useState();
   const [filter, setFilter] = useState();
@@ -165,6 +165,18 @@ export const InteropRunTaskForm = () => {
                 // taskConfig 0 - sender API, 1 - receiver API, 2 - sender API filters, 
                 // 3 - payload model, 4 - is DHIS2 receiver, 5 - mappingsObjectId, 6 - task type  
 
+                const iterate = (obj) => {
+                  Object.keys(obj).forEach(key => {
+                  if(key==='dataValues'){
+                    console.log(`key: ${key}, value: ${obj[key]}`)
+                    instanceObject.data.trackedEntityInstances.dataValues.push(obj[key]);
+                  }
+                  if (typeof obj[key] === 'object') {
+                          iterate(obj[key])
+                      }
+                  })
+                }
+                
                 console.log('0 - sender API ' + taskObjectMeta[0]);
                 setSender(taskObjectMeta[0]);
                 console.log('1 - receiver API ' + taskObjectMeta[1]);
@@ -243,7 +255,64 @@ export const InteropRunTaskForm = () => {
                   messg = StatusAlertService.showInfo(i18n.t('Reading sender data.'));
                   setAlertId({
                     messg
-                  }); //GET DHIS2 INSTANCES AS PER API ENDPOINT
+                  }); 
+                  
+                  //GET DHIS2 INSTANCES AS PER API ENDPOINT
+
+                  if(taskObjectMeta[6]==='Go.Data Contact'){
+                    console.log('sender instance ' + taskObjectMeta[6])
+
+                    var endpoints = taskObjectMeta[0].split(' ')
+                    var filters = taskObjectMeta[2].split(' ')
+
+                    instanceIds = await axios.get(endpoints[0] + filters[0], {
+                      headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Authorization': createAuthenticationHeader('admin', 'district'),
+                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        'Content-Type': 'application/json',
+                        crossDomain: true
+                      }
+                    });
+console.log('ids of contacts ' + JSON.stringify(instanceIds) + ' ' + JSON.stringify(instanceIds.data.rows[0][0]))
+                      var fromPromise = []
+                      for(let x = 0; x < instanceIds.data.rows.length; x++) {
+                        fromPromise.push(instanceIds.data.rows[x][0])
+                      }
+console.log('jinout ' + fromPromise)
+instanceObject = {}
+instanceObject["data"] = {}
+instanceObject.data["trackedEntityInstances"] = []
+instanceObject.data.trackedEntityInstances["dataValues"] = []
+                    for(let x = 0; x < fromPromise.length; x++){
+                     
+                      var instance = await axios.get(endpoints[1] + fromPromise[x] + filters[1], {
+                        headers: {
+                          'Access-Control-Allow-Origin': '*',
+                          'Authorization': createAuthenticationHeader('admin', 'district'),
+                          'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                          'Content-Type': 'application/json',
+                          crossDomain: true
+                        }
+                      });
+
+                      instance.data["id"] = instance.data.trackedEntityInstance
+                      instance.data["name"] = "Case ID: " + instance.data.trackedEntityInstance
+                      instance.data["dataValues"] = []
+
+                      instanceObject.data.trackedEntityInstances.push(instance.data)
+                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[0].dataValues, instanceObject)
+                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[1].dataValues, instanceObject)
+                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[2].dataValues, instanceObject)
+                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[3].dataValues, instanceObject)
+                      //iterate(instanceObject.data.trackedEntityInstances)
+                    }
+                    
+
+
+console.log('contacts ' + JSON.stringify(instanceObject))
+                  }else{
+
 
                   instanceObject = await axios.get(taskObjectMeta[0] + taskObjectMeta[2], {
                     headers: {
@@ -254,11 +323,13 @@ export const InteropRunTaskForm = () => {
                       crossDomain: true
                     }
                   });
+                }
+
                   messg = StatusAlertService.showSuccess(i18n.t('Reading sender data - Success.'));
                   setAlertId({
                     messg
                   });
-                  //console.log('instanceObject.data' + JSON.stringify(instanceObject.data));
+                  console.log('instanceObject.data' + JSON.stringify(instanceObject.data));
                   console.log('jsonCollectionName ' + taskObjectMeta[7]);
                   var tmp = JSON.parse(JSON.stringify(instanceObject.data[taskObjectMeta[7]]));
                   setSenderData(tmp);
@@ -298,7 +369,6 @@ export const InteropRunTaskForm = () => {
                           lon = 0;
                         }
                       }
-                  
 
 //create Go.Data format of each org unit
                     parentChild.push(
@@ -361,7 +431,7 @@ console.log(JSON.stringify(idMapping))
 
 
 //download json hierarchy of org units
-                if(taskType==='Go.Data Location'){
+                if(taskObjectMeta[6]=='Go.Data Location'){
                       const link = document.createElement('a');
                       link.href = URL.createObjectURL(file);
                       link.download = 'orgunits.json'
@@ -632,9 +702,9 @@ console.log(JSON.stringify(idMapping))
                 if(stringBoolean == tmp.props.values[keys[i]]){
                     return keys[i]
                 }
-            } 
+            }
               //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
-              return val;
+             // return val;
             
           } else if (tmp.props.conversion === 'geo') {
             //console.log('dotnot geometry ' + JSON.stringify(dot.pick('geometry', stmp)))
@@ -684,9 +754,39 @@ console.log(JSON.stringify(idMapping))
             }
             //none of tries are successful, simply return 0
                 return 0
+          } else if (tmp.props.conversion === 'delm'){
+            console.log('processing delm ' + stmp.dataValues.length)  
+            for (var i = 0, length = stmp.enrollments[0].events[0].dataValues.length; i < length; i++) {
+                  if (stmp.enrollments[0].events[0].dataValues[i]["dataElement"] == tmp.dhis2){
+                      return stmp.enrollments[0].events[0].dataValues[i].["value"];
+                  }
+          }
+          for (var i = 0, length = stmp.enrollments[0].events[1].dataValues.length; i < length; i++) {
+            if (stmp.enrollments[0].events[1].dataValues[i]["dataElement"] == tmp.dhis2){
+                return stmp.enrollments[0].events[1].dataValues[i].["value"];
+            }
+    }
+    for (var i = 0, length = stmp.enrollments[0].events[2].dataValues.length; i < length; i++) {
+      if (stmp.enrollments[0].events[2].dataValues[i]["dataElement"] == tmp.dhis2){
+          return stmp.enrollments[0].events[2].dataValues[i].["value"];
+      }
+}
+for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < length; i++) {
+  if (stmp.enrollments[0].events[3].dataValues[i]["dataElement"] == tmp.dhis2){
+      return stmp.enrollments[0].events[3].dataValues[i].["value"];
+  }
+}
+          } else if (tmp.props.conversion === 'attr'){
+            console.log('processing attr ' + stmp.attributes.length)
+            for (var i = 0, length = stmp.attributes.length; i < length; i++) {
+              if (stmp.attributes[i]["attribute"] == tmp.dhis2){
+                  return stmp.attributes[i].["value"];
+              }
+      }
           }
           else {
             //console.log('tmp.dhis2 ' + tmp.dhis2)
+             //nothing could help, simply return what was given
             return tmp.dhis2;
           }
         } else {
