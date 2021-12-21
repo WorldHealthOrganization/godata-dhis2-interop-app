@@ -44,6 +44,7 @@ export const InteropRunTaskForm = () => {
   const [sender, setSender] = useState();
   const [receiver, setReceiver] = useState();
   const [filter, setFilter] = useState();
+  const [file, setFile] = useState();
   const [payloadModel, setPayloadModel] = useState();
   const [isDhis, setIsDhis] = useState();
   const [taskType, setTaskType] = useState();
@@ -209,8 +210,16 @@ export const InteropRunTaskForm = () => {
                   }); //get Go.Data security token
 
                   const loginObject = await axios.post(loginDetailsGodata.urlTemplate + '/api/users/login', {
-                    email: loginDetailsGodata.username,
-                    password: loginDetailsGodata.password
+                    headers: {
+                      'Access-Control-Allow-Origin': '*',
+                      'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                      'Content-Type': 'application/json',
+                      crossDomain: true,
+                    },
+                    data: {
+                      email: loginDetailsGodata.username,
+                      password: loginDetailsGodata.password
+                    },
                   });
                   messg = StatusAlertService.showSuccess(i18n.t('Login in to Go.Data Instance - Success.'));
                   setAlertId({
@@ -286,7 +295,7 @@ instanceObject.data["trackedEntityInstances"] = []
 instanceObject.data.trackedEntityInstances["dataValues"] = []
                     for(let x = 0; x < fromPromise.length; x++){
                      
-                      var instance = await axios.get(endpoints[1] + fromPromise[x] + filters[1], {
+                      var inst = await axios.get(endpoints[1] + fromPromise[x] + filters[1], {
                         headers: {
                           'Access-Control-Allow-Origin': '*',
                           'Authorization': createAuthenticationHeader('admin', 'district'),
@@ -296,15 +305,11 @@ instanceObject.data.trackedEntityInstances["dataValues"] = []
                         }
                       });
 
-                      instance.data["id"] = instance.data.trackedEntityInstance
-                      instance.data["name"] = "Case ID: " + instance.data.trackedEntityInstance
-                      instance.data["dataValues"] = []
+                      inst.data["id"] = inst.data.trackedEntityInstance
+                      inst.data["name"] = "Case ID: " + inst.data.trackedEntityInstance
+                      inst.data["dataValues"] = []
 
-                      instanceObject.data.trackedEntityInstances.push(instance.data)
-                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[0].dataValues, instanceObject)
-                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[1].dataValues, instanceObject)
-                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[2].dataValues, instanceObject)
-                      //dot.move(instanceObject.data.trackedEntityInstance[0].dataValues, instanceObject.data.trackedEntityInstance[0].enrollments[0].events[3].dataValues, instanceObject)
+                      instanceObject.data.trackedEntityInstances.push(inst.data)
                       //iterate(instanceObject.data.trackedEntityInstances)
                     }
                     
@@ -371,6 +376,7 @@ console.log('contacts ' + JSON.stringify(instanceObject))
                       }
 
 //create Go.Data format of each org unit
+
                     parentChild.push(
                         //{'id': object.id, 'parentId': object?.parent?.id }
                        { "location": 
@@ -390,11 +396,11 @@ console.log('contacts ' + JSON.stringify(instanceObject))
                         }
                       }
                     )
-
                   }); //MAP AND SHOW MODAL FOR SELECTION
 
                   
                   instance = JSON.parse(JSON.stringify(instance)); 
+                  if(taskObjectMeta[6]=='Go.Data Location'){
                     parentChild = JSON.parse(JSON.stringify(parentChild)); //get real copy from promise
 console.log(parentChild.length + ' pc ' + JSON.stringify(parentChild))
 //reduce relationships of org units
@@ -425,13 +431,14 @@ console.log(JSON.stringify(idMapping))
                       const file = new File([json], "orgunits.json" , {
                         type: 'application/json', lastModified: new Date()
                       });
-                      const data = new FormData();
-                      data.append("document", file);
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      setFile(formData)
                       //sendOrgUnits(data)
 
 
 //download json hierarchy of org units
-                if(taskObjectMeta[6]=='Go.Data Location'){
+                
                       const link = document.createElement('a');
                       link.href = URL.createObjectURL(file);
                       link.download = 'orgunits.json'
@@ -451,7 +458,7 @@ console.log(JSON.stringify(idMapping))
             getTask(id);
           }
         } catch (error) {
-          messg = StatusAlertService.showError(i18n.t('Loging into the Go.Data Instance Failed.' + error), options);
+          messg = StatusAlertService.showError(i18n.t('Loging into the Go.Data Instance Failed.' + error));
           setAlertId({
             messg
           });
@@ -529,7 +536,7 @@ console.log(JSON.stringify(idMapping))
 
   const runAllTasks = () => {
     for (var y = 0; y < checkedConstants.length; y++){
-      console.log('iofchecked ' + y)
+      console.log('yofchecked ' + y)
       if(taskType==='Go.Data Location' && y===1){
         return
       }
@@ -596,7 +603,10 @@ console.log(JSON.stringify(idMapping))
       }
     }
 
-    iterate(payloadModel);
+    if(!taskType!='Go.Data Location'){
+      iterate(payloadModel);
+    }
+    
 
 
           //SEND PAYLOAD TO RECIEVER
@@ -676,7 +686,7 @@ console.log(JSON.stringify(idMapping))
           if (tmp.props.conversion === 'true' || typeof tmp.props.conversion == 'boolean') {
             //console.log('senderData' + senderData)
             let val = dot.pick(tmp.dhis2, stmp);
-
+            console.log('val ' + val)
         //set val to string if its number
         if (typeof val === 'number') {
             val = val.toString();
@@ -704,7 +714,7 @@ console.log(JSON.stringify(idMapping))
                 }
             }
               //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
-             // return val;
+              return val;
             
           } else if (tmp.props.conversion === 'geo') {
             //console.log('dotnot geometry ' + JSON.stringify(dot.pick('geometry', stmp)))
@@ -744,9 +754,7 @@ console.log(JSON.stringify(idMapping))
                 } else if (tmp.godata === 'geoLocation.lng') {
                   console.log(point[1])
                   return point[1];
-                } else {
-                  return 0;
-                }
+                } 
               }else{
                 return 0
               }
@@ -800,6 +808,12 @@ for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < le
       try {
         let res = await axios({
           method: 'POST',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+            'Content-Type': 'application/json',
+            crossDomain: true,
+          },
           data: {
             email: godataLogn.username,
             password: godataLogn.password
@@ -811,37 +825,63 @@ for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < le
           console.log('res.data.id ' + res.data.id);
           setToken(JSON.parse(JSON.stringify(res.data.id)));
 
-          var payload = ''
           if(taskType==='Go.Data Location'){
-            payload = parentChildRelations
+            console.log('Go.Data Location sending' + file)
+            axios({
+              method: "post",
+              url: receiver + '?access_token=' + res.data.id,
+              data: file,
+              headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+              "Content-Type": "multipart/form-data" },
+            })
+              .then(function (response) {
+                //handle success
+                console.log('ou resp success ' + response);
+                messg = StatusAlertService.showSuccess(i18n.t('Locations send and processed successfully' + JSON.stringify(response?.data.length)) + ' Organisation Units processed.', {
+                  autoHideTime: 10000000
+                });
+                setAlertId({
+                  messg
+                });
+              })
+              .catch(function (response) {
+                //handle error
+                console.log('ou resp failed ' + response);
+                messg = StatusAlertService.showError(i18n.t('Locations sending failed: ' + JSON.stringify(error?.response?.data)), {
+                  autoHideTime: 10000000
+                });
+                setAlertId({
+                  messg
+                });
+              });
           }else{
-            payload = payloadModel
-          }
 
-          console.log('payloadModel ' + JSON.stringify(payload));
+          console.log('payloadModel ' + JSON.stringify(payloadModel));
           let ans = await axios({
             method: 'POST',
-            data: payload,
+            data: payloadModel,
             headers: {
               'Access-Control-Allow-Origin': '*',
               'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
               'Content-Type': 'application/json',
               crossDomain: true //Authorization: `bearer ${res.data.id}` ,
-
             },
             url: receiver + '?access_token=' + res.data.id
           });
-
+        
           if (res.status == 200) {
             console.log('res.data ' + JSON.stringify(ans.data));
 
-            messg = StatusAlertService.showSuccess(i18n.t('Data send successfully' + JSON.stringify(ans.data)), {
+            messg = StatusAlertService.showSuccess(i18n.t('Data send successfully. ' + JSON.stringify(ans.data)), {
               autoHideTime: 10000000
             });
             setAlertId({
               messg
             });
           }
+        }
         }
       } catch (error) {
         console.log('outer error: ' + JSON.stringify(error));
