@@ -10,13 +10,13 @@ export const UPDATE_TASK_CONSTANT_MUTATION = {
         //code: 'cases1',
         name: nameInput,
         description: JSON.stringify(allValues) ,
-        createdBy: {
+/*        createdBy: {
             code: 'admin', 
             displayName: 'admin admin',
             name: 'admin admin',
             id: 'M5zQapPyTZI',
             username: 'admin',
-            },
+            },*/
             created: Date.now(),
             lastUpdated: Date.now(),
         value: '-1000002',

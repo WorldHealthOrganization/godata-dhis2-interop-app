@@ -19,7 +19,6 @@ import { GODATA_DHIS_OUTBREAK_MODEL,
 
 import {
     useCreateCasesConstantMutation,
-    useSetDefaultConstantMutation,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
     useReadMappingConfigConstantsQueryForMappings
@@ -55,11 +54,6 @@ export const MetadataConfigList = () => {
         { loading: loadingDelete, error: errorDelete },
     ] = useDeleteConstantsMutation()
 
-    const [
-        makeConstantDefault,
-        { loading: loadingSetDefault, error: errorSetDefault },
-    ] = useSetDefaultConstantMutation()
-
     const onDeleteClick = () => {
         const variables = { ids: checkedConstants }
         deleteCheckedConstants(variables).then(refetchReadConstants)
@@ -83,7 +77,7 @@ export const MetadataConfigList = () => {
         makeConstantDefault(variables).then(refetchReadConstants)
     }
 
-    const loading = loadingReadConstants || loadingDelete || loadingSetDefault
+    const loading = loadingReadConstants || loadingDelete
 
     if (loading) {
         return (
@@ -96,7 +90,7 @@ export const MetadataConfigList = () => {
         )
     }
 
-    const error = errorReadConstants || errorDelete || errorSetDefault
+    const error = errorReadConstants || errorDelete
 
     if (error) {
         const msg = i18n.t(

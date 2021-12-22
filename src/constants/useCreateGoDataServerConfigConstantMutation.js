@@ -10,13 +10,13 @@ export const CREATE_GODATA_SERVER_CONFIG_CONSTANT_MUTATION = {
         code: 'godataserverconf',
         name: 'Go.Data Server configs',
         description: '{"urlTemplate": "' + urlTemplate + '", "username": "' + username + '", "password": "' + password + '"}',
-        createdBy: {
+ /*       createdBy: {
             code: 'admin', 
             displayName: 'admin admin',
             name: 'admin admin',
             id: 'M5zQapPyTZI',
             username: 'admin',
-            },
+            },*/
             created: Date.now(),
             lastUpdated: Date.now(),
         value: '-1000001',

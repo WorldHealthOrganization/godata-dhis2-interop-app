@@ -9,13 +9,13 @@ export const CREATE_CASES_CONSTANT_MUTATION = {
         //code: 'dhis2serverconf',
         name: nameInput,
         description: JSON.stringify(allValues) ,
-        createdBy: {
+/*        createdBy: {
             code: 'admin', 
             displayName: 'admin admin',
             name: 'admin admin',
             id: 'M5zQapPyTZI',
             username: 'admin',
-            },
+            },*/
             created: Date.now(),
             lastUpdated: Date.now(),
         value: '-1000000',
