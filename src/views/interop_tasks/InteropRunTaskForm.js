@@ -267,8 +267,8 @@ export const InteropRunTaskForm = () => {
                   }); 
                   
                   //GET DHIS2 INSTANCES AS PER API ENDPOINT
-
-                  if(taskObjectMeta[6]==='Go.Data Contact'){
+                  var currentTaskType = 'Go.Data Case' || 'Go.Data Contact' || 'Go.Data Contact of Contact'
+                  if(taskObjectMeta[6]===currentTaskType){
                     console.log('sender instance ' + taskObjectMeta[6])
 
                     var endpoints = taskObjectMeta[0].split(' ')
@@ -559,6 +559,13 @@ console.log(JSON.stringify(idMapping))
 
     const senderObject = senderData.find(x => x.id === checkedConstants[y]);
     stmp = senderObject;
+    var currentTaskType = 'Go.Data Case' || 'Go.Data Contact' || 'Go.Data Contact of Contact'
+    if(taskType=== currentTaskType){
+    stmp["dataElements"] = []
+    for (var i = 0, length = stmp.enrollments[0].events.length; i < length; i++) {
+    smtp.dataElements.append(stmp.enrollments[0].events[i].dataValues)
+    }
+  }
     console.log('stmp ' + JSON.stringify(stmp))
 
     const iterate = (obj) => {
@@ -677,7 +684,6 @@ console.log(JSON.stringify(idMapping))
 
         //console.log('selected object ' + JSON.stringify(checkedConstants[0]));
 
-
         if (tmp) {
           //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
           // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
@@ -764,45 +770,27 @@ console.log(JSON.stringify(idMapping))
                 return 0
           } else if (tmp.props.conversion === 'delm'){
             console.log('processing delm ' + stmp.dataValues.length)  
-            for (var i = 0, length = stmp.enrollments[0].events[0].dataValues.length; i < length; i++) {
-                  if (stmp.enrollments[0].events[0].dataValues[i]["dataElement"] == tmp.dhis2){
-                      return stmp.enrollments[0].events[0].dataValues[i].["value"];
-                  }
-          }
-          for (var i = 0, length = stmp.enrollments[0].events[1].dataValues.length; i < length; i++) {
-            if (stmp.enrollments[0].events[1].dataValues[i]["dataElement"] == tmp.dhis2){
-                return stmp.enrollments[0].events[1].dataValues[i].["value"];
+            for (var i = 0, length = stmp.attributes.length; i < length; i++) {
+              if (stmp.dataElements[i]["dataElement"] == tmp.dhis2){
+                return stmp.dataValues[i].["value"];
+              }
             }
-    }
-    for (var i = 0, length = stmp.enrollments[0].events[2].dataValues.length; i < length; i++) {
-      if (stmp.enrollments[0].events[2].dataValues[i]["dataElement"] == tmp.dhis2){
-          return stmp.enrollments[0].events[2].dataValues[i].["value"];
-      }
-}
-for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < length; i++) {
-  if (stmp.enrollments[0].events[3].dataValues[i]["dataElement"] == tmp.dhis2){
-      return stmp.enrollments[0].events[3].dataValues[i].["value"];
-  }
-}
           } else if (tmp.props.conversion === 'attr'){
             console.log('processing attr ' + stmp.attributes.length)
             for (var i = 0, length = stmp.attributes.length; i < length; i++) {
               if (stmp.attributes[i]["attribute"] == tmp.dhis2){
                   return stmp.attributes[i].["value"];
               }
-      }
+            }
           }
           else {
             //console.log('tmp.dhis2 ' + tmp.dhis2)
              //nothing could help, simply return what was given
             return tmp.dhis2;
           }
-        } else {
-          //return 'VALUE NOT SET';
-        }
+        }  
     }
   } //end of getTaskDone()
-
 
     async function login() {
       try {
@@ -896,7 +884,6 @@ for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < le
       }
     }
   
-
   const onCloseModal = () => {
     setOpen(false);
   };
@@ -948,14 +935,6 @@ for (var i = 0, length = stmp.enrollments[0].events[3].dataValues.length; i < le
                     </TableRow>)}
             </TableBody>
         </Table>
-
-
-
-
-
-
-        
-
     </Modal>    
     </FormRow>
    
