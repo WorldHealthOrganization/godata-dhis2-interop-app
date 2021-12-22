@@ -268,7 +268,7 @@ export const InteropRunTaskForm = () => {
                   
                   //GET DHIS2 INSTANCES AS PER API ENDPOINT
                   var currentTaskType = 'Go.Data Case' || 'Go.Data Contact' || 'Go.Data Contact of Contact'
-                  if(taskObjectMeta[6]===currentTaskType){
+                  if(taskObjectMeta[6]==='Go.Data Contact'){
                     console.log('sender instance ' + taskObjectMeta[6])
 
                     var endpoints = taskObjectMeta[0].split(' ')
@@ -770,7 +770,7 @@ console.log(JSON.stringify(idMapping))
                 return 0
           } else if (tmp.props.conversion === 'delm'){
             console.log('processing delm ' + stmp.dataValues.length)  
-            for (var i = 0, length = stmp.attributes.length; i < length; i++) {
+            for (var i = 0, length = stmp.dataValues.length; i < length; i++) {
               if (stmp.dataElements[i]["dataElement"] == tmp.dhis2){
                 return stmp.dataValues[i].["value"];
               }
