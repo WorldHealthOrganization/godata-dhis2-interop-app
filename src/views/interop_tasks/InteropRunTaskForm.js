@@ -125,7 +125,7 @@ export const InteropRunTaskForm = () => {
                   'Access-Control-Allow-Origin': '*',
                   'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                   'Content-Type': 'application/json',
-                  'Authorization': createAuthenticationHeader('admin', 'district')
+                  'Authorization': createAuthenticationHeader(loginDetailsDhis.username, loginDetailsDhis.password)
                 }
               });
               const taskObjectMeta = JSON.parse(taskObject.data.description);
@@ -147,7 +147,7 @@ export const InteropRunTaskForm = () => {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                     'Content-Type': 'application/json',
-                    'Authorization': createAuthenticationHeader('admin', 'district')
+                    'Authorization': createAuthenticationHeader(loginDetailsDhis.username, loginDetailsDhis.password)
                   }
                 });
                 const mappingObjectMeta = JSON.parse(mappingObject.data.description);
@@ -268,7 +268,7 @@ export const InteropRunTaskForm = () => {
                   
                   //GET DHIS2 INSTANCES AS PER API ENDPOINT
                   var currentTaskType =  'Go.Data Contact'
-                  if(taskObjectMeta[6]==='Go.Data Contact'){
+                  if(taskObjectMeta[6]==='Go.Data Contact' || taskObjectMeta[6]==='Go.Data Case' || taskObjectMeta[6]==='Go.Data Contact of Contact'){
                     console.log('sender instance ' + taskObjectMeta[6])
 
                     var endpoints = taskObjectMeta[0].split(' ')
@@ -277,7 +277,7 @@ export const InteropRunTaskForm = () => {
                     instanceIds = await axios.get(endpoints[0] + filters[0], {
                       headers: {
                         'Access-Control-Allow-Origin': '*',
-                        'Authorization': createAuthenticationHeader('admin', 'district'),
+                        'Authorization': createAuthenticationHeader(loginDetailsDhis.username, loginDetailsDhis.password),
                         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                         'Content-Type': 'application/json',
                         crossDomain: true
@@ -298,7 +298,7 @@ instanceObject.data.trackedEntityInstances["dataValues"] = []
                       var inst = await axios.get(endpoints[1] + fromPromise[x] + filters[1], {
                         headers: {
                           'Access-Control-Allow-Origin': '*',
-                          'Authorization': createAuthenticationHeader('admin', 'district'),
+                          'Authorization': createAuthenticationHeader(loginDetailsDhis.username, loginDetailsDhis.password),
                           'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                           'Content-Type': 'application/json',
                           crossDomain: true
@@ -322,7 +322,7 @@ console.log('contacts ' + JSON.stringify(instanceObject))
                   instanceObject = await axios.get(taskObjectMeta[0] + taskObjectMeta[2], {
                     headers: {
                       'Access-Control-Allow-Origin': '*',
-                      'Authorization': createAuthenticationHeader('admin', 'district'),
+                      'Authorization': createAuthenticationHeader(loginDetailsDhis.username, loginDetailsDhis.password),
                       'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                       'Content-Type': 'application/json',
                       crossDomain: true
@@ -561,7 +561,7 @@ console.log(JSON.stringify(idMapping))
     console.log('senderData.find ' + JSON.stringify(senderData.find(x => x.id === checkedConstants[y])))
     stmp = senderObject;
     console.log('stmp here: ' + JSON.stringify(stmp))
-    var currentTaskType =  'Go.Data Contact' 
+    var currentTaskType =  'Go.Data Contact' || 'Go.Data Case'
     if(taskType=== currentTaskType){
     stmp["dataElements"] = []
     //here we have some fixed linkage, need to formulate to make it generic too
@@ -783,9 +783,10 @@ console.log(JSON.stringify(idMapping))
             }
           } else if (tmp.props.conversion === 'attr'){
             console.log('processing attr ' + stmp.attributes.length)
-            for (var i = 0, length = stmp.attributes.length; i < length; i++) {
-              if (stmp.attributes[i]["attribute"] == tmp.dhis2){
-                  return stmp.attributes[i].["value"];
+            for (var i = 0; i < stmp.attributes.length; i++) {
+              if (stmp.attributes[i].attribute == tmp.dhis2){
+                console.log('process atrr val ' + stmp.attributes[i].value + ' dhis ' + tmp.dhis2)
+                  return stmp.attributes[i].value;
               }
             }
           }
