@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-22T02:18:37.968Z\n"
-"PO-Revision-Date: 2021-12-22T02:18:37.968Z\n"
+"POT-Creation-Date: 2022-01-10T17:02:41.684Z\n"
+"PO-Revision-Date: 2022-01-10T17:02:41.684Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -264,6 +264,9 @@ msgid "Reading sender data."
 msgstr ""
 
 msgid "Reading sender data - Success."
+msgstr ""
+
+msgid "Something went wrong whilst loading data"
 msgstr ""
 
 msgid "Start sending data"

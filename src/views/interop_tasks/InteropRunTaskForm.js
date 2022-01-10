@@ -267,7 +267,7 @@ export const InteropRunTaskForm = () => {
                   }); 
                   
                   //GET DHIS2 INSTANCES AS PER API ENDPOINT
-                  var currentTaskType = 'Go.Data Case' || 'Go.Data Contact' || 'Go.Data Contact of Contact'
+                  var currentTaskType =  'Go.Data Contact'
                   if(taskObjectMeta[6]==='Go.Data Contact'){
                     console.log('sender instance ' + taskObjectMeta[6])
 
@@ -482,7 +482,7 @@ console.log(JSON.stringify(idMapping))
   }
 
   if (error) {
-    const msg = i18n.t('Something went wrong whilst loading gateways');
+    const msg = i18n.t('Something went wrong whilst loading data');
     return <>
             <PageHeadline>{i18n.t('Edit')}</PageHeadline>
             <NoticeBox error title={msg}>
@@ -556,18 +556,19 @@ console.log(JSON.stringify(idMapping))
     var model = JSON.parse(JSON.stringify(payloadModel));
 
     var mappings;
-
+    console.log('senderData: ' + JSON.stringify(senderData))
     const senderObject = senderData.find(x => x.id === checkedConstants[y]);
+    console.log('senderData.find ' + JSON.stringify(senderData.find(x => x.id === checkedConstants[y])))
     stmp = senderObject;
-    var currentTaskType = 'Go.Data Case' || 'Go.Data Contact' || 'Go.Data Contact of Contact'
+    console.log('stmp here: ' + JSON.stringify(stmp))
+    var currentTaskType =  'Go.Data Contact' 
     if(taskType=== currentTaskType){
     stmp["dataElements"] = []
+    //here we have some fixed linkage, need to formulate to make it generic too
     for (var i = 0, length = stmp.enrollments[0].events.length; i < length; i++) {
-    smtp.dataElements.append(stmp.enrollments[0].events[i].dataValues)
+    stmp.dataElements.push(stmp.enrollments[0].events[i].dataValues)
     }
   }
-    console.log('stmp ' + JSON.stringify(stmp))
-
     const iterate = (obj) => {
       var walked = [];
       var stack = [{
@@ -769,10 +770,15 @@ console.log(JSON.stringify(idMapping))
             //none of tries are successful, simply return 0
                 return 0
           } else if (tmp.props.conversion === 'delm'){
-            console.log('processing delm ' + stmp.dataValues.length)  
-            for (var i = 0, length = stmp.dataValues.length; i < length; i++) {
-              if (stmp.dataElements[i]["dataElement"] == tmp.dhis2){
-                return stmp.dataValues[i].["value"];
+            
+            console.log('processing delm ' + stmp.enrollments[0].events.length)  
+            for (var i = 0; i < stmp.enrollments[0].events.length; i++) {
+              //console.log('processing delm2 ' + stmp.enrollments[0].events[i].dataValues.length)  
+              for (var y = 0; y < stmp.enrollments[0].events[i].dataValues.length; y++) {
+                //console.log('deiy ' + stmp.enrollments[0].events[i].dataValues[y].dataElement)
+              if (stmp.enrollments[0].events[i].dataValues[y].dataElement == tmp.dhis2){
+                return stmp.enrollments[0].events[i].dataValues[y].value;
+                }
               }
             }
           } else if (tmp.props.conversion === 'attr'){
