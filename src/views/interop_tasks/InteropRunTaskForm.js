@@ -318,7 +318,6 @@ instanceObject.data.trackedEntityInstances["dataValues"] = []
 console.log('contacts ' + JSON.stringify(instanceObject))
                   }else{
 
-
                   instanceObject = await axios.get(taskObjectMeta[0] + taskObjectMeta[2], {
                     headers: {
                       'Access-Control-Allow-Origin': '*',
