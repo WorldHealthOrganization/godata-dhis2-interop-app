@@ -1,4 +1,4 @@
-# godata-dhis2-configuration-app
+# godata-dhis2-integration-app
 
 GoData <-> DHIS2 Interoperability web app
 
