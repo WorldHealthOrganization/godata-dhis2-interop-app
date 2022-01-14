@@ -4,24 +4,6 @@ GoData <-> DHIS2 Interoperability web app
 
 This project was bootstrapped with [DHIS2 Application Platform](https://github.com/dhis2/app-platform).
 
-## End-to-End tests
-
-You will need a `cypress.env.json` file with the contents:
-
-```json
-{
-    "dhis2_base_url": "",
-    "dhis2_username": "",
-    "dhis2_password": "",
-}
-```
-
-The value for the first three fields needs to be appropriate for the
-server you wish to test against. 
-An additional required environment variable (`dhis2_datatest_prefix`) is 
-specified as `dhis2-smsconfiguration` in `cypress.json`.
-
-Run the tests with `yarn cy:run`.
 
 ## Available Scripts
 
