@@ -1,7 +1,7 @@
-# Go.Data-DHIS2 Interoperability App <img src="assets/godata-dhis2-icon.png" align="right" height="260"/>
+# DHIS2-Go.Data Interoperability App <img src="assets/godata-dhis2-icon.png" align="right" height="260"/>
 
 ## Overview
-This Go.Data-DHIS2 Interoperability App enables metadata to be securely exchanged between [Go.Data](https://www.who.int/tools/godata) (an outbreak response tool developed by WHO) and [DHIS2](https://dhis2.org/) (a widely used system for national health information management developed by the University of Oslo). This includes bi-directional exchange of reference medadata used across both platforms (i.e. location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). 
+The DHIS2-Go.Data Interoperability App enables metadata to be securely exchanged between [DHIS2](https://dhis2.org/) (a widely used system for national health information management developed by the University of Oslo) and [Go.Data](https://www.who.int/tools/godata) (an outbreak response tool developed by WHO). This includes exchange of reference medadata used across both platforms (i.e. location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). 
 
 Such an integration enables field teams to make use of additional visualizations for chains of transmission and contact tracing follow up in Go.Data during an acute outbreak scenario while ensuring key field intel gets reflected back into overarching DHIS2 system. 
 
@@ -42,3 +42,7 @@ You can learn more about the platform in the [DHIS2 Application Platform Documen
 You can learn more about the runtime in the [DHIS2 Application Runtime Documentation](https://runtime.dhis2.nu/).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Feedback and contact
+
+For any questions or feedabck, please contact godata@who.int or post on the Go.Data Community of Practice here: https://community-godata.who.int/
