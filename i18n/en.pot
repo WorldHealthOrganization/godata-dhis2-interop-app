@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-01-10T17:02:41.684Z\n"
-"PO-Revision-Date: 2022-01-10T17:02:41.684Z\n"
+"POT-Creation-Date: 2022-01-30T19:11:36.750Z\n"
+"PO-Revision-Date: 2022-01-30T19:11:36.750Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -139,22 +139,7 @@ msgstr ""
 msgid "Configure DHIS2 server"
 msgstr ""
 
-msgid "Something went wrong whilst saving configs"
-msgstr ""
-
-msgid "Metadata Mapping"
-msgstr ""
-
-msgid "Something went wrong whilst saving server configs"
-msgstr ""
-
-msgid "Edit Server Config"
-msgstr ""
-
 msgid "Configure Go.Data server"
-msgstr ""
-
-msgid "GET"
 msgstr ""
 
 msgid "Overview: Configure Go.Data-DHIS2 Interoperability App"
@@ -185,6 +170,9 @@ msgid ""
 msgstr ""
 
 msgid "Set up DHIS2 server instance"
+msgstr ""
+
+msgid "Metadata Mapping"
 msgstr ""
 
 msgid ""
@@ -296,4 +284,16 @@ msgstr ""
 msgid ""
 "It looks like there aren't any configured metadta, or they couldn't be "
 "loaded."
+msgstr ""
+
+msgid "Something went wrong whilst saving configs"
+msgstr ""
+
+msgid "Something went wrong whilst saving server configs"
+msgstr ""
+
+msgid "Edit Server Config"
+msgstr ""
+
+msgid "GET"
 msgstr ""

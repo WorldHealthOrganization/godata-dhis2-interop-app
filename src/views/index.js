@@ -1,6 +1,5 @@
 export * from './home/Home'
 export * from './godata_configuration/GoDataConfigForm'
-export * from './godata_call/GoDataCallForm'
 export * from './metadata_configuration/MetadataConfigList'
 export * from './metadata_configuration/MetadataConfigFormEdit'
 export * from './metadata_configuration/MetadataConfigFormNew'
