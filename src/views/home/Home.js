@@ -19,7 +19,7 @@ export const Home = () => {
     return (
         <div data-test={dataTest('views-home')} className={s.container}>
             <PageHeadline>
-                {i18n.t('Overview: Configure Go.Data-DHIS2 Interoperability App', {
+                {i18n.t('Overview: Go.Data-DHIS2 Interoperability App', {
                     nsSeparator: '>',
                 })}
             </PageHeadline>

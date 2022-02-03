@@ -1,7 +1,12 @@
 import { ReactFinalForm, NoticeBox, CenteredContent, CircularLoader, Button, ButtonStrip, Checkbox, Table, TableHead, TableBody, TableRowHead, TableCellHead, TableRow, TableCell } from '@dhis2/ui';
 import { useHistory, useParams } from 'react-router-dom';
 import React, { useState, useQuery, useEffect } from 'react';
+
 import axios from 'axios';
+
+import api from '../../utils/api'
+import { useConfig } from '@dhis2/app-runtime'
+
 import { INTEROP_LIST_PATH } from './InteropList';
 import traverse from 'traverse';
 import centroid from 'turf-centroid';
@@ -61,10 +66,68 @@ export const InteropRunTaskForm = () => {
 `;
   let [sloading, setLoading] = useState(false);
   let [color, setColor] = useState("#ffffff");
+  
+  const config = useConfig()
+  console.log(JSON.stringify(config.baseUrl))
 
   const createAuthenticationHeader = (username, password) => {
     return 'Basic ' + new Buffer(username + ':' + password).toString('base64');
   };
+
+   
+  const [godataUser, setGodataUser] = useState()
+  const [godataUserPass, setGodataUserPass] = useState()
+  const [godataUrl, setGodataUrl] = useState()
+  const [loginDetailsGodata, setCredentialsValuesGodata] = useState()
+    
+  api.getValue('dhis2-godata-interop-configuration', 'godatauser').then(response => {
+    setGodataUser(response.value)
+    console.log('godatauser ' + JSON.stringify(response.value));
+}).catch(e => {
+    setGodataUser('')
+    api.createValue('dhis2-godata-interop-configuration', 'godatauser', '')
+    //console.log(e);
+});
+
+api.getValue('dhis2-godata-interop-configuration', 'godatauserpass').then(response => {
+    setGodataUserPass(response.value)
+    console.log('godatauser pass ' + JSON.stringify(response.value));
+}).catch(e => {
+    setGodataUserPass('')
+    api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', '')
+    //console.log(e);
+});
+
+api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl').then(response => {
+    setGodataUrl(response.value)
+    console.log('godatabaseurl ' + JSON.stringify(response.value));
+}).catch(e => {
+    setGodataUrl('')
+    api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', '')
+    //console.log(e);
+});
+
+  const [dhisUser, setDhisUser] = useState()
+  const [dhisUserPass, setDhisUserPass] = useState()
+  const [loginDetailsDhis, setCredentialsValuesDhis] = useState()
+
+  api.getValue('dhis2-godata-interop-configuration', 'dhisuser').then(response => {
+    setDhisUser(response.value)
+    console.log('dhisuser ' + JSON.stringify(response.value));
+}).catch(e => {
+    setDhisUser('')
+    api.createValue('dhis2-godata-interop-configuration', 'dhisuser', '')
+    console.log(e);
+});
+
+api.getValue('dhis2-godata-interop-configuration', 'dhisuserpass').then(response => {
+    setDhisUserPass(response.value)
+    console.log('dhisuser pass ' + JSON.stringify(response.value));
+}).catch(e => {
+    setDhisUserPass('')
+    api.createValue('dhis2-godata-interop-configuration', 'dhisuserpass', '')
+    console.log(e);
+});
 
   const {
     lloading,
@@ -82,10 +145,28 @@ export const InteropRunTaskForm = () => {
     setAlertId({
       messg
     });
-    const loginDetailsGodata = data && data.constants.constants.length > 0 ? JSON.parse(data.constants.constants[0].description) : {};
-    const loginDetailsDhis = progData && progData.constants.constants.length > 0 ? JSON.parse(progData.constants.constants[0].description) : {};
-    console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis));
-    console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata));
+
+ 
+    setCredentialsValuesGodata ( {'urlTemplate': godataUrl,
+    'username': godataUser, 
+    'password': godataUserPass})
+
+console.log('gcreds ' + JSON.stringify(loginDetailsGodata))
+//    const loginDetailsGodata = data && data.constants.constants.length > 0 ? JSON.parse(data.constants.constants[0].description) : {};
+
+let dhisBaseUrl = config.baseUrl
+ 
+setCredentialsValuesDhis ( {'urlTemplate': dhisBaseUrl,
+'username': dhisUser, 
+'password': dhisUserPass})
+
+console.log('dcreds ' + JSON.stringify(loginDetailsDhis))
+//const loginDetailsDhis = progData && progData.constants.constants.length > 0 ? JSON.parse(progData.constants.constants[0].description) : {};
+
+
+
+//    console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis));
+//    console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata));
     setGodataLogin(loginDetailsGodata);
     messg = StatusAlertService.showSuccess(i18n.t('Reading task configurations - Success.'));
     setAlertId({
@@ -119,7 +200,7 @@ export const InteropRunTaskForm = () => {
             }); //GET TASK DEFINITION
 
             const getTask = async (id) => {
-              var taskObject = await axios.get(loginDetailsDhis.urlTemplate + '/dhis/api/constants/' + id + '?paging=false&fields=id,displayName,code,description,shortName,name', {
+              var taskObject = await axios.get(loginDetailsDhis.urlTemplate + '/api/constants/' + id + '?paging=false&fields=id,displayName,code,description,shortName,name', {
                 crossDomain: true,
                 headers: {
                   'Access-Control-Allow-Origin': '*',
@@ -141,7 +222,7 @@ export const InteropRunTaskForm = () => {
               });
 
               const getMappings = async id => {
-                var mappingObject = await axios.get(loginDetailsDhis.urlTemplate + '/dhis/api/constants/' + id + '?paging=false&fields=id,displayName,code,description,shortName,name', {
+                var mappingObject = await axios.get(loginDetailsDhis.urlTemplate + '/api/constants/' + id + '?paging=false&fields=id,displayName,code,description,shortName,name', {
                   crossDomain: true,
                   headers: {
                     'Access-Control-Allow-Origin': '*',

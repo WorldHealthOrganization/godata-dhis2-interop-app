@@ -10,6 +10,8 @@ const { Field } = ReactFinalForm
 
 import axios from 'axios'
 
+import api from '../utils/api'
+
 import 'jsoneditor-react/es/editor.min.css'
 import ReactJson from 'react-json-view'
 import 'react-responsive-modal/styles.css';
@@ -136,6 +138,39 @@ export const ContactsOfContactForm = ({
     const [godataModelInput, setGodataModelInput] = useState('')
 
     var instanceObject
+ 
+    const [godataUser, setGodataUser] = useState()
+    const [godataUserPass, setGodataUserPass] = useState()
+    const [godataUrl, setGodataUrl] = useState()
+    const [loginDetails, setCredentialsValues] = useState()
+
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatauser').then(response => {
+        setGodataUser(response.value)
+        console.log('godatauser ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUser('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatauser', '')
+        //console.log(e);
+    });
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatauserpass').then(response => {
+        setGodataUserPass(response.value)
+        console.log('godatauser pass ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUserPass('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', '')
+        //console.log(e);
+    });
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl').then(response => {
+        setGodataUrl(response.value)
+        console.log('godatabaseurl ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUrl('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', '')
+        //console.log(e);
+    });
 
     const { lloading, data: progData, lerror } = useReadProgramsQueryForMappings()
     //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
@@ -148,10 +183,16 @@ export const ContactsOfContactForm = ({
 
     useEffect(() => {
  
-        const loginDetails = 
+        setCredentialsValues ( {'urlTemplate': godataUrl,
+        'username': godataUser, 
+        'password': godataUserPass})
+
+    console.log('creds ' + JSON.stringify(loginDetails))
+
+ /*       const loginDetails = 
         data && data.constants.constants.length >0
         ? JSON.parse(data.constants.constants[0].description)
-                : {}
+                : {} */
 
                 const programInstance = 
                 progData && progData.programs.programs.length >0

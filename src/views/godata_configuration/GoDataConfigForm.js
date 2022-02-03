@@ -2,6 +2,8 @@ import { CenteredContent, CircularLoader, NoticeBox } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 
+import api from '../../utils/api'
+
 import { HOME_PATH } from '..'
 
 import { FormRow } from '../../forms'
@@ -21,51 +23,72 @@ export const GODATA_CONFIG_FORM_LABEL = 'Go.Data Server Credentials'
 
 export const GoDataConfigForm = () => {
     const history = useHistory()
-    const { code } = 'godataserverconf'
-    //const [id, setId] = useState('')
-var id, exists
-const { loading, data, error  } = useReadMappingConfigConstantsQueryForConfig()
 
+    var id, exists, initialValues;
+    const [godataUser, setGodataUser] = useState()
+    const [godataUserPass, setGodataUserPass] = useState()
+    const [godataUrl, setGodataUrl] = useState()
+    
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatauser').then(response => {
+        setGodataUser(response.value)
+        console.log('godatauser ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUser('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatauser', '')
+        //console.log(e);
+    });
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatauserpass').then(response => {
+        setGodataUserPass(response.value)
+        console.log('godatauser pass ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUserPass('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', '')
+        //console.log(e);
+    });
+    
+    api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl').then(response => {
+        setGodataUrl(response.value)
+        console.log('godatabaseurl ' + JSON.stringify(response.value));
+    }).catch(e => {
+        setGodataUrl('')
+        api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', '')
+        //console.log(e);
+    });    
+    
 
-        const loginDetails = 
-        data && data.constants.constants.length >0
-        ? JSON.parse(data.constants.constants[0].description)
-                : {}
-
-
-
-     id = data?.constants?.constants[0]?.id
-     console.log('id id ' + id)
-
-     exists = 
-id===undefined
-? false : true
-console.log('exists assign ' + exists)
-
-     var vals = loginDetails
-     id!=='undefined'
-     ?vals.id = id
-     :''
-     
-     const initialValues = vals
-
-
-    const [saveGoDataServerConfigConstant] = useCreateGoDataServerConfigConstantMutation()
-    const [updateGoDataServerConfigConstant] = useUpdateGoDataServerConfigConstantMutation()
+    initialValues = {urlTemplate: godataUrl,
+        'username': godataUser, 
+        'password': godataUserPass}
+    console.log('initialValues ' + JSON.stringify(initialValues))
 
 
     const onSubmit = async values => {
         try {
 
-            if(exists){
-                console.log('exists onsubmit ' + exists)
-                //setId(jsonData.constants.constants[0].id)
-                console.log('id : ' + id)
-                await updateGoDataServerConfigConstant(values, id)
-            }else{
-                console.log('hre ')
-                await saveGoDataServerConfigConstant(values)
-            }
+            console.log('values.username ' + values.username)
+
+            api.createValue('dhis2-godata-interop-configuration', 'godatauser', values.username).then(response => {
+                            console.log('godatauser ' + JSON.stringify(response.value));
+                        }).catch(e => {
+            api.updateValue('dhis2-godata-interop-configuration', 'godatauser', values.username)
+                            //console.log(e);
+                        });
+            
+            api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', values.password).then(response => {
+                            console.log('godatauser pass ' + JSON.stringify(response.value));
+                        }).catch(e => {
+            api.updateValue('dhis2-godata-interop-configuration', 'godatauserpass', values.password)
+                            //console.log(e);
+                        });
+            
+            api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', values.urlTemplate).then(response => {
+                            console.log('godatabaseurl ' + JSON.stringify(response.value));
+                        }).catch(e => {
+            api.updateValue('dhis2-godata-interop-configuration', 'godatabaseurl', values.urlTemplate)
+                            //console.log(e);
+                        });                        
             
             history.push(HOME_PATH)
         } catch (e) {

@@ -19,7 +19,7 @@ export const GoDataServerConfigForm = ({
     initialValues,
 }) => {
     console.log('initialValues ' + JSON.stringify(initialValues))
-    const submitText = initialValues.id !=='undefined'
+    const submitText = initialValues.username !==''
         ? i18n.t('Save')
         : i18n.t('Add')
 

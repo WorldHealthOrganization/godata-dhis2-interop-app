@@ -3,6 +3,9 @@ import { CssVariables } from '@dhis2/ui'
 import React from 'react'
 import styles from './App.module.css'
 
+import { useD2 } from '@dhis2/app-runtime-adapter-d2'
+import { getUserSettings } from 'd2'
+
 import { AlertHandler } from './notifications'
 import { Navigation } from './navigation'
 import {
@@ -31,7 +34,18 @@ import {
 } from './views'
 import { dataTest } from './dataTest'
 
-const App = () => (
+const d2Config = {
+    schemas: ['dataStore'],
+}
+
+const App = () => {
+    const { d2 } = useD2()
+
+    if (!d2) {
+        return null
+    }
+
+    return (
     <AlertHandler>
         <CssVariables spacers colors />
         <HashRouter>
@@ -112,7 +126,7 @@ const App = () => (
                 </main>
             </div>
         </HashRouter>
-    </AlertHandler>
-)
+    </AlertHandler>)
+}
 
 export default App
