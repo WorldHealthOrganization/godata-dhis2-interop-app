@@ -1,4 +1,4 @@
-# DHIS2-Go.Data Interoperability App ![InteropLogo](https://user-images.githubusercontent.com/91990504/156531767-a9ab3a15-2521-47eb-942b-e4c35d283469.png)
+# DHIS2-Go.Data Interoperability App <img src="assets/godata-dhis2-icon.png" align="right" height="260"/> 
 A comprehensive guide for end-users.
 
 
