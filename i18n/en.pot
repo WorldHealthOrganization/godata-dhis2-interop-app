@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-02-03T03:21:57.690Z\n"
-"PO-Revision-Date: 2022-02-03T03:21:57.690Z\n"
+"POT-Creation-Date: 2022-04-08T09:54:28.565Z\n"
+"PO-Revision-Date: 2022-04-08T09:54:28.565Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -74,21 +74,6 @@ msgstr ""
 msgid "User name"
 msgstr ""
 
-msgid "Go.Data Outbreak"
-msgstr ""
-
-msgid "Go.Data Case"
-msgstr ""
-
-msgid "Go.Data Contact"
-msgstr ""
-
-msgid "Go.Data Contact of Contact"
-msgstr ""
-
-msgid "Go.Data Location"
-msgstr ""
-
 msgid "Save task"
 msgstr ""
 
@@ -129,6 +114,21 @@ msgid "Location mappings setup"
 msgstr ""
 
 msgid "Outbreaks mappings setup"
+msgstr ""
+
+msgid "Go.Data Outbreak"
+msgstr ""
+
+msgid "Go.Data Case"
+msgstr ""
+
+msgid "Go.Data Contact"
+msgstr ""
+
+msgid "Go.Data Contact of Contact"
+msgstr ""
+
+msgid "Go.Data Location"
 msgstr ""
 
 msgid ""
@@ -195,7 +195,7 @@ msgstr ""
 msgid "Manage Tasks"
 msgstr ""
 
-msgid "Something went wrong whilst loading constants"
+msgid "Something went wrong whilst loading task"
 msgstr ""
 
 msgid "Something went wrong whilst performing the requested operation"
@@ -261,6 +261,9 @@ msgid "Start sending data"
 msgstr ""
 
 msgid "Proceed"
+msgstr ""
+
+msgid "Edit mapping"
 msgstr ""
 
 msgid "Something went wrong whilst saving the constant"

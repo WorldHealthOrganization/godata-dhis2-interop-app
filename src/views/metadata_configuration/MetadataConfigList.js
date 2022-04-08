@@ -1,6 +1,9 @@
 import { useHistory } from 'react-router-dom'
-import React, { useState } from 'react'
-import { NoticeBox, CenteredContent, CircularLoader,    Button,
+import React, { useState, useEffect } from 'react'
+import * as dataStore from '../../utils/dataStore.js'
+import {
+    NoticeBox,
+    Button,
     ButtonStrip,
     Checkbox,
     Table,
@@ -9,19 +12,19 @@ import { NoticeBox, CenteredContent, CircularLoader,    Button,
     TableRowHead,
     TableCellHead,
     TableRow,
-    TableCell, } from '@dhis2/ui'
+    TableCell,
+} from '@dhis2/ui'
 
 import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
 import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from './MetadataConfigFormEdit'
 
-import { GODATA_DHIS_OUTBREAK_MODEL, 
-    GODATA_DHIS_LOCATION_MODEL } from '../../constants'
+import {
+    GODATA_DHIS_OUTBREAK_MODEL,
+    GODATA_DHIS_LOCATION_MODEL,
+} from '../../constants'
 
 import {
-    useCreateCasesConstantMutation,
-    useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
-    useReadMappingConfigConstantsQueryForMappings
 } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
@@ -39,75 +42,47 @@ export const MetadataConfigList = () => {
 
     const [checkedConstants, setCheckedConstants] = useState([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [mappings, setMappings] = useState([])
 
-    const {
-        loading: loadingReadConstants,
-        error: errorReadConstants,
-        data,
-        refetch: refetchReadConstants,
-    } = useReadMappingConfigConstantsQueryForMappings()
+    useEffect(() => {
+        dataStore.getValue('mappings').then(mappings => {
+            console.log(mappings)
+            setMappings(mappings)
+        })
+    }, [])
 
-    const constants = data?.constants?.constants
-
-    const [
-        deleteCheckedConstants,
-        { loading: loadingDelete, error: errorDelete },
-    ] = useDeleteConstantsMutation()
-
-    const onDeleteClick = () => {
-        const variables = { ids: checkedConstants }
-        deleteCheckedConstants(variables).then(refetchReadConstants)
+    const onDeleteClick = async () => {
+        console.log("Deleting...")
+        console.log(checkedConstants)
+        setMappings(await dataStore.deleteByArrayIds('mappings', checkedConstants))
+        setCheckedConstants([])
         setShowDeleteDialog(false)
     }
 
-    const [ addDefaultConstant ] = useCreateCasesConstantMutation()    
-
-    const onDefaultsClick = () => {
+    const onDefaultsClick = async () => {
         console.log('default clicked')
         var allValues = GODATA_DHIS_OUTBREAK_MODEL
         var nameInput = 'Default Go.Data DHIS2 Outbreak Mapping'
-        addDefaultConstant({allValues,nameInput})
+        console.log({
+            mapping: allValues,
+            displayName: nameInput,
+        })
+        await dataStore.appendValue('mappings', {
+            mapping: allValues,
+            displayName: nameInput,
+        })
         allValues = GODATA_DHIS_LOCATION_MODEL
         nameInput = 'Default Go.Data DHIS2 Location Mapping'
-        addDefaultConstant({allValues,nameInput}).then(refetchReadConstants)
+        await dataStore.appendValue('mappings', {
+            mapping: allValues,
+            displayName: nameInput,
+        })
+        await dataStore
+            .getValue('mappings')
+            .then(mappings => setMappings(mappings))
     }
 
-    const onMakeDefaultClick = id => {
-        const variables = { id }
-        makeConstantDefault(variables).then(refetchReadConstants)
-    }
-
-    const loading = loadingReadConstants || loadingDelete
-
-    if (loading) {
-        return (
-            <>
-                <PageHeadline>{METADATA_CONFIG_LIST_LABEL}</PageHeadline>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-
-    const error = errorReadConstants || errorDelete
-
-    if (error) {
-        const msg = i18n.t(
-            'Something went wrong whilst performing the requested operation'
-        )
-
-        return (
-            <>
-                <PageHeadline>{METADATA_CONFIG_LIST_LABEL}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {error.message}
-                </NoticeBox>
-            </>
-        )
-    }
-
-    const allConstantsChecked = checkedConstants.length === constants.length
+    const allConstantsChecked = checkedConstants.length === mappings.length
 
     const toggleConstant = id => {
         if (checkedConstants.includes(id)) {
@@ -128,16 +103,10 @@ export const MetadataConfigList = () => {
     }
 
     const toggleAll = () => {
-        if (!allConstantsChecked) {
-            const allConstantIds = constants.map(({ id }) => id)
-            setCheckedConstants(allConstantIds)
-        } else {
-            setCheckedConstants([])
-        }
+        if (!allConstantsChecked)
+            setCheckedConstants([...Array(mappings.length).keys()])
+        else setCheckedConstants([])
     }
-    
-    const hasMappings = !!data?.constants?.constants?.length
-    
 
     return (
         <div
@@ -158,102 +127,107 @@ export const MetadataConfigList = () => {
                 defaultLabel={i18n.t('Load default config')}
                 dataTest="views-gatewayconfiglist"
                 onAddClick={onAddConstantClick}
-                onDefaultsClick = {onDefaultsClick}
+                onDefaultsClick={onDefaultsClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
-                disableAdd={loadingDelete}
-                disableDelete={!checkedConstants.length || loadingDelete}
             />
 
-            {hasMappings ? (
-        <div
-        className={styles.container}
-        data-test={dataTest('constants-gatewaylist')}
-    >
-        {loading && (
-            <div className={styles.processingMessage}>
-                <div className={styles.loadingContainer}>
-                    <CircularLoader />
-                </div>
-            </div>
-        )}
+            {mappings.length ? (
+                <div
+                    className={styles.container}
+                    data-test={dataTest('constants-gatewaylist')}
+                >
 
-<Table dataTest={dataTest('constants-constantstable')}>
-            <TableHead>
-                <TableRowHead>
-                    <TableCellHead
-                        dataTest={dataTest('constants-constantstable-checkall')}
-                    >
-                        <Checkbox
-                            onChange={toggleAll}
-                            checked={allConstantsChecked}
-                        />
-                    </TableCellHead>
-                    <TableCellHead>{i18n.t('Name')}</TableCellHead>
-                    <TableCellHead>{i18n.t('Type')}</TableCellHead>
-                    <TableCellHead />
-                    <TableCellHead />
-                </TableRowHead>
-            </TableHead>
-
-            <TableBody>
-                {constants.map(constant => (
-                    <TableRow
-                        key={constant.id}
-                        dataTest={dataTest('constants-constantstable-row')}
-                    >
-                        <TableCell
-                            className={styles.checkboxCell}
-                            dataTest={dataTest(
-                                'constants-constantstable-checkbox'
-                            )}
-                        >
-                            <Checkbox
-                                value={constant.id}
-                                onChange={() => toggleConstant(constant.id)}
-                                checked={checkedConstants.includes(constant.id)}
-                                dataTest={dataTest('constants-constantstable-id')}
-                            />
-                        </TableCell>
-
-                        <TableCell
-                            dataTest={dataTest('constants-constantstable-name')}
-                        >
-                            {constant.displayName}
-                        </TableCell>
-
-                        <TableCell
-                            className={styles.typeCell}
-                            dataTest={dataTest('constants-constantstable-type')}
-                        >
-                            {constant.shortName}
-                        </TableCell>
-
-                        <TableCell
-                            dataTest={dataTest(
-                                'constants-constantstable-actions'
-                            )}
-                            className={styles.editCell}
-                        >
-                            <ButtonStrip className={styles.rowActions}>
-                                <Button
+                    <Table dataTest={dataTest('constants-constantstable')}>
+                        <TableHead>
+                            <TableRowHead>
+                                <TableCellHead
                                     dataTest={dataTest(
-                                        'constants-constantstable-edit'
+                                        'constants-constantstable-checkall'
                                     )}
-                                    onClick={() => {
-                                        history.push(
-                                            `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/${constant.id}`
-                                        )
-                                    }}
                                 >
-                                    {i18n.t('Edit')}
-                                </Button>
-                            </ButtonStrip>
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    </div>
+                                    <Checkbox
+                                        onChange={toggleAll}
+                                        checked={allConstantsChecked}
+                                    />
+                                </TableCellHead>
+                                <TableCellHead>{i18n.t('Name')}</TableCellHead>
+                                <TableCellHead>{i18n.t('Type')}</TableCellHead>
+                                <TableCellHead />
+                                <TableCellHead />
+                            </TableRowHead>
+                        </TableHead>
+
+                        <TableBody>
+                            {mappings.map((constant, i) => (
+                                <TableRow
+                                    key={i}
+                                    dataTest={dataTest(
+                                        'constants-constantstable-row'
+                                    )}
+                                >
+                                    <TableCell
+                                        className={styles.checkboxCell}
+                                        dataTest={dataTest(
+                                            'constants-constantstable-checkbox'
+                                        )}
+                                    >
+                                        <Checkbox
+                                            value={i.toString()}
+                                            onChange={() => toggleConstant(i)}
+                                            checked={checkedConstants.includes(
+                                                i
+                                            )}
+                                            dataTest={dataTest(
+                                                'constants-constantstable-id'
+                                            )}
+                                        />
+                                    </TableCell>
+
+                                    <TableCell
+                                        dataTest={dataTest(
+                                            'constants-constantstable-name'
+                                        )}
+                                    >
+                                        {constant.displayName}
+                                    </TableCell>
+
+                                    <TableCell
+                                        className={styles.typeCell}
+                                        dataTest={dataTest(
+                                            'constants-constantstable-type'
+                                        )}
+                                    >
+                                        {constant.displayName}
+                                    </TableCell>
+
+                                    <TableCell
+                                        dataTest={dataTest(
+                                            'constants-constantstable-actions'
+                                        )}
+                                        className={styles.editCell}
+                                    >
+                                        <ButtonStrip
+                                            className={styles.rowActions}
+                                        >
+                                            <Button
+                                                dataTest={dataTest(
+                                                    'constants-constantstable-edit'
+                                                )}
+                                                onClick={() => {
+                                                    history.push(
+                                                        `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/${i}`
+                                                    )
+                                                }}
+                                            >
+                                                {i18n.t('Edit')}
+                                            </Button>
+                                        </ButtonStrip>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             ) : (
                 <NoticeBox info title={i18n.t('No mappings found')}>
                     {i18n.t(

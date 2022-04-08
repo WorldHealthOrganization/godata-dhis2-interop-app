@@ -8,16 +8,16 @@ export const CREATE_CASES_CONSTANT_MUTATION = {
         shortName: nameInput,
         //code: 'dhis2serverconf',
         name: nameInput,
-        description: JSON.stringify(allValues) ,
-/*        createdBy: {
+        description: JSON.stringify(allValues),
+        /*        createdBy: {
             code: 'admin', 
             displayName: 'admin admin',
             name: 'admin admin',
             id: 'M5zQapPyTZI',
             username: 'admin',
             },*/
-            created: Date.now(),
-            lastUpdated: Date.now(),
+        created: Date.now(),
+        lastUpdated: Date.now(),
         value: '-1000000',
     }),
 }

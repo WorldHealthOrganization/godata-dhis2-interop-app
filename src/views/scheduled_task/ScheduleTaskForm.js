@@ -18,6 +18,7 @@ import {
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './ScheduleTaskForm.module.css'
+import { getValue } from '../../utils/dataStore'
 
 export const SCHEDULED_TASK_FORM_PATH = '/scheduled_task'
 export const SCHEDULED_TASK_FORM_LABEL = 'Scheduled Task'
@@ -37,15 +38,15 @@ export const ScheduleTaskForm = () => {
     jsonData && jsonData.constants.constants.length >0
     ? JSON.parse(jsonData.constants.constants[0].description)
             : {}
-    const  queryGoData = () => {
-                axios
-                .post("http://localhost:8000/api/users/login", {
-                  email: 'admin@who.int',
-                  password: 'Rabota@2021murod',
+    const  queryGoData = async () => {
+                const email = await getValue("godatauser")
+                const pass  = await getValue("godatauserpass")
+                axios.post("http://localhost:8000/api/users/login", {
+                  email: email,
+                  password: pass,
                 }
                 )
                 .then(response => {
-                    //https://godata-r5.who.int
                   //const data = response.data.results;
                   //this.setState({ data });
                   axios

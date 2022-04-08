@@ -1,10 +1,19 @@
-import { SingleSelectField, SingleSelectOption, NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
+import {
+    NoticeBox,
+    CenteredContent,
+    CircularLoader,
+} from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
-import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
-    GODATA_ORG_UNIT } from '../../constants'
+import {
+    GODATA_OUTBREAK,
+    GODATA_CASE,
+    GODATA_CONTACT,
+    GODATA_CONTACT_OF_CONTACT,
+    GODATA_ORG_UNIT,
+} from '../../constants'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
@@ -14,42 +23,43 @@ import {
     ContactsForm,
     ContactsOfContactForm,
     OutbreaksForm,
-    useReadMappingConfigConstantsQueryById,
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './MetadataConfigFormEdit.module.css'
+import * as dataStore from '../../utils/dataStore.js'
+
 
 export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
 export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
 
+// const getInitialValues = jsonData => {
+//     return jsonData.constant
+// }
 
-const getInitialValues = jsonData => {
-    return jsonData.constant
-}
+const getInitialValues = async id => (await dataStore.getValue('mappings'))[id]
 
-    const getFormComponent = selectedForm => {
-        if (GODATA_OUTBREAK === selectedForm) {
-            return OutbreaksForm
-        }
-    
-        if (GODATA_CASE === selectedForm) {
-            return CasesForm
-        }
-    
-        if (GODATA_CONTACT === selectedForm) {
-            return ContactsForm
-        }
-            
-        if (GODATA_CONTACT_OF_CONTACT === selectedForm) {
-            return ContactsOfContactForm
-        }
-            
-        if (GODATA_ORG_UNIT === selectedForm) {
-            return LocationsForm
-        }
-        throw new Error(`The conversion type does not exist, got "${selectedForm}"`)
+const getFormComponent = selectedForm => {
+    if (GODATA_OUTBREAK === selectedForm) {
+        return OutbreaksForm
     }
 
+    if (GODATA_CASE === selectedForm) {
+        return CasesForm
+    }
+
+    if (GODATA_CONTACT === selectedForm) {
+        return ContactsForm
+    }
+
+    if (GODATA_CONTACT_OF_CONTACT === selectedForm) {
+        return ContactsOfContactForm
+    }
+
+    if (GODATA_ORG_UNIT === selectedForm) {
+        return LocationsForm
+    }
+    throw new Error(`The conversion type does not exist, got "${selectedForm}"`)
+}
 
 export const MetadataConfigFormEdit = () => {
     const history = useHistory()
@@ -58,39 +68,19 @@ export const MetadataConfigFormEdit = () => {
     const [showCancelDialog, setShowCancelDialog] = useState(false)
     const onCancel = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
-
-    const { loading, error: loadError, data: jsonData } = useReadMappingConfigConstantsQueryById(
-        id
-    )
-    //console.log('jsonData ' + JSON.stringify(jsonData?.constant?.description))
-    const conversionType =
-    jsonData
-        ? JSON.parse(jsonData.constant.description)[0].godataValue[0][0].conversionType
-        : {}
+    const [conversionType, setConversionType] = useState(undefined);
+    const [initialValues, setInitialValues] = useState({});
     
-    if (loading) {
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
+    const init = async () => {
+        const value = await getInitialValues(id)
+        setConversionType(value.mapping[0].godataValue[0][0].conversionType);
+        setInitialValues(value);
+        console.log({value})
     }
 
-    if (loadError) {
-        const msg = i18n.t('Something went wrong whilst loading constants')
-
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
+    useEffect(() => {
+        init();
+    }, [])
 
     const onSubmit = async values => {
         try {
@@ -102,17 +92,14 @@ export const MetadataConfigFormEdit = () => {
 
     const onCancelClick = () => history.push(METADATA_CONFIG_LIST_PATH)
 
-//console.log(JSON.parse(jsonData.constant.description)[0][0].conversionType)
-
-    const FormComponent = getFormComponent(conversionType)
-    const initialValues = conversionType && getInitialValues(jsonData)
+    const FormComponent = conversionType ? getFormComponent(conversionType) : OutbreaksForm;
 
     return (
         <div
             data-test={dataTest('views-constantconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Add mappings')}</PageHeadline>
+            <PageHeadline>{i18n.t('Edit mapping')}</PageHeadline>
 
             <FormRow>
                 {visibleForm === GODATA_OUTBREAK && (
@@ -137,7 +124,7 @@ export const MetadataConfigFormEdit = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-                
+
                 {visibleForm === GODATA_CONTACT_OF_CONTACT && (
                     <ContactsOfContactForm
                         onSubmit={onSubmit}
@@ -145,7 +132,7 @@ export const MetadataConfigFormEdit = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-                
+
                 {visibleForm === GODATA_ORG_UNIT && (
                     <LocationsForm
                         onSubmit={onSubmit}
@@ -155,15 +142,15 @@ export const MetadataConfigFormEdit = () => {
                 )}
             </FormRow>
             <FormComponent
-                        initialValues={initialValues}
-                        converterType={visibleForm}
-                        onSubmit={onSubmit}
-                        onCancelClick={pristine =>
-                            pristine
-                                ? history.push(METADATA_CONFIG_LIST_PATH)
-                                : setShowCancelDialog(true)
-                        }
-                    />
+                initialValues={initialValues}
+                converterType={visibleForm}
+                onSubmit={onSubmit}
+                onCancelClick={pristine =>
+                    pristine
+                        ? history.push(METADATA_CONFIG_LIST_PATH)
+                        : setShowCancelDialog(true)
+                }
+            />
         </div>
     )
 }

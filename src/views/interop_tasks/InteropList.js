@@ -1,6 +1,11 @@
 import { useHistory } from 'react-router-dom'
-import React, { useState } from 'react'
-import { NoticeBox, CenteredContent, CircularLoader,    Button,
+import React, { useState, useEffect } from 'react'
+import * as dataStore from '../../utils/dataStore.js'
+import {
+    NoticeBox,
+    CenteredContent,
+    CircularLoader,
+    Button,
     ButtonStrip,
     Checkbox,
     Table,
@@ -9,21 +14,24 @@ import { NoticeBox, CenteredContent, CircularLoader,    Button,
     TableRowHead,
     TableCellHead,
     TableRow,
-    TableCell, } from '@dhis2/ui'
+    TableCell,
+} from '@dhis2/ui'
 
 import { INTEROP_FORM_NEW_PATH } from './InteropFormNew'
-import {INTEROP_RUN_TASK_FORM_PATH_STATIC} from './InteropRunTaskForm'
+import { INTEROP_RUN_TASK_FORM_PATH_STATIC } from './InteropRunTaskForm'
 import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 
-import { GODATA_DHIS_OUTBREAK_TASK, 
-    GODATA_DHIS_LOCATION_TASK } from '../../constants'
+import {
+    GODATA_DHIS_OUTBREAK_TASK,
+    GODATA_DHIS_LOCATION_TASK,
+} from '../../constants'
 
 import {
     useCreateTaskConstantMutation,
     useReadTaskConstantsQueryById,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
-    useReadTaskConstantsQueryForTasks
+    useReadTaskConstantsQueryForTasks,
 } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
@@ -40,6 +48,7 @@ export const InteropList = () => {
     const onAddConstantClick = () => history.push(INTEROP_FORM_NEW_PATH)
     const [checkedConstants, setCheckedConstants] = useState([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [tasks, setTasks] = useState({})
 
     const {
         loading: loadingReadConstants,
@@ -48,6 +57,14 @@ export const InteropList = () => {
         refetch: refetchReadConstants,
     } = useReadTaskConstantsQueryForTasks()
 
+    useEffect(() => {
+        console.log('here')
+        dataStore.getValue('tasks').then(tasks => {
+            console.log(tasks)
+            setTasks(tasks)
+        })
+    }, [])
+
     const constants = data?.constants?.constants
 
     const [
@@ -55,24 +72,32 @@ export const InteropList = () => {
         { loading: loadingDelete, error: errorDelete },
     ] = useDeleteConstantsMutation()
 
-    const onDeleteClick = () => {
-        const variables = { ids: checkedConstants }
-        deleteCheckedConstants(variables).then(refetchReadConstants)
+    const onDeleteClick = async () => {
+        setTasks(await dataStore.deleteByArrayIds('tasks', checkedConstants))
+        setCheckedConstants([])
         setShowDeleteDialog(false)
     }
-    const [ addDefaultConstant ] = useCreateTaskConstantMutation()    
 
-    const onDefaultsClick = () => {
+    const onDefaultsClick = async () => {
         console.log('default clicked')
         var allValues = GODATA_DHIS_OUTBREAK_TASK
         var nameInput = 'Default Go.Data DHIS2 Outbreak Task'
-        addDefaultConstant({allValues,nameInput})
+        console.log({ task: allValues, displayName: nameInput })
+        await dataStore.appendValue('tasks', {
+            task: allValues,
+            displayName: nameInput,
+        })
         allValues = GODATA_DHIS_LOCATION_TASK
         nameInput = 'Default Go.Data DHIS2 Location Task'
-        addDefaultConstant({allValues,nameInput}).then(refetchReadConstants)
+        setTasks(
+            await dataStore.appendValue('tasks', {
+                task: allValues,
+                displayName: nameInput,
+            })
+        )
     }
 
-    const loading = loadingReadConstants || loadingDelete 
+    const loading = loadingReadConstants || loadingDelete
 
     if (loading) {
         return (
@@ -102,7 +127,7 @@ export const InteropList = () => {
         )
     }
 
-    const allConstantsChecked = checkedConstants.length === constants.length
+    const allConstantsChecked = checkedConstants.length === tasks.length
 
     const toggleConstant = id => {
         if (checkedConstants.includes(id)) {
@@ -123,16 +148,13 @@ export const InteropList = () => {
     }
 
     const toggleAll = () => {
-        if (!allConstantsChecked) {
-            const allConstantIds = constants.map(({ id }) => id)
-            setCheckedConstants(allConstantIds)
-        } else {
-            setCheckedConstants([])
-        }
+        if (!allConstantsChecked)
+            setCheckedConstants([...Array(tasks.length).keys()])
+        else setCheckedConstants([])
     }
-    
+
     const hasMappings = !!data?.constants?.constants?.length
-    
+
     return (
         <div
             className={styles.container}
@@ -152,115 +174,128 @@ export const InteropList = () => {
                 defaultLabel={i18n.t('Load default config')}
                 dataTest="views-gatewayconfiglist"
                 onAddClick={onAddConstantClick}
-                onDefaultsClick = {onDefaultsClick}
+                onDefaultsClick={onDefaultsClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
                 disableAdd={loadingDelete}
                 disableDelete={!checkedConstants.length || loadingDelete}
             />
 
-            {hasMappings ? (
-        <div
-        className={styles.container}
-        data-test={dataTest('constants-gatewaylist')}
-    >
-        {loading && (
-            <div className={styles.processingMessage}>
-                <div className={styles.loadingContainer}>
-                    <CircularLoader />
+            {Object.keys(tasks).length ? (
+                <div
+                    className={styles.container}
+                    data-test={dataTest('constants-gatewaylist')}
+                >
+                    {loading && (
+                        <div className={styles.processingMessage}>
+                            <div className={styles.loadingContainer}>
+                                <CircularLoader />
+                            </div>
+                        </div>
+                    )}
+
+                    <Table dataTest={dataTest('constants-constantstable')}>
+                        <TableHead>
+                            <TableRowHead>
+                                <TableCellHead
+                                    dataTest={dataTest(
+                                        'constants-constantstable-checkall'
+                                    )}
+                                >
+                                    <Checkbox
+                                        onChange={toggleAll}
+                                        checked={allConstantsChecked}
+                                    />
+                                </TableCellHead>
+                                <TableCellHead>{i18n.t('Name')}</TableCellHead>
+                                <TableCellHead>{i18n.t('Type')}</TableCellHead>
+                                <TableCellHead />
+                                <TableCellHead />
+                            </TableRowHead>
+                        </TableHead>
+
+                        <TableBody>
+                            {tasks.map((task, i) => (
+                                <TableRow
+                                    key={i}
+                                    dataTest={dataTest(
+                                        'constants-constantstable-row'
+                                    )}
+                                >
+                                    <TableCell
+                                        className={styles.checkboxCell}
+                                        dataTest={dataTest(
+                                            'constants-constantstable-checkbox'
+                                        )}
+                                    >
+                                        <Checkbox
+                                            value={i.toString()}
+                                            onChange={() => toggleConstant(i)}
+                                            checked={checkedConstants.includes(
+                                                i
+                                            )}
+                                            dataTest={dataTest(
+                                                'constants-constantstable-id'
+                                            )}
+                                        />
+                                    </TableCell>
+
+                                    <TableCell
+                                        dataTest={dataTest(
+                                            'constants-constantstable-name'
+                                        )}
+                                    >
+                                        {task.displayName}
+                                    </TableCell>
+
+                                    <TableCell
+                                        className={styles.typeCell}
+                                        dataTest={dataTest(
+                                            'constants-constantstable-type'
+                                        )}
+                                    >
+                                        {task.displayName}
+                                    </TableCell>
+
+                                    <TableCell
+                                        dataTest={dataTest(
+                                            'constants-constantstable-actions'
+                                        )}
+                                        className={styles.editCell}
+                                    >
+                                        <ButtonStrip
+                                            className={styles.rowActions}
+                                        >
+                                            <Button
+                                                dataTest={dataTest(
+                                                    'constants-constantstable-edit'
+                                                )}
+                                                onClick={() => {
+                                                    history.push(
+                                                        `${INTEROP_FORM_EDIT_PATH_STATIC}/${i}`
+                                                    )
+                                                }}
+                                            >
+                                                {i18n.t('Edit')}
+                                            </Button>
+                                            <Button
+                                                dataTest={dataTest(
+                                                    'constants-constantstable-edit'
+                                                )}
+                                                onClick={() => {
+                                                    history.push(
+                                                        `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/${i}`
+                                                    )
+                                                }}
+                                            >
+                                                {i18n.t('Run Task')}
+                                            </Button>
+                                        </ButtonStrip>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </div>
-            </div>
-        )}
-
-<Table dataTest={dataTest('constants-constantstable')}>
-            <TableHead>
-                <TableRowHead>
-                    <TableCellHead
-                        dataTest={dataTest('constants-constantstable-checkall')}
-                    >
-                        <Checkbox
-                            onChange={toggleAll}
-                            checked={allConstantsChecked}
-                        />
-                    </TableCellHead>
-                    <TableCellHead>{i18n.t('Name')}</TableCellHead>
-                    <TableCellHead>{i18n.t('Type')}</TableCellHead>
-                    <TableCellHead />
-                    <TableCellHead />
-                </TableRowHead>
-            </TableHead>
-
-            <TableBody>
-                {constants.map(constant => (
-                    <TableRow
-                        key={constant.id}
-                        dataTest={dataTest('constants-constantstable-row')}
-                    >
-                        <TableCell
-                            className={styles.checkboxCell}
-                            dataTest={dataTest(
-                                'constants-constantstable-checkbox'
-                            )}
-                        >
-                            <Checkbox
-                                value={constant.id}
-                                onChange={() => toggleConstant(constant.id)}
-                                checked={checkedConstants.includes(constant.id)}
-                                dataTest={dataTest('constants-constantstable-id')}
-                            />
-                        </TableCell>
-
-                        <TableCell
-                            dataTest={dataTest('constants-constantstable-name')}
-                        >
-                            {constant.displayName}
-                        </TableCell>
-
-                        <TableCell
-                            className={styles.typeCell}
-                            dataTest={dataTest('constants-constantstable-type')}
-                        >
-                            {constant.shortName}
-                        </TableCell>
-
-                        <TableCell
-                            dataTest={dataTest(
-                                'constants-constantstable-actions'
-                            )}
-                            className={styles.editCell}
-                        >
-                            <ButtonStrip className={styles.rowActions}>
-                                <Button
-                                    dataTest={dataTest(
-                                        'constants-constantstable-edit'
-                                    )}
-                                    onClick={() => {
-                                        history.push(
-                                            `${INTEROP_FORM_EDIT_PATH_STATIC}/${constant.id}`
-                                        )
-                                    }}
-                                >
-                                    {i18n.t('Edit')}
-                                </Button>
-                                <Button
-                                    dataTest={dataTest(
-                                        'constants-constantstable-edit'
-                                    )}
-                                    onClick={() => {
-                                        history.push(
-                                            `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/${constant.id}`
-                                        )
-                                        
-                                    }}
-                                >
-                                    {i18n.t('Run Task')}
-                                </Button>
-                            </ButtonStrip>
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    </div>
             ) : (
                 <NoticeBox info title={i18n.t('No task found')}>
                     {i18n.t(

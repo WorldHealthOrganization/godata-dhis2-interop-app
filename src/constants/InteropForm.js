@@ -1,13 +1,34 @@
-import { CheckboxField, SingleSelectField, SingleSelect, SingleSelectOption, Button, ButtonStrip, 
-    ReactFinalForm,  SingleSelectFieldFF, CenteredContent, CircularLoader, composeValidators, hasValue,
-    string, InputField } from '@dhis2/ui'
+import {
+    CheckboxField,
+    SingleSelectField,
+    SingleSelect,
+    SingleSelectOption,
+    Button,
+    ButtonStrip,
+    ReactFinalForm,
+    SingleSelectFieldFF,
+    CenteredContent,
+    CircularLoader,
+    composeValidators,
+    hasValue,
+    string,
+    InputField,
+} from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useParams } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {useReadMappingConfigConstantsQueryForConfig, useReadProgramsQueryForMappings} from '.'
+import {
+    useReadMappingConfigConstantsQueryForConfig,
+    useReadProgramsQueryForMappings,
+} from '.'
 import { INTEROP_LIST_PATH } from '../views'
-import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
-    GODATA_ORG_UNIT } from '../constants'
+import {
+    GODATA_OUTBREAK,
+    GODATA_CASE,
+    GODATA_CONTACT,
+    GODATA_CONTACT_OF_CONTACT,
+    GODATA_ORG_UNIT,
+} from '../constants'
 
 const { Field } = ReactFinalForm
 
@@ -15,7 +36,7 @@ import axios from 'axios'
 
 import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
-import 'react-responsive-modal/styles.css';
+import 'react-responsive-modal/styles.css'
 
 import {
     useReadMappingConfigConstantsQueryForMappings,
@@ -26,7 +47,7 @@ import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
-import { eachItem } from 'ajv/dist/compile/util'
+import * as dataStore from '../utils/dataStore.js'
 
 const { Form } = ReactFinalForm
 
@@ -34,6 +55,7 @@ export const InteropForm = ({
     onCancelClick,
     onSubmit,
     initialValues,
+    taskId,
 }) => {
     const history = useHistory()
 
@@ -53,105 +75,68 @@ export const InteropForm = ({
 
     var instanceObject
 
-    const { loading: loadingReadConstants, data: convt,  error: errorReadConstants } = useReadMappingConfigConstantsQueryForMappings()
+    const {
+        loading: loadingReadConstants,
+        data: convt,
+        error: errorReadConstants,
+    } = useReadMappingConfigConstantsQueryForMappings()
 
-    const { loading : loadingData, data: progData, error: loadError } = useReadProgramsQueryForMappings()
- 
-    const { loading : laodingConf, data: data, error: confError  } = useReadMappingConfigConstantsQueryForConfig()
+    const {
+        loading: loadingData,
+        data: progData,
+        error: loadError,
+    } = useReadProgramsQueryForMappings()
 
-    const loading  = loadingReadConstants || loadingData || laodingConf
-    const error  = errorReadConstants || loadError || confError
+    const {
+        loading: laodingConf,
+        data: data,
+        error: confError,
+    } = useReadMappingConfigConstantsQueryForConfig()
 
-    const [ addTaskConstant ] = useCreateTaskConstantMutation()
-    const [ saveTaskConstant ] = useUpdateTaskConstantMutation()
+    const loading = loadingReadConstants || loadingData || laodingConf
+    const error = errorReadConstants || loadError || confError
 
-
-
+    const [addTaskConstant] = useCreateTaskConstantMutation()
+    const [saveTaskConstant] = useUpdateTaskConstantMutation()
 
     useEffect(() => {
- 
-            
-        const loginDetails = 
-        data && data.constants.constants.length >0
-        ? JSON.parse(data.constants.constants[0].description)
-                : {}
-
-                const programInstance = 
-                progData && progData.programs.programs.length >0
+        const programInstance =
+            progData && progData.programs.programs.length > 0
                 ? progData.programs.programs[0]
-                        : {}
-                       // console.log('programInstance ' + JSON.stringify(programInstance))
-                        
-                        const convts = 
-                        convt && convt.constants.constants.length >0
-                        ? convt.constants.constants
-                                : []
-                                //console.log('constants.constants ' + JSON.stringify(convts))   
+                : {}
+        // console.log('programInstance ' + JSON.stringify(programInstance))
 
-                                
-                                setConverters( 
-                                    convts.map(({ id, displayName }) => ({
-                                    label: displayName,
-                                    value: id,
-                                }))           
-                                )
-                                //console.log('converters '+JSON.stringify(converters))
-                                if(initialValues && initialValues.name != 'undefined'){
-                                    console.log('initialValues called ' + initialValues.name)
-                                    setNameInput(initialValues.name)
-                            
-                                    const paramsJson = JSON.parse(initialValues.description)
-                            
-                                    setSenderEndpointInput(paramsJson[0])
-                                    setReceiverEndpointInput(paramsJson[1])
-                                    setSenderParamsInput(paramsJson[2])
-                                    setPayloadInput(paramsJson[3])
-                                    setDhisReceiver(paramsJson[4])
-                                    setConverter(paramsJson[5])
-                                    setTaskType(paramsJson[6])
-                                    setJsonCollectionName(paramsJson[7])
-                                }
+        const convts =
+            convt && convt.constants.constants.length > 0
+                ? convt.constants.constants
+                : []
+        //console.log('constants.constants ' + JSON.stringify(convts))
 
-        if(data) {
-            async function login() {
-                try {
-                  let res = await axios({
-                    method: 'POST',
-                    data: {
-                        email: loginDetails.username,
-                        password: loginDetails.password,
-                    },
-                    url: loginDetails.urlTemplate+"/api/users/login",
-              
-                  });
-                  if (res.status == 200) {
-                    console.log('res.data.id ' + res.data.id);
+        setConverters(
+            convts.map(({ id, displayName }) => ({
+                label: displayName,
+                value: id,
+            }))
+        )
+        //console.log('converters '+JSON.stringify(converters))
+        if (initialValues && initialValues.name != 'undefined') {
+            console.log('initialValues called ' + initialValues.name)
+            console.log(initialValues)
+            setNameInput(initialValues.displayName)
 
-                    const getInstanceData = async () => {
-                        instanceObject = await axios.get(
-                            loginDetails.urlTemplate +'/api/outbreaks', {
-                                headers : {
-                                    Authorization: res.data.id,
-                                  }
-                                });
-                                console.log('initval name ' + initialValues.name)
-                      };
-                      getInstanceData()
-                  };
-                }
-                catch (error) {
-                    console.log(error);
-                };
-              }
-              login()
-              console.log('outbreaks: ' + JSON.stringify(instanceObject))
-            }
-
+            setSenderEndpointInput(initialValues.task[0])
+            setReceiverEndpointInput(initialValues.task[1])
+            setSenderParamsInput(initialValues.task[2])
+            setPayloadInput(initialValues.task[3])
+            setDhisReceiver(initialValues.task[4])
+            setConverter(initialValues.task[5])
+            setTaskType(initialValues.task[6])
+            setJsonCollectionName(initialValues.task[7])
+        }
         return () => {
-            
-            console.log("This will be logged on unmount");
-          }
-      }, [ data, progData, convt ])
+            console.log('This will be logged on unmount')
+        }
+    }, [data, progData, convt])
 
     if (loading) {
         return (
@@ -174,41 +159,63 @@ export const InteropForm = ({
         )
     }
 
-
     const submitText = initialValues.name
-    ? i18n.t('Save task')
-    : i18n.t('Add task')
+        ? i18n.t('Save task')
+        : i18n.t('Add task')
 
-    const onNameInput = (ev) => { setNameInput(ev)}
-    const onSenderEndpointInput = (ev) => { setSenderEndpointInput(ev)}
-    const onReceiverEndpointInput = (ev) => { setReceiverEndpointInput(ev)}
-    const onPayloadInput = (ev) => { setPayloadInput(ev)}
-    const onSenderParamsInput = (ev) => { setSenderParamsInput(ev)}
-    const onReceiverInput = (ev) => { setDhisReceiver( ev.value==true ? false : true)}
-    const onConvertorInput = (ev) => { setConverter(ev)}
-    const onTaskTypeInput = (ev) => { setTaskType(ev)}
-    const onJsonCollectionNameInput  = (ev) => { setJsonCollectionName(ev)}
+    const onNameInput = ev => {
+        setNameInput(ev)
+    }
+    const onSenderEndpointInput = ev => {
+        setSenderEndpointInput(ev)
+    }
+    const onReceiverEndpointInput = ev => {
+        setReceiverEndpointInput(ev)
+    }
+    const onPayloadInput = ev => {
+        setPayloadInput(ev)
+    }
+    const onSenderParamsInput = ev => {
+        setSenderParamsInput(ev)
+    }
+    const onReceiverInput = ev => {
+        setDhisReceiver(ev.value == true ? false : true)
+    }
+    const onConvertorInput = ev => {
+        setConverter(ev)
+    }
+    const onTaskTypeInput = ev => {
+        setTaskType(ev)
+    }
+    const onJsonCollectionNameInput = ev => {
+        setJsonCollectionName(ev)
+    }
 
     const saveConstant = async () => {
-
         const allValues = []
         allValues.push(senderEndpointInput)
         allValues.push(receiverEndpointInput)
         allValues.push(senderParamsInput)
         allValues.push(payloadInput)
-        allValues.push(dhisReceiver) 
+        allValues.push(dhisReceiver)
         allValues.push(converter)
         allValues.push(taskType)
         allValues.push(jsonCollectionName)
-        console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
-
-        if(initialValues.name){
-            var id = initialValues.id
-            await saveTaskConstant({ allValues, nameInput, id })
-        }else{
-            await addTaskConstant({ allValues, nameInput })
-        }
-        
+        console.log('===============================')
+        console.log(nameInput)
+        console.log(initialValues.displayName)
+        console.log(allValues)
+        console.log(taskId)
+        if (!!initialValues.displayName)
+            await dataStore.editById('tasks', taskId, {
+                displayName: nameInput,
+                task: allValues,
+            })
+        else
+            await dataStore.appendValue('tasks', {
+                displayName: nameInput,
+                task: allValues,
+            })
         history.push(INTEROP_LIST_PATH)
     }
 
@@ -226,181 +233,216 @@ export const InteropForm = ({
                     <PageSubHeadline>{i18n.t('Task setup')}</PageSubHeadline>
 
                     <FormRow>
-                <SingleSelectField
-                    label={i18n.t('Type')}
-                    onChange={({ selected }) => onTaskTypeInput(selected)}
-                    selected={taskType}
-                    dataTest={dataTest(
-                        'views-gatewayconfigformnew-gatewaytype'
-                    )}
-                >
-                    <SingleSelectOption
-                        value={GODATA_OUTBREAK}
-                        label={i18n.t(GODATA_OUTBREAK)}
-                    />
+                        <SingleSelectField
+                            label={i18n.t('Type')}
+                            onChange={({ selected }) =>
+                                onTaskTypeInput(selected)
+                            }
+                            selected={taskType}
+                            dataTest={dataTest(
+                                'views-gatewayconfigformnew-gatewaytype'
+                            )}
+                        >
+                            <SingleSelectOption
+                                value={GODATA_OUTBREAK}
+                                label={i18n.t(GODATA_OUTBREAK)}
+                            />
 
-                    <SingleSelectOption
-                        value={GODATA_CASE}
-                        label={i18n.t(GODATA_CASE)}
-                    />
+                            <SingleSelectOption
+                                value={GODATA_CASE}
+                                label={i18n.t(GODATA_CASE)}
+                            />
 
-                    <SingleSelectOption
-                        value={GODATA_CONTACT}
-                        label={i18n.t(GODATA_CONTACT)}
-                    />
+                            <SingleSelectOption
+                                value={GODATA_CONTACT}
+                                label={i18n.t(GODATA_CONTACT)}
+                            />
 
-                    <SingleSelectOption
-                        value={GODATA_CONTACT_OF_CONTACT}
-                        label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
-                    />
-                    
-                    <SingleSelectOption
-                        value={GODATA_ORG_UNIT}
-                        label={i18n.t(GODATA_ORG_UNIT)}
-                    />
+                            <SingleSelectOption
+                                value={GODATA_CONTACT_OF_CONTACT}
+                                label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
+                            />
 
-                </SingleSelectField>
-            </FormRow>
+                            <SingleSelectOption
+                                value={GODATA_ORG_UNIT}
+                                label={i18n.t(GODATA_ORG_UNIT)}
+                            />
+                        </SingleSelectField>
+                    </FormRow>
 
                     <FormRow>
-                        <Field 
-                        name='name'
-                        render={() =>
-                        <InputField
-                        id="name" 
-                        label={i18n.t('Name')}
-                        className="" 
-                        type="text"
-                        helpText='Meaningful name of Task'
-                        value={nameInput}
-                        onChange={ev => onNameInput(ev.value)}
-                        required
-                        validate={composeValidators(string, hasValue)}
-                        />}
+                        <Field
+                            name="name"
+                            render={() => (
+                                <InputField
+                                    id="name"
+                                    label={i18n.t('Name')}
+                                    className=""
+                                    type="text"
+                                    helpText="Meaningful name of Task"
+                                    value={nameInput}
+                                    onChange={ev => onNameInput(ev.value)}
+                                    required
+                                    validate={composeValidators(
+                                        string,
+                                        hasValue
+                                    )}
+                                />
+                            )}
                         />
                     </FormRow>
 
                     <FormRow>
                         <Field
-                        name='senderendpoint'
-                        render={() =>
-                        <InputField
-                        id="senderendpoint" 
-                        label={i18n.t('Sender API endpoint')}
-                        className="" 
-                        type="text" 
-                        helpText='Fully qualified URL of sender API endpoint (e.g. https://somesite.org/api/somevalues)'
-                        value={senderEndpointInput}
-                        onChange={ev => onSenderEndpointInput(ev.value)}
-                        required
-                        validate={composeValidators(string, hasValue)}
-                        />}
-                        />
-                    </FormRow>
-                    
-                    
-                    <FormRow>
-                        <Field
-                        name='jsonobject'
-                        render={() =>
-                        <InputField
-                        id="senderendpointcolname" 
-                        label={i18n.t('Sender json object"s collection name')}
-                        className="" 
-                        type="text" 
-                        helpText='Name json objects collection, e.g. organisationUnits, programs, etc.'
-                        value={jsonCollectionName}
-                        onChange={ev => onJsonCollectionNameInput(ev.value)}
-                        required
-                        validate={composeValidators(string, hasValue)}
-                        />}
+                            name="senderendpoint"
+                            render={() => (
+                                <InputField
+                                    id="senderendpoint"
+                                    label={i18n.t('Sender API endpoint')}
+                                    className=""
+                                    type="text"
+                                    helpText="Fully qualified URL of sender API endpoint (e.g. https://somesite.org/api/somevalues)"
+                                    value={senderEndpointInput}
+                                    onChange={ev =>
+                                        onSenderEndpointInput(ev.value)
+                                    }
+                                    required
+                                    validate={composeValidators(
+                                        string,
+                                        hasValue
+                                    )}
+                                />
+                            )}
                         />
                     </FormRow>
 
                     <FormRow>
                         <Field
-                        name='receiverendpoint'
-                        render={() =>
-                        <InputField
-                        id="receiverendpoint" 
-                        label={i18n.t('Receiver API endpoint')}
-                        className="" 
-                        type="text"
-                        helpText='Fully qualified URL of receiver API endpoint (e.g. https://somesite.org/api/somevalues)'
-                        value={receiverEndpointInput}
-                        onChange={ev => onReceiverEndpointInput(ev.value)}
-                        validate={composeValidators(string, hasValue)}
-                        required/>}
-
-                        />
-                    </FormRow>
-
-                    <FormRow>
-<SingleSelectField
-                    label={i18n.t('Converter')}
-                    onChange={({ selected }) => onConvertorInput(selected)}
-                    selected={converter}
-                    value={converters.filter(function(option) {
-                        return option.value === converter;
-                      })}
-                >
-
-                    {converters.map(function(object, i){
-        return <SingleSelectOption value={object.value} label={object.label} key={i}/>;
-    })}
-
-                    </SingleSelectField>
-                    
-                    
-                    </FormRow>
-
-                    <FormRow>
-                    <Editor
-                        mode='text'
-                        value={payloadInput}
-                        onChange={ev => onPayloadInput(ev)}
-                        />
-                    </FormRow>
-
-                    <FormRow>
-                        <Field 
-                        name='senderparams'
-                        render={() =>
-                        <InputField
-                        id="senderparams" 
-                        label={i18n.t('Sender API parameters')}
-                        className="" 
-                        type="text" 
-                        helpText='E.g ?fields=id,name,description,[organisationunits]&paging=false&filters=name.eq.blabla. DHIS2 API example'
-                        value={senderParamsInput}
-                        onChange={ev => onSenderParamsInput(ev.value)}
-                        />}
+                            name="jsonobject"
+                            render={() => (
+                                <InputField
+                                    id="senderendpointcolname"
+                                    label={i18n.t(
+                                        'Sender json object"s collection name'
+                                    )}
+                                    className=""
+                                    type="text"
+                                    helpText="Name json objects collection, e.g. organisationUnits, programs, etc."
+                                    value={jsonCollectionName}
+                                    onChange={ev =>
+                                        onJsonCollectionNameInput(ev.value)
+                                    }
+                                    required
+                                    validate={composeValidators(
+                                        string,
+                                        hasValue
+                                    )}
+                                />
+                            )}
                         />
                     </FormRow>
 
                     <FormRow>
                         <Field
-                        name="dhisReceiver"
-                        label={i18n.t('DHIS2 Receiving End')}
-                        helpText={i18n.t('If selected DHIS2 will receive data from Go.Data')}
-                        render={() =>
-                            <CheckboxField
-                            id="senderparams" 
-                            label={i18n.t('DHIS2 is Receiving End')}
-                            className="" 
-                            type="checkbox" 
-                            helpText={i18n.t('If selected, DHIS2 will receive data from Go.Data')}
-                            value={dhisReceiver}
-                            checked={dhisReceiver}
-                            onChange={ev => onReceiverInput(ev)}
-                            />}
-                    />
+                            name="receiverendpoint"
+                            render={() => (
+                                <InputField
+                                    id="receiverendpoint"
+                                    label={i18n.t('Receiver API endpoint')}
+                                    className=""
+                                    type="text"
+                                    helpText="Fully qualified URL of receiver API endpoint (e.g. https://somesite.org/api/somevalues)"
+                                    value={receiverEndpointInput}
+                                    onChange={ev =>
+                                        onReceiverEndpointInput(ev.value)
+                                    }
+                                    validate={composeValidators(
+                                        string,
+                                        hasValue
+                                    )}
+                                    required
+                                />
+                            )}
+                        />
                     </FormRow>
-                    
+
+                    <FormRow>
+                        <SingleSelectField
+                            label={i18n.t('Converter')}
+                            onChange={({ selected }) =>
+                                onConvertorInput(selected)
+                            }
+                            selected={converter}
+                            value={converters.filter(function(option) {
+                                return option.value === converter
+                            })}
+                        >
+                            {converters.map(function(object, i) {
+                                return (
+                                    <SingleSelectOption
+                                        value={object.value}
+                                        label={object.label}
+                                        key={i}
+                                    />
+                                )
+                            })}
+                        </SingleSelectField>
+                    </FormRow>
+
+                    <FormRow>
+                        <Editor
+                            mode="text"
+                            value={payloadInput}
+                            onChange={ev => onPayloadInput(ev)}
+                        />
+                    </FormRow>
+
+                    <FormRow>
+                        <Field
+                            name="senderparams"
+                            render={() => (
+                                <InputField
+                                    id="senderparams"
+                                    label={i18n.t('Sender API parameters')}
+                                    className=""
+                                    type="text"
+                                    helpText="E.g ?fields=id,name,description,[organisationunits]&paging=false&filters=name.eq.blabla. DHIS2 API example"
+                                    value={senderParamsInput}
+                                    onChange={ev =>
+                                        onSenderParamsInput(ev.value)
+                                    }
+                                />
+                            )}
+                        />
+                    </FormRow>
+
+                    <FormRow>
+                        <Field
+                            name="dhisReceiver"
+                            label={i18n.t('DHIS2 Receiving End')}
+                            helpText={i18n.t(
+                                'If selected DHIS2 will receive data from Go.Data'
+                            )}
+                            render={() => (
+                                <CheckboxField
+                                    id="senderparams"
+                                    label={i18n.t('DHIS2 is Receiving End')}
+                                    className=""
+                                    type="checkbox"
+                                    helpText={i18n.t(
+                                        'If selected, DHIS2 will receive data from Go.Data'
+                                    )}
+                                    value={dhisReceiver.toString()}
+                                    checked={dhisReceiver}
+                                    onChange={ev => onReceiverInput(ev)}
+                                />
+                            )}
+                        />
+                    </FormRow>
+
                     <ButtonStrip>
-
                         <Button primary onClick={() => saveConstant()}>
-                        {submitText}
+                            {submitText}
                         </Button>
                         <Button onClick={() => onCancelClick(pristine)}>
                             {i18n.t('Cancel')}

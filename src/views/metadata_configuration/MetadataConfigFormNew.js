@@ -3,15 +3,19 @@ import { useHistory } from 'react-router-dom'
 import React, { useState } from 'react'
 
 import { METADATA_CONFIG_LIST_PATH } from './MetadataConfigList'
-import { GODATA_OUTBREAK, GODATA_CASE, GODATA_CONTACT, GODATA_CONTACT_OF_CONTACT, 
-    GODATA_ORG_UNIT, GODATA_CUSTOM } from '../../constants'
+import {
+    GODATA_OUTBREAK,
+    GODATA_CASE,
+    GODATA_CONTACT,
+    GODATA_CONTACT_OF_CONTACT,
+    GODATA_ORG_UNIT,
+    GODATA_CUSTOM,
+} from '../../constants'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 
-import {
-    useCreateCasesConstantMutation,
-} from '../../constants'
+import { useCreateCasesConstantMutation } from '../../constants'
 import {
     LocationsForm,
     CasesForm,
@@ -27,10 +31,13 @@ export const METADATA_CONFIG_FORM_NEW_PATH = '/metadata/new'
 
 export const MetadataConfigFormNew = () => {
     const history = useHistory()
-    
+
     const [visibleForm, setVisibleForm] = useState(GODATA_OUTBREAK)
 
-    const [saveCasesConstant,{ error: saveCasesConstantError },] = useCreateCasesConstantMutation()
+    const [
+        saveCasesConstant,
+        { error: saveCasesConstantError },
+    ] = useCreateCasesConstantMutation()
 
     const error = saveCasesConstantError
 
@@ -57,8 +64,6 @@ export const MetadataConfigFormNew = () => {
             return Promise.reject(e)
         }
     }
-
-
 
     const onCancelClick = () => history.push(METADATA_CONFIG_LIST_PATH)
 
@@ -97,12 +102,12 @@ export const MetadataConfigFormNew = () => {
                         value={GODATA_CONTACT_OF_CONTACT}
                         label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
                     />
-                    
+
                     <SingleSelectOption
                         value={GODATA_ORG_UNIT}
                         label={i18n.t(GODATA_ORG_UNIT)}
                     />
-                    
+
                     <SingleSelectOption
                         value={GODATA_CUSTOM}
                         label={i18n.t(GODATA_CUSTOM)}
@@ -133,7 +138,7 @@ export const MetadataConfigFormNew = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-                
+
                 {visibleForm === GODATA_CONTACT_OF_CONTACT && (
                     <ContactsOfContactForm
                         onSubmit={onSubmit}
@@ -141,7 +146,7 @@ export const MetadataConfigFormNew = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-                
+
                 {visibleForm === GODATA_ORG_UNIT && (
                     <LocationsForm
                         onSubmit={onSubmit}
@@ -149,15 +154,15 @@ export const MetadataConfigFormNew = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
-                
+
                 {visibleForm === GODATA_CUSTOM && (
                     <CustomForm
                         onSubmit={onSubmit}
                         passwordRequired={true}
                         onCancelClick={onCancelClick}
                     />
-                )}                
-            </FormRow>            
+                )}
+            </FormRow>
         </div>
     )
 }

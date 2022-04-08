@@ -1,16 +1,19 @@
-import { ReactFinalForm, NoticeBox, CenteredContent, CircularLoader } from '@dhis2/ui'
+import {
+    ReactFinalForm,
+    NoticeBox,
+    CenteredContent,
+    CircularLoader,
+} from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import * as dataStore from '../../utils/dataStore.js'
 
 import { INTEROP_LIST_PATH } from './InteropList'
 
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
-import {
-    InteropForm,
-    useReadTaskConstantsQueryById,
-} from '../../constants'
+import { InteropForm, useReadTaskConstantsQueryById } from '../../constants'
 import i18n from '../../locales'
 import styles from './InteropFormEdit.module.css'
 
@@ -19,11 +22,9 @@ const { Form, useForm } = ReactFinalForm
 export const INTEROP_FORM_EDIT_PATH_STATIC = '/interop/edit'
 export const INTEROP_FORM_EDIT_PATH = `${INTEROP_FORM_EDIT_PATH_STATIC}/:id`
 
-
 const getInitialValues = jsonData => {
     return jsonData.constant
 }
-
 
 export const InteropFormEdit = () => {
     const history = useHistory()
@@ -31,17 +32,29 @@ export const InteropFormEdit = () => {
     const [showCancelDialog, setShowCancelDialog] = useState(false)
     const onCancel = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
+    const [task, setTask] = useState(null)
+    const [dataError, setDataError] = useState(false)
+    // const {
+    //     loading,
+    //     error: loadError,
+    //     data: jsonData,
+    // } = useReadTaskConstantsQueryById(id)
 
-    const { loading, error: loadError, data: jsonData } = useReadTaskConstantsQueryById(
-        id
-    )
-    
-    const taskConfig =
-    jsonData
-        ? JSON.parse(jsonData.constant.description)
-        : {}
-    
-    if (loading) {
+    // const taskConfig = jsonData ? JSON.parse(jsonData.constant.description) : {}
+
+    useEffect(() => {
+        dataStore
+            .getValue('tasks')
+            .then(tasks => {
+                setTask(tasks[id])
+            })
+            .catch(err => {
+                console.error(err)
+                setDataError(true)
+            })
+    }, [])
+
+    if (!task) {
         return (
             <>
                 <PageHeadline>{i18n.t('Edit')}</PageHeadline>
@@ -52,8 +65,8 @@ export const InteropFormEdit = () => {
         )
     }
 
-    if (loadError) {
-        const msg = i18n.t('Something went wrong whilst loading constants')
+    if (dataError) {
+        const msg = i18n.t('Something went wrong whilst loading task')
 
         return (
             <>
@@ -76,7 +89,7 @@ export const InteropFormEdit = () => {
     const onCancelClick = () => history.push(INTEROP_LIST_PATH)
 
     //const FormComponent = getFormComponent(taskConfig)
-    const initialValues = taskConfig && getInitialValues(jsonData)
+    //const initialValues = taskConfig && getInitialValues(jsonData)
 
     return (
         <div
@@ -84,14 +97,15 @@ export const InteropFormEdit = () => {
             className={styles.container}
         >
             <Form destroyOnUnregister onSubmit={onSubmit}>
-            {({ handleSubmit }) => (
+                {({ handleSubmit }) => (
                     <InteropForm
-                    handleSubmit={handleSubmit}
-                    onSubmit={onSubmit}
-                    initialValues={initialValues}
-                    onCancelClick={onCancelClick}
+                        handleSubmit={handleSubmit}
+                        onSubmit={onSubmit}
+                        initialValues={task}
+                        onCancelClick={onCancelClick}
+                        taskId={id}
                     />
-                    )}
+                )}
             </Form>
         </div>
     )
