@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-08T09:54:28.565Z\n"
-"PO-Revision-Date: 2022-04-08T09:54:28.565Z\n"
+"POT-Creation-Date: 2022-04-10T18:18:20.705Z\n"
+"PO-Revision-Date: 2022-04-10T18:18:20.705Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -17,19 +17,13 @@ msgstr ""
 msgid "Yes, cancel"
 msgstr ""
 
-msgid "Something went wrong whilst loading gateways"
-msgstr ""
-
-msgid "Edit"
-msgstr ""
-
 msgid "Save mappings"
 msgstr ""
 
 msgid "Add mappings"
 msgstr ""
 
-msgid "Case mappings setup"
+msgid "Outbreaks mappings setup"
 msgstr ""
 
 msgid "Name"
@@ -39,6 +33,12 @@ msgid "Cancel"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Something went wrong whilst loading gateways"
 msgstr ""
 
 msgid "Contacts mappings setup"
@@ -111,9 +111,6 @@ msgid "If selected, DHIS2 will receive data from Go.Data"
 msgstr ""
 
 msgid "Location mappings setup"
-msgstr ""
-
-msgid "Outbreaks mappings setup"
 msgstr ""
 
 msgid "Go.Data Outbreak"
@@ -263,7 +260,7 @@ msgstr ""
 msgid "Proceed"
 msgstr ""
 
-msgid "Edit mapping"
+msgid "Something went wrong whilst loading constants"
 msgstr ""
 
 msgid "Something went wrong whilst saving the constant"

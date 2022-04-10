@@ -1,4 +1,6 @@
 import {
+    SingleSelectField,
+    SingleSelectOption,
     NoticeBox,
     CenteredContent,
     CircularLoader,
@@ -23,22 +25,19 @@ import {
     ContactsForm,
     ContactsOfContactForm,
     OutbreaksForm,
+    useReadMappingConfigConstantsQueryById,
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './MetadataConfigFormEdit.module.css'
 import * as dataStore from '../../utils/dataStore.js'
 
-
 export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
 export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
-
-// const getInitialValues = jsonData => {
-//     return jsonData.constant
-// }
 
 const getInitialValues = async id => (await dataStore.getValue('mappings'))[id]
 
 const getFormComponent = selectedForm => {
+    console.log(selectedForm)
     if (GODATA_OUTBREAK === selectedForm) {
         return OutbreaksForm
     }
@@ -69,18 +68,41 @@ export const MetadataConfigFormEdit = () => {
     const onCancel = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
     const [conversionType, setConversionType] = useState(undefined);
-    const [initialValues, setInitialValues] = useState({});
-    
+    const [initialValues, setInitialValues] = useState(undefined)
+
     const init = async () => {
-        const value = await getInitialValues(id)
-        setConversionType(value.mapping[0].godataValue[0][0].conversionType);
-        setInitialValues(value);
-        console.log({value})
+        const values = await getInitialValues(id)
+        setConversionType(values.mapping[0].godataValue[0][0].conversionType)
+        setInitialValues(values)
     }
 
     useEffect(() => {
-        init();
+        init()
     }, [])
+
+    if (!conversionType || !initialValues) {
+        return (
+            <>
+                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
+    }
+
+    // if (loadError) {
+    //     const msg = i18n.t('Something went wrong whilst loading constants')
+
+    //     return (
+    //         <>
+    //             <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+    //             <NoticeBox error title={msg}>
+    //                 {loadError.message}
+    //             </NoticeBox>
+    //         </>
+    //     )
+    // }
 
     const onSubmit = async values => {
         try {
@@ -92,14 +114,16 @@ export const MetadataConfigFormEdit = () => {
 
     const onCancelClick = () => history.push(METADATA_CONFIG_LIST_PATH)
 
-    const FormComponent = conversionType ? getFormComponent(conversionType) : OutbreaksForm;
+    //console.log(JSON.parse(jsonData.constant.description)[0][0].conversionType)
+
+    const FormComponent = getFormComponent(conversionType)
 
     return (
         <div
             data-test={dataTest('views-constantconfigformnew')}
             className={styles.container}
         >
-            <PageHeadline>{i18n.t('Edit mapping')}</PageHeadline>
+            <PageHeadline>{initialValues.displayName ? i18n.t('Add mappings') : i18n.t('Save mappings')}</PageHeadline>
 
             <FormRow>
                 {visibleForm === GODATA_OUTBREAK && (
