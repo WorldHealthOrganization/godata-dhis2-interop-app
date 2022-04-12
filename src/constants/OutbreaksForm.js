@@ -19,7 +19,7 @@ import * as dataStore from '../utils/dataStore.js'
 
 const { Field } = ReactFinalForm
 
-import { getCredentialsFromDataStore } from '../utils/get'
+import { getCredentialsFromUserDataStore } from '../utils/get'
 
 import axios from 'axios'
 
@@ -140,7 +140,7 @@ export const OutbreaksForm = ({
     } = useReadProgramsQueryForMappings()
 
     const processAll = useCallback(async () => {
-        const credentials = await getCredentialsFromDataStore().catch(
+        const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
         )
         const loginDetails = {
@@ -184,8 +184,7 @@ export const OutbreaksForm = ({
                 console.log({ initialValues })
                 setGodataValue(initialValues.mapping[0].godataValue)
                 setNameInput(initialValues.displayName)
-                setGodataModelInput(initialValues[1])
-                setDhisModelInput(initialValues[2])
+
             }
             setLoading(false)
         }

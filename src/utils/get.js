@@ -1,4 +1,5 @@
-import api from '../utils/api'
+import { getValueUserDataStore } from './userDataStore.js'
+const NAMESPACE_APP = 'dhis2-godata-interop-configuration'
 
 export const get = (path, object) => {
     let value = null
@@ -23,37 +24,26 @@ export const get = (path, object) => {
     return value
 }
 
-export const getCredentialsFromDataStore = () => {
-    return Promise.all([
-        api.getValue('dhis2-godata-interop-configuration', 'godatauser'),
-        api.getValue('dhis2-godata-interop-configuration', 'godatauserpass'),
-        api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl'),
-        api.getValue('dhis2-godata-interop-configuration', 'dhisuser'),
-        api.getValue('dhis2-godata-interop-configuration', 'dhisuserpass'),
-        api.getValue('dhis2-godata-interop-configuration', 'dhisbaseurl'),
-    ])
-        .then(v => v.map(v => v.value))
-        .then(values => {
-            const [
-                godatauser,
-                godatauserpass,
-                godatabaseurl,
-                dhisuser,
-                dhisuserpass,
-                dhisbaseurl,
-            ] = values
-            const res = {}
-            res.godata = {
-                username: godatauser,
-                password: godatauserpass,
-                url: godatabaseurl,
-            }
+export const getCredentialsFromUserDataStore = async () => {
+    const godatauser = await getValueUserDataStore('godatauser');
+    const godatauserpass = await getValueUserDataStore('godatauserpass');
+    const godatabaseurl = await getValueUserDataStore('godatabaseurl');
+    const dhisuser = await getValueUserDataStore('dhisuser');
+    const dhisuserpass = await getValueUserDataStore('dhisuserpass');
+    const dhisbaseurl = await getValueUserDataStore('dhisbaseurl');
 
-            res.dhis = {
-                username: dhisuser,
-                password: dhisuserpass,
-                url: dhisbaseurl,
-            }
-            return res
-        })
+    const res = {}
+    res.godata = {
+        username: godatauser,
+        password: godatauserpass,
+        url: godatabaseurl,
+    }
+
+    res.dhis = {
+        username: dhisuser,
+        password: dhisuserpass,
+        url: dhisbaseurl,
+    }
+    console.log(res);
+    return res
 }

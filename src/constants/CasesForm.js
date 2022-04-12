@@ -16,10 +16,12 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import * as dataStore from '../utils/dataStore.js'
+import * as userDataStore from '../utils/userDataStore.js'
+
 
 const { Field } = ReactFinalForm
 
-import { getCredentialsFromDataStore } from '../utils/get'
+import { getCredentialsFromUserDataStore } from '../utils/get'
 
 import axios from 'axios'
 
@@ -138,7 +140,7 @@ export const CasesForm = ({
     } = useReadProgramsQueryForMappings()
 
     const processAll = useCallback(async () => {
-        const credentials = await getCredentialsFromDataStore().catch(
+        const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
         )
         const loginDetails = {
@@ -188,7 +190,7 @@ export const CasesForm = ({
                             },
                         }
                     )
-                )
+                ).catch(console.error)
             if (!!instanceObject) {
                 iterate(instanceObject.data[0])
                 const caseMeta = []
@@ -380,7 +382,7 @@ export const CasesForm = ({
                                 onDelete={deleteNode}
                                 enableClipboard={selectedNode}
                                 theme="apathy:inverted"
-                                name={'Outbreak'}
+                                name={'Case'}
                                 displayArrayKey={true}
                             />
                         </div>

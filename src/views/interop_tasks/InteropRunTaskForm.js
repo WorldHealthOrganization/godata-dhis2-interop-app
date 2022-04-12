@@ -44,6 +44,8 @@ import { classImplements } from '@babel/types'
 const { Form, useForm } = ReactFinalForm
 export const INTEROP_RUN_TASK_FORM_PATH_STATIC = '/interop/run'
 export const INTEROP_RUN_TASK_FORM_PATH = `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/:id`
+import { getCredentialsFromUserDataStore } from '../utils/get'
+
 export const InteropRunTaskForm = () => {
     const history = useHistory()
     const { id } = useParams()
@@ -105,84 +107,23 @@ export const InteropRunTaskForm = () => {
     const [godataUrl, setGodataUrl] = useState()
     const [loginDetailsGodata, setCredentialsValuesGodata] = useState()
 
-    api.getValue('dhis2-godata-interop-configuration', 'godatauser')
-        .then(response => {
-            setGodataUser(response.value)
-            console.log('godatauser ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUser('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatauser',
-                ''
-            )
-            //console.log(e);
-        })
 
-    api.getValue('dhis2-godata-interop-configuration', 'godatauserpass')
-        .then(response => {
-            setGodataUserPass(response.value)
-            console.log('godatauser pass ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUserPass('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatauserpass',
-                ''
-            )
-            //console.log(e);
-        })
+    const credentials = getCredentialsFromUserDataStore().then((credentials) => {
+        setGodataUser(credentials.godata.username)
+        setGodataUserPass(credentials.godata.password)
+        setGodataUrl(credentials.godata.url)
+    
+        const [dhisUser, setDhisUser] = useState()
+        const [dhisUserPass, setDhisUserPass] = useState()
+        const [loginDetailsDhis, setCredentialsValuesDhis] = useState()
+    
+        setDhisUser(credentials.dhis.username)
+        setDhisUserPass(credentials.dhis.password)
 
-    api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl')
-        .then(response => {
-            setGodataUrl(response.value)
-            console.log('godatabaseurl ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUrl('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatabaseurl',
-                ''
-            )
-            //console.log(e);
-        })
+    }).catch(
+        console.error
+    )
 
-    const [dhisUser, setDhisUser] = useState()
-    const [dhisUserPass, setDhisUserPass] = useState()
-    const [loginDetailsDhis, setCredentialsValuesDhis] = useState()
-
-    api.getValue('dhis2-godata-interop-configuration', 'dhisuser')
-        .then(response => {
-            setDhisUser(response.value)
-            console.log('dhisuser ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setDhisUser('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'dhisuser',
-                ''
-            )
-            console.log(e)
-        })
-
-    api.getValue('dhis2-godata-interop-configuration', 'dhisuserpass')
-        .then(response => {
-            setDhisUserPass(response.value)
-            console.log('dhisuser pass ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setDhisUserPass('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'dhisuserpass',
-                ''
-            )
-            console.log(e)
-        })
 
     const {
         lloading,

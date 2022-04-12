@@ -3,6 +3,11 @@ import { getInstance } from 'd2'
 const NAMESPACE_APP = 'dhis2-godata-interop-configuration'
 
 /**
+ * DATA STORE
+ */
+
+
+/**
  * @post set(key,{...currentValue, value})
  * @returns {Promise}
  */
@@ -88,3 +93,4 @@ export const deleteByArrayIds = (key, ids) => {
         )
     )
 }
+

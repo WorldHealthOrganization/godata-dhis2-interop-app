@@ -1,112 +1,92 @@
 import { CenteredContent, CircularLoader, NoticeBox } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useState, useEffect } from 'react'
-
+import React, { useState, useEffect, useCallback } from 'react'
 import { useConfig } from '@dhis2/app-runtime'
-import api from '../../utils/api'
 
 import { HOME_PATH } from '..'
 
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
-import {
-    GoDataServerConfigForm,
-    useCreateDhisServerConfigConstantMutation,
-    useReadConstantsQueryForDhisConfig,
-    useUpdateDhisServerConfigConstantMutation,
-} from '../../constants'
+import { GoDataServerConfigForm } from '../../constants'
 import i18n from '../../locales'
 import styles from './DhisConfigForm.module.css'
+import * as userDataStore from '../../utils/userDataStore.js'
 
 export const DHIS_CONFIG_FORM_PATH = '/dhis-config'
 export const DHIS_CONFIG_FORM_LABEL = 'DHIS2 Server Credentials'
 
 export const DhisConfigForm = () => {
     const history = useHistory()
-var id, exists, initialValues;
+    const config = useConfig()
+    const [initialValues, setInitialValues] = useState({})
+    const [loading, setLoading] = useState(true)
 
-const [dhisUser, setDhisUser] = useState()
-const [dhisUserPass, setDhisUserPass] = useState()
+    const processAll = useCallback(async () => {
+        const username = await userDataStore
+            .getValueUserDataStore('dhisuser')
+            .catch(console.error)
+        const password = await userDataStore
+            .getValueUserDataStore('dhisuserpass')
+            .catch(console.error)
+        setInitialValues({
+            urlTemplate: config.baseUrl,
+            username: Object.keys(username).length !== 0 ? username : '',
+            password: Object.keys(password).length !== 0 ? password : '',
+        })
+        setLoading(false)
+    })
 
-const config = useConfig()
-console.log(JSON.stringify(config.baseUrl))
-
-
-api.getValue('dhis2-godata-interop-configuration', 'dhisuser').then(response => {
-    setDhisUser(response.value)
-    console.log('dhisuser ' + JSON.stringify(response.value));
-}).catch(e => {
-    setDhisUser('')
-    api.createValue('dhis2-godata-interop-configuration', 'dhisuser', '')
-    console.log(e);
-});
-
-
-api.getValue('dhis2-godata-interop-configuration', 'dhisuserpass').then(response => {
-    setDhisUserPass(response.value)
-    console.log('dhisuser pass ' + JSON.stringify(response.value));
-}).catch(e => {
-    setDhisUserPass('')
-    api.createValue('dhis2-godata-interop-configuration', 'dhisuserpass', '')
-    console.log(e);
-});
-
-
-let dhisBaseUrl = config.baseUrl
-
-
-initialValues = {urlTemplate: dhisBaseUrl,
-    'username': dhisUser, 
-    'password': dhisUserPass}
-console.log('initialValues ' + JSON.stringify(initialValues))
+    useEffect(() => {
+        processAll()
+    }, [])
 
     const onSubmit = async values => {
-        try {
+        console.log({ values })
+        await userDataStore
+            .setKeyValueUserDataStore('dhisuser', values.username)
+            .catch(console.error)
+        await userDataStore
+            .setKeyValueUserDataStore('dhisuserpass', values.password)
+            .catch(console.error)
+        await userDataStore
+            .setKeyValueUserDataStore('dhisbaseurl', values.urlTemplate)
+            .catch(console.error)
 
-//            api.createValue('dhis2-godata-interop-configuration', 'dhisuserpass', values.urlTemplate)
-console.log('values.username ' + values.username)
-
-api.createValue('dhis2-godata-interop-configuration', 'dhisuser', values.username).then(response => {
-                console.log('dhisuser ' + JSON.stringify(response.value));
-            }).catch(e => {
-api.updateValue('dhis2-godata-interop-configuration', 'dhisuser', values.username)
-                //console.log(e);
-            });
-
-api.createValue('dhis2-godata-interop-configuration', 'dhisuserpass', values.password).then(response => {
-                console.log('dhisuser pass ' + JSON.stringify(response.value));
-            }).catch(e => {
-api.updateValue('dhis2-godata-interop-configuration', 'dhisuserpass', values.password)
-                //console.log(e);
-            });
-            
-            history.push(HOME_PATH)
-        } catch (e) {
-            return Promise.reject(e)
-        }
+        history.push(HOME_PATH)
     }
 
+    if (loading)
+        return (
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
     const onCancelClick = () => history.push(HOME_PATH)
-
-    return (
-        <div
-            data-test={dataTest('views-gatewayconfigformnew')}
-            className={styles.container}
-        >
-            <PageHeadline>{i18n.t('Configure DHIS2 server')}</PageHeadline>
-
-            <FormRow>
-
+    if (!!initialValues)
+        return (
+            <div
+                data-test={dataTest('views-gatewayconfigformnew')}
+                className={styles.container}
+            >
+                <PageHeadline>{i18n.t('Configure DHIS2 server')}</PageHeadline>
+                <FormRow>
                     <GoDataServerConfigForm
-                    initialValues={initialValues}
+                        initialValues={initialValues}
                         onSubmit={onSubmit}
                         passwordRequired={true}
                         onCancelClick={onCancelClick}
                     />
-
-            </FormRow>
-
-        </div>
+                </FormRow>
+            </div>
+        )
+    return (
+        <>
+            <CenteredContent>
+                <CircularLoader />
+            </CenteredContent>
+        </>
     )
 }

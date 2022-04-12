@@ -12,19 +12,16 @@ import {
     TextAreaField,
 } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {
-    useReadMappingConfigConstantsQueryForConfig,
-    useReadOrgUnitsQueryForMappings,
-} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
+import * as dataStore from '../utils/dataStore.js'
 
 const { Field } = ReactFinalForm
 
-import axios from 'axios'
+import { getCredentialsFromUserDataStore } from '../utils/get'
 
-import api from '../utils/api'
+import axios from 'axios'
 
 import 'jsoneditor-react/es/editor.min.css'
 import ReactJson from 'react-json-view'
@@ -32,15 +29,11 @@ import 'react-responsive-modal/styles.css'
 import { Modal } from 'react-responsive-modal'
 import dot from 'dot-object'
 
-import {
-    useCreateCasesConstantMutation,
-    useUpdateCasesConstantMutation,
-} from '../constants'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
-
+import { useReadProgramsQueryForMappings } from '.'
 const { Form } = ReactFinalForm
 
 export const LocationsForm = ({
@@ -49,304 +42,159 @@ export const LocationsForm = ({
     initialValues,
     converterType,
 }) => {
+    const iterate = obj => {
+        var walked = []
+        var stack = [{ obj: obj, stack: '' }]
+        mappings = []
+        var i = 0
+        while (stack.length > 0) {
+            var item = stack.pop()
+            var obj = item.obj
+            for (var property in obj) {
+                if (obj.hasOwnProperty(property)) {
+                    if (typeof obj[property] == 'object') {
+                        var alreadyFound = false
+                        for (var i = 0; i < walked.length; i++) {
+                            if (walked[i] === obj[property]) {
+                                alreadyFound = true
+                                break
+                            }
+                        }
+                        if (!alreadyFound) {
+                            walked.push(obj[property])
+                            stack.push({
+                                obj: obj[property],
+                                stack: item.stack + '.' + property,
+                            })
+                        }
+                    } else {
+                        i++
+                        mappings.push({
+                            godata: (item.stack + '.' + property).substr(1),
+                            dhis2: '',
+                            props: {
+                                conversion: 'true',
+                                values: {},
+                            },
+                        })
+                    }
+                }
+                console.log('mappings length ' + mappings.length)
+                const pattern = /\.\d*\./
+                reducedGodataMappings = mappings.filter(
+                    obj => !pattern.test(String(obj.godata))
+                )
+            }
+        }
+    }
+    const iterate2 = obj => {
+        var walked = []
+        var stack = [{ obj: obj, stack: '' }]
+        dhismappings = []
+        while (stack.length > 0) {
+            var item = stack.pop()
+            var obj = item.obj
+            for (var property in obj) {
+                if (obj.hasOwnProperty(property)) {
+                    if (typeof obj[property] == 'object') {
+                        var alreadyFound = false
+                        for (var i = 0; i < walked.length; i++) {
+                            if (walked[i] === obj[property]) {
+                                alreadyFound = true
+                                break
+                            }
+                        }
+                        if (!alreadyFound) {
+                            walked.push(obj[property])
+                            stack.push({
+                                obj: obj[property],
+                                stack: item.stack + '.' + property,
+                            })
+                        }
+                    } else {
+                        dhismappings.push({
+                            dhis2: (item.stack + '.' + property).substr(1),
+                        })
+                    }
+                }
+            }
+        }
+        console.log('dhis2 mappings length ' + dhismappings.length)
+    }
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
     const [dhisValue, setDhisValue] = useState({})
     const [godataValue, setGodataValue] = useState([])
 
-    const [descriptionModels, setDescriptionModels] = useState({})
+    const [nameInput, setNameInput] = useState(initialValues.displayName)
 
-    const [nameInput, setNameInput] = useState('')
-    const [dhisModelInput, setDhisModelInput] = useState('')
-    const [godataModelInput, setGodataModelInput] = useState('')
 
-    var mappings, dhismappings
-    var instanceObject
-
-    const [godataUser, setGodataUser] = useState()
-    const [godataUserPass, setGodataUserPass] = useState()
-    const [godataUrl, setGodataUrl] = useState()
-    const [loginDetails, setCredentialsValues] = useState()
-
-    api.getValue('dhis2-godata-interop-configuration', 'godatauser')
-        .then(response => {
-            setGodataUser(response.value)
-            console.log('godatauser ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUser('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatauser',
-                ''
-            )
-            //console.log(e);
-        })
-
-    api.getValue('dhis2-godata-interop-configuration', 'godatauserpass')
-        .then(response => {
-            setGodataUserPass(response.value)
-            console.log('godatauser pass ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUserPass('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatauserpass',
-                ''
-            )
-            //console.log(e);
-        })
-
-    api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl')
-        .then(response => {
-            setGodataUrl(response.value)
-            console.log('godatabaseurl ' + JSON.stringify(response.value))
-        })
-        .catch(e => {
-            setGodataUrl('')
-            api.createValue(
-                'dhis2-godata-interop-configuration',
-                'godatabaseurl',
-                ''
-            )
-            //console.log(e);
-        })
+    var mappings, dhismappings, reducedGodataMappings
+    const [loading, setLoading] = useState(true)
 
     const {
         lloading,
         data: progData,
         lerror,
-    } = useReadOrgUnitsQueryForMappings()
-    //console.log('progData stringified ' + JSON.stringify(progData?.programs?.programs[0]))
+    } = useReadProgramsQueryForMappings()
 
-    const {
-        loading,
-        data,
-        error,
-    } = useReadMappingConfigConstantsQueryForConfig()
+    const processAll = useCallback(async () => {
+        const credentials = await getCredentialsFromUserDataStore().catch(
+            console.error
+        )
+        const loginDetails = {
+            urlTemplate: credentials.godata.url,
+            username: credentials.godata.username,
+            password: credentials.godata.password,
+        }
 
-    const [addCasesConstant] = useCreateCasesConstantMutation()
-    const [saveCasesConstant] = useUpdateCasesConstantMutation()
+        const programInstance =
+            progData && progData.programs.programs.length > 0
+                ? progData.programs.programs[0]
+                : {}
+        const instanceObject = await axios({
+            method: 'POST',
+            data: {
+                email: loginDetails.username,
+                password: loginDetails.password,
+            },
+            url: `${loginDetails.urlTemplate}/api/users/login`,
+        })
+            .then(res => {
+                console.log(res.data.id)
+                return axios.get(`${loginDetails.urlTemplate}/api/locations`, {
+                    headers: {
+                        Authorization: res.data.id,
+                    },
+                })
+            })
+            .catch(console.error)
+        if (!!instanceObject) {
+            iterate(instanceObject.data[0])
+            const caseMeta = []
+            caseMeta.push([{ conversionType: 'Go.Data Location' }])
+            caseMeta.push(reducedGodataMappings)
+            setGodataValue(caseMeta)
+
+            iterate2(programInstance)
+            setDhisValue(dhismappings)
+
+            if (!!initialValues.displayName) {
+                console.log({ initialValues })
+                setGodataValue(initialValues.mapping[0].godataValue)
+                setNameInput(initialValues.displayName)
+
+            }
+            setLoading(false)
+        }
+    })
 
     useEffect(() => {
-        setCredentialsValues({
-            urlTemplate: godataUrl,
-            username: godataUser,
-            password: godataUserPass,
-        })
+        processAll()
+    }, [progData])
 
-        console.log('creds ' + JSON.stringify(loginDetails))
-
-        /*       const loginDetails = 
-        data && data.constants.constants.length >0
-        ? JSON.parse(data.constants.constants[0].description)
-                : {}
-*/
-        const programInstance =
-            progData && progData.programs.organisationUnits.length > 0
-                ? progData.programs.organisationUnits[15]
-                : {}
-        console.log('organisationUnit ' + programInstance)
-
-        if (data) {
-            async function login() {
-                if (!!loginDetails.urlTemplate) {
-                    try {
-                        let res = await axios({
-                            method: 'POST',
-                            data: {
-                                email: loginDetails.username,
-                                password: loginDetails.password,
-                            },
-                            url: loginDetails.urlTemplate + '/api/users/login',
-                        })
-                        if (res.status == 200) {
-                            console.log('res.data.id ' + res.data.id)
-
-                            const getInstanceData = async () => {
-                                instanceObject = await axios.get(
-                                    loginDetails.urlTemplate + '/api/locations',
-                                    {
-                                        headers: {
-                                            Authorization: res.data.id,
-                                        },
-                                    }
-                                )
-
-                                function iterate(obj) {
-                                    var walked = []
-                                    var stack = [{ obj: obj, stack: '' }]
-                                    mappings = []
-                                    var i = 0
-                                    while (stack.length > 0) {
-                                        var item = stack.pop()
-                                        var obj = item.obj
-                                        for (var property in obj) {
-                                            if (obj.hasOwnProperty(property)) {
-                                                if (
-                                                    typeof obj[property] ==
-                                                    'object'
-                                                ) {
-                                                    var alreadyFound = false
-                                                    for (
-                                                        var i = 0;
-                                                        i < walked.length;
-                                                        i++
-                                                    ) {
-                                                        if (
-                                                            walked[i] ===
-                                                            obj[property]
-                                                        ) {
-                                                            alreadyFound = true
-                                                            break
-                                                        }
-                                                    }
-                                                    if (!alreadyFound) {
-                                                        walked.push(
-                                                            obj[property]
-                                                        )
-                                                        stack.push({
-                                                            obj: obj[property],
-                                                            stack:
-                                                                item.stack +
-                                                                '.' +
-                                                                property,
-                                                        })
-                                                    }
-                                                } else {
-                                                    i++
-                                                    mappings.push({
-                                                        godata: (
-                                                            item.stack +
-                                                            '.' +
-                                                            property
-                                                        ).substr(1),
-                                                        dhis2: '',
-                                                        props: {
-                                                            conversion: 'true',
-                                                            values: {},
-                                                        },
-                                                    })
-                                                }
-                                            }
-                                            //  console.log('mappings length ' + mappings.length)
-                                        }
-                                    }
-                                }
-                                console.log(initialValues)
-                                iterate(instanceObject.data[0])
-                                const caseMeta = []
-                                caseMeta.push([
-                                    { conversionType: 'Go.Data Location' },
-                                ])
-                                caseMeta.push(mappings)
-                                setGodataValue(caseMeta)
-
-                                function iterate2(obj) {
-                                    var walked = []
-                                    var stack = [{ obj: obj, stack: '' }]
-                                    dhismappings = []
-                                    while (stack.length > 0) {
-                                        var item = stack.pop()
-                                        var obj = item.obj
-                                        for (var property in obj) {
-                                            if (obj.hasOwnProperty(property)) {
-                                                if (
-                                                    typeof obj[property] ==
-                                                    'object'
-                                                ) {
-                                                    var alreadyFound = false
-                                                    for (
-                                                        var i = 0;
-                                                        i < walked.length;
-                                                        i++
-                                                    ) {
-                                                        if (
-                                                            walked[i] ===
-                                                            obj[property]
-                                                        ) {
-                                                            alreadyFound = true
-                                                            break
-                                                        }
-                                                    }
-                                                    if (!alreadyFound) {
-                                                        walked.push(
-                                                            obj[property]
-                                                        )
-                                                        stack.push({
-                                                            obj: obj[property],
-                                                            stack:
-                                                                item.stack +
-                                                                '.' +
-                                                                property,
-                                                        })
-                                                    }
-                                                } else {
-                                                    dhismappings.push({
-                                                        dhis2: (
-                                                            item.stack +
-                                                            '.' +
-                                                            property
-                                                        ).substr(1),
-                                                    })
-                                                    //mappings.set(item.stack + '.' + property , 'to be other stuff');
-                                                    //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    console.log(
-                                        'dhis2 mappings length ' +
-                                            dhismappings.length
-                                    )
-                                }
-
-                                iterate2(programInstance)
-                                setDhisValue(dhismappings)
-
-                                if (!!initialValues.name) {
-                                    setGodataValue(
-                                        JSON.parse(initialValues.description)[0]
-                                            .godataValue
-                                    )
-                                    setNameInput(initialValues.name)
-                                    setGodataModelInput(
-                                        JSON.stringify(
-                                            JSON.parse(
-                                                initialValues.description
-                                            )[1]
-                                        )
-                                    )
-                                    setDhisModelInput(
-                                        JSON.stringify(
-                                            JSON.parse(
-                                                initialValues.description
-                                            )[2]
-                                        )
-                                    )
-                                }
-                            }
-                            getInstanceData()
-
-                            console.log('converterType ' + converterType)
-                        }
-                    } catch (error) {
-                        console.log(error)
-                    }
-                }
-            }
-            login()
-            console.log('outbreaks: ' + JSON.stringify(instanceObject))
-        }
-
-        return () => {
-            console.log('This will be logged on unmount')
-        }
-    }, [data, progData])
-
-    if (loading) {
+    if (loading)
         return (
             <>
                 <CenteredContent>
@@ -354,41 +202,8 @@ export const LocationsForm = ({
                 </CenteredContent>
             </>
         )
-    }
-    if (error) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
 
-    if (lloading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-    if (lerror) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
-
-    const submitText = initialValues.name
+    const submitText = initialValues.displayName
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
@@ -401,7 +216,6 @@ export const LocationsForm = ({
         setGodataValue(godataValue => {
             const Outbreak = [...godataValue]
             var tmp = Outbreak[1][instance.namespace[1]]
-            console.log('tmp' + JSON.stringify(tmp))
             var path = ''
             instance.namespace.shift()
             instance.namespace.shift()
@@ -427,7 +241,6 @@ export const LocationsForm = ({
                 instance.src,
                 godataValue[1][valueHolder[2]]
             )
-            console.log('str ths: ' + JSON.stringify(ths))
             setGodataValue(godataValue => {
                 const Outbreak = [...godataValue]
                 Outbreak[1][valueHolder[2]] = ths
@@ -475,41 +288,27 @@ export const LocationsForm = ({
     const onNameInput = ev => {
         setNameInput(ev)
     }
-    const onDhisModelInput = ev => {
-        setDhisModelInput(ev)
-    }
-    const onGodataModelInput = ev => {
-        setGodataModelInput(ev)
-    }
 
     //console.log(nameInput)
     const saveConstant = async godataValue => {
-        const godataModelJson =
-            Object.keys(godataModelInput).length != 0
-                ? JSON.parse(godataModelInput)
-                : {}
-
-        const dhisModelJson =
-            Object.keys(dhisModelInput).length != 0
-                ? JSON.parse(dhisModelInput)
-                : {}
         const allValues = []
         allValues.push(godataValue)
-        console.log('allValues godataValue ' + JSON.stringify(allValues))
-        allValues.push(godataModelJson)
-        console.log('allValues godataModelJson ' + JSON.stringify(allValues))
-        allValues.push(dhisModelJson)
-        console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
-
-        if (initialValues.name) {
+        if (initialValues.displayName) {
             var id = initialValues.id
-            await saveCasesConstant({ allValues, nameInput, id })
+            await dataStore.editById('mappings', id, {
+                displayName: nameInput,
+                mapping: allValues,
+            })
         } else {
-            await addCasesConstant({ allValues, nameInput })
+            await dataStore.appendValue('mappings', {
+                displayName: nameInput,
+                mapping: allValues,
+            })
         }
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
+
 
     return (
         <Form
@@ -561,7 +360,7 @@ export const LocationsForm = ({
                                 onDelete={deleteNode}
                                 enableClipboard={selectedNode}
                                 theme="apathy:inverted"
-                                name={'Outbreak'}
+                                name={'Location'}
                                 displayArrayKey={true}
                             />
                         </div>

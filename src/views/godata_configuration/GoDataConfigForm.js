@@ -1,6 +1,6 @@
 import { CenteredContent, CircularLoader, NoticeBox } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import api from '../../utils/api'
 
@@ -17,6 +17,7 @@ import {
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './GoDataConfigForm.module.css'
+import * as userDataStore from '../../utils/userDataStore.js'
 
 export const GODATA_CONFIG_FORM_PATH = '/godata-config'
 export const GODATA_CONFIG_FORM_LABEL = 'Go.Data Server Credentials'
@@ -24,98 +25,79 @@ export const GODATA_CONFIG_FORM_LABEL = 'Go.Data Server Credentials'
 export const GoDataConfigForm = () => {
     const history = useHistory()
 
-    var id, exists, initialValues;
-    const [godataUser, setGodataUser] = useState()
-    const [godataUserPass, setGodataUserPass] = useState()
-    const [godataUrl, setGodataUrl] = useState()
-    
-    
-    api.getValue('dhis2-godata-interop-configuration', 'godatauser').then(response => {
-        setGodataUser(response.value)
-        console.log('godatauser ' + JSON.stringify(response.value));
-    }).catch(e => {
-        setGodataUser('')
-        api.createValue('dhis2-godata-interop-configuration', 'godatauser', '')
-        //console.log(e);
-    });
-    
-    api.getValue('dhis2-godata-interop-configuration', 'godatauserpass').then(response => {
-        setGodataUserPass(response.value)
-        console.log('godatauser pass ' + JSON.stringify(response.value));
-    }).catch(e => {
-        setGodataUserPass('')
-        api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', '')
-        //console.log(e);
-    });
-    
-    api.getValue('dhis2-godata-interop-configuration', 'godatabaseurl').then(response => {
-        setGodataUrl(response.value)
-        console.log('godatabaseurl ' + JSON.stringify(response.value));
-    }).catch(e => {
-        setGodataUrl('')
-        api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', '')
-        //console.log(e);
-    });    
-    
+    const [initialValues, setInitialValues] = useState({})
+    const [loading, setLoading] = useState(true)
 
-    initialValues = {urlTemplate: godataUrl,
-        'username': godataUser, 
-        'password': godataUserPass}
-    console.log('initialValues ' + JSON.stringify(initialValues))
+    const processAll = useCallback(async () => {
+        const username = await userDataStore
+            .getValueUserDataStore('godatauser')
+            .catch(console.error)
+        const password = await userDataStore
+            .getValueUserDataStore('godatauserpass')
+            .catch(console.error)
+        const url = await userDataStore
+            .getValueUserDataStore('godatabaseurl')
+            .catch(console.error)
+        setInitialValues({
+            urlTemplate: Object.keys(url).length !== 0 ? url : '',
+            username: Object.keys(username).length !== 0 ? username : '',
+            password: Object.keys(password).length !== 0 ? password : '',
+        })
+        setLoading(false)
+    })
 
+    useEffect(() => {
+        processAll()
+    }, [])
 
     const onSubmit = async values => {
-        try {
+        console.log({ values })
+        await userDataStore
+            .setKeyValueUserDataStore('godatauser', values.username)
+            .catch(console.error)
+        await userDataStore
+            .setKeyValueUserDataStore('godatauserpass', values.password)
+            .catch(console.error)
+        await userDataStore
+            .setKeyValueUserDataStore('godatabaseurl', values.urlTemplate)
+            .catch(console.error)
 
-            console.log('values.username ' + values.username)
-
-            api.createValue('dhis2-godata-interop-configuration', 'godatauser', values.username).then(response => {
-                            console.log('godatauser ' + JSON.stringify(response.value));
-                        }).catch(e => {
-            api.updateValue('dhis2-godata-interop-configuration', 'godatauser', values.username)
-                            //console.log(e);
-                        });
-            
-            api.createValue('dhis2-godata-interop-configuration', 'godatauserpass', values.password).then(response => {
-                            console.log('godatauser pass ' + JSON.stringify(response.value));
-                        }).catch(e => {
-            api.updateValue('dhis2-godata-interop-configuration', 'godatauserpass', values.password)
-                            //console.log(e);
-                        });
-            
-            api.createValue('dhis2-godata-interop-configuration', 'godatabaseurl', values.urlTemplate).then(response => {
-                            console.log('godatabaseurl ' + JSON.stringify(response.value));
-                        }).catch(e => {
-            api.updateValue('dhis2-godata-interop-configuration', 'godatabaseurl', values.urlTemplate)
-                            //console.log(e);
-                        });                        
-            
-            history.push(HOME_PATH)
-        } catch (e) {
-            return Promise.reject(e)
-        }
+        history.push(HOME_PATH)
     }
 
+    if (loading)
+        return (
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
     const onCancelClick = () => history.push(HOME_PATH)
-
-    return (
-        <div
-            data-test={dataTest('views-gatewayconfigformnew')}
-            className={styles.container}
-        >
-            <PageHeadline>{i18n.t('Configure Go.Data server')}</PageHeadline>
-
-            <FormRow>
-
+    if (!!initialValues)
+        return (
+            <div
+                data-test={dataTest('views-gatewayconfigformnew')}
+                className={styles.container}
+            >
+                <PageHeadline>
+                    {i18n.t('Configure Go.Data server')}
+                </PageHeadline>
+                <FormRow>
                     <GoDataServerConfigForm
-                    initialValues={initialValues}
+                        initialValues={initialValues}
                         onSubmit={onSubmit}
                         passwordRequired={true}
                         onCancelClick={onCancelClick}
                     />
-
-            </FormRow>
-
-        </div>
+                </FormRow>
+            </div>
+        )
+    return (
+        <>
+            <CenteredContent>
+                <CircularLoader />
+            </CenteredContent>
+        </>
     )
 }
