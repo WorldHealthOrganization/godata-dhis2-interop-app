@@ -58,9 +58,7 @@ export const InteropList = () => {
     } = useReadTaskConstantsQueryForTasks()
 
     useEffect(() => {
-        console.log('here')
         dataStore.getValue('tasks').then(tasks => {
-            console.log(tasks)
             setTasks(tasks)
         })
     }, [])
@@ -214,6 +212,7 @@ export const InteropList = () => {
                         </TableHead>
 
                         <TableBody>
+                            {console.log(tasks)}
                             {tasks.map((task, i) => (
                                 <TableRow
                                     key={i}
@@ -253,7 +252,7 @@ export const InteropList = () => {
                                             'constants-constantstable-type'
                                         )}
                                     >
-                                        {task.displayName}
+                                        {task.task[6]}
                                     </TableCell>
 
                                     <TableCell

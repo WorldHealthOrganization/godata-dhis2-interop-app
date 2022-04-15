@@ -23,9 +23,7 @@ import {
     GODATA_DHIS_LOCATION_MODEL,
 } from '../../constants'
 
-import {
-    DeleteConstantsConfirmationDialog,
-} from '../../constants'
+import { DeleteConstantsConfirmationDialog } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
 import { Paragraph } from '../../text'
@@ -52,9 +50,11 @@ export const MetadataConfigList = () => {
     }, [])
 
     const onDeleteClick = async () => {
-        console.log("Deleting...")
+        console.log('Deleting...')
         console.log(checkedConstants)
-        setMappings(await dataStore.deleteByArrayIds('mappings', checkedConstants))
+        setMappings(
+            await dataStore.deleteByArrayIds('mappings', checkedConstants)
+        )
         setCheckedConstants([])
         setShowDeleteDialog(false)
     }
@@ -136,7 +136,6 @@ export const MetadataConfigList = () => {
                     className={styles.container}
                     data-test={dataTest('constants-gatewaylist')}
                 >
-
                     <Table dataTest={dataTest('constants-constantstable')}>
                         <TableHead>
                             <TableRowHead>
@@ -158,6 +157,7 @@ export const MetadataConfigList = () => {
                         </TableHead>
 
                         <TableBody>
+                            {console.log({ mappings })}
                             {mappings.map((constant, i) => (
                                 <TableRow
                                     key={i}
@@ -197,7 +197,11 @@ export const MetadataConfigList = () => {
                                             'constants-constantstable-type'
                                         )}
                                     >
-                                        {constant.displayName}
+                                        {
+                                            constant.mapping[0]
+                                                .godataValue[0][0]
+                                                .conversionType
+                                        }
                                     </TableCell>
 
                                     <TableCell

@@ -15,15 +15,11 @@ import {
     TableCell,
 } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
-import React, { useState, useQuery, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import axios from 'axios'
 
-import api from '../../utils/api'
-import { useConfig } from '@dhis2/app-runtime'
-
 import { INTEROP_LIST_PATH } from './InteropList'
-import traverse from 'traverse'
 import centroid from 'turf-centroid'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
@@ -40,11 +36,11 @@ import {
     useReadMappingConfigConstantsQueryForConfig,
     useReadConstantsQueryForDhisConfig,
 } from '../../constants'
-import { classImplements } from '@babel/types'
 const { Form, useForm } = ReactFinalForm
 export const INTEROP_RUN_TASK_FORM_PATH_STATIC = '/interop/run'
 export const INTEROP_RUN_TASK_FORM_PATH = `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/:id`
-import { getCredentialsFromUserDataStore } from '../utils/get'
+import { getCredentialsFromUserDataStore } from '../../utils/get'
+import * as dataStore from '../../utils/dataStore.js'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
@@ -65,7 +61,7 @@ export const InteropRunTaskForm = () => {
     const [open, setOpen] = useState(false)
     var instanceObject,
         instance,
-        messg,
+        message,
         parentChild,
         thisId,
         stmp,
@@ -90,40 +86,15 @@ export const InteropRunTaskForm = () => {
         margin: 0 auto;
         border-color: #36d7b7;
     `
-    let [sloading, setLoading] = useState(false)
+    let [sloading, setLoading] = useState(true)
     let [color, setColor] = useState('#ffffff')
-
-    const config = useConfig()
-    console.log(JSON.stringify(config.baseUrl))
 
     const createAuthenticationHeader = (username, password) => {
         return (
-            'Basic ' + new Buffer(username + ':' + password).toString('base64')
+            'Basic ' +
+            new Buffer.from(username + ':' + password).toString('base64')
         )
     }
-
-    const [godataUser, setGodataUser] = useState()
-    const [godataUserPass, setGodataUserPass] = useState()
-    const [godataUrl, setGodataUrl] = useState()
-    const [loginDetailsGodata, setCredentialsValuesGodata] = useState()
-
-
-    const credentials = getCredentialsFromUserDataStore().then((credentials) => {
-        setGodataUser(credentials.godata.username)
-        setGodataUserPass(credentials.godata.password)
-        setGodataUrl(credentials.godata.url)
-    
-        const [dhisUser, setDhisUser] = useState()
-        const [dhisUserPass, setDhisUserPass] = useState()
-        const [loginDetailsDhis, setCredentialsValuesDhis] = useState()
-    
-        setDhisUser(credentials.dhis.username)
-        setDhisUserPass(credentials.dhis.password)
-
-    }).catch(
-        console.error
-    )
-
 
     const {
         lloading,
@@ -135,702 +106,423 @@ export const InteropRunTaskForm = () => {
         data,
         error,
     } = useReadMappingConfigConstantsQueryForConfig()
-    useEffect(() => {
-        setLoading(true)
-        messg = StatusAlertService.showInfo(
+
+    const getMappings = async (map_id, taskObject) => {
+        console.log({ map_id })
+        const credentials = await getCredentialsFromUserDataStore()
+        const mappingObject = (await dataStore.getValue('mappings'))[map_id]
+            .mapping
+        console.log({ mappingObject })
+        setMappings(mappingObject)
+
+        message = StatusAlertService.showSuccess(
+            i18n.t('Read mappings config - Success.')
+        )
+        setAlertId({
+            message,
+        })
+        //setTask(JSON.parse(taskObject.data))//in promise
+        //setMappings(JSON.parse(mappingObject.data)) //in promise
+        // taskConfig 0 - sender API, 1 - receiver API, 2 - sender API filters,
+        // 3 - payload model, 4 - is DHIS2 receiver, 5 - mappingsObjectId, 6 - task type
+
+        const iterate = obj => {
+            Object.keys(obj).forEach(key => {
+                if (key === 'dataValues') {
+                    console.log(`key: ${key}, value: ${obj[key]}`)
+                    instanceObject.data.trackedEntityInstances.dataValues.push(
+                        obj[key]
+                    )
+                }
+                if (typeof obj[key] === 'object') {
+                    iterate(obj[key])
+                }
+            })
+        }
+
+        console.log('0 - sender API ' + taskObject[0])
+        setSender(taskObject[0])
+        console.log('1 - receiver API ' + taskObject[1])
+        setReceiver(taskObject[1])
+        console.log('2 - sender API filters ' + taskObject[2])
+        setFilter(taskObject[2])
+        console.log('3 - sender API payload model ' + taskObject[3])
+        setPayloadModel(taskObject[3])
+        console.log('4 - is DHIS2 receiver ' + taskObject[4])
+        setIsDhis(taskObject[4])
+        console.log('5 - mappings object Id ' + taskObject[5])
+        console.log('6 - task type ' + taskObject[6])
+        setTaskType(taskObject[6])
+        console.log('7 - jsoncollectionname ' + taskObject[7])
+        setJsonCollectionName(taskObject[7])
+        //console.log(' - mapping object ' + JSON.stringify(mappingObjectMeta));
+        setMappingModel(mappingObject)
+        setTask(taskObject[6]) //const mappingJson =
+
+        //console.log(JSON.stringify('mappingObjectMeta ' + mappingObjectMeta[0])); //if DHIS2 is receiving end
+
+        if (isDhis) {
+            message = StatusAlertService.showInfo(
+                i18n.t('DHIS2 is receiving endpoint.')
+            )
+            setAlertId({
+                message,
+            })
+            message = StatusAlertService.showInfo(
+                i18n.t('Login in to Go.Data Instance.') + credentials.godata.url
+            )
+            setAlertId({
+                message,
+            }) //get Go.Data security token
+
+            const loginObject = await axios.post(
+                credentials.godata.url + '/api/users/login',
+                {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods':
+                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        'Content-Type': 'application/json',
+                        crossDomain: true,
+                    },
+                    data: {
+                        email: credentials.godata.username,
+                        password: credentials.godata.password,
+                    },
+                }
+            )
+            message = StatusAlertService.showSuccess(
+                i18n.t('Login in to Go.Data Instance - Success.')
+            )
+            setAlertId({
+                message,
+            })
+            message = StatusAlertService.showInfo(
+                i18n.t('Reading sender data.')
+            )
+            setAlertId({
+                message,
+            }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
+
+            instanceObject = await axios.get(taskObject[0] + taskObject[2], {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods':
+                        'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    'Content-Type': 'application/json',
+                    crossDomain: true,
+                    Authorization: loginObject.data.id,
+                },
+            })
+            message = StatusAlertService.showSuccess(
+                i18n.t('Reading sender data - Success.')
+            )
+            setAlertId({
+                message,
+            })
+            console.log(JSON.stringify(instanceObject.data))
+            var tmp = JSON.parse(JSON.stringify(instanceObject.data))
+            setSenderData(tmp)
+            instance = []
+            instanceObject.data.map(function(object, i) {
+                instance.push({
+                    name: object.name,
+                    id: object.id,
+                }) // console.log('name ' +object.name + ' id ' + object.id +' key ' + i)
+                // console.log(JSON.stringify('instance ' + instance))
+
+                instance = JSON.parse(JSON.stringify(instance)) //MAP AND SHOW MODAL FOR SELECTION
+
+                setInst(instance)
+                setLoading(false)
+                setOpen(true) // console.log('after modal opened')
+            }) //if DHIS2 is not receiving end
+        } else {
+            message = StatusAlertService.showInfo(
+                i18n.t('Reading sender data.')
+            )
+            setAlertId({
+                message,
+            })
+
+            //GET DHIS2 INSTANCES AS PER API ENDPOINT
+            var currentTaskType = 'Go.Data Contact'
+            if (
+                taskObject[6] === 'Go.Data Contact' ||
+                taskObject[6] === 'Go.Data Case' ||
+                taskObject[6] === 'Go.Data Contact of Contact'
+            ) {
+                console.log('sender instance ' + taskObject[6])
+
+                var endpoints = taskObject[0].split(' ')
+                var filters = taskObject[2].split(' ')
+
+                instanceIds = await axios.get(endpoints[0] + filters[0], {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        Authorization: createAuthenticationHeader(
+                            credentials.dhis.username,
+                            credentials.dhis.password
+                        ),
+                        'Access-Control-Allow-Methods':
+                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        'Content-Type': 'application/json',
+                        crossDomain: true,
+                    },
+                })
+                var fromPromise = []
+                for (let x = 0; x < instanceIds.data.rows.length; x++) {
+                    fromPromise.push(instanceIds.data.rows[x][0])
+                }
+                instanceObject = {}
+                instanceObject['data'] = {}
+                instanceObject.data['trackedEntityInstances'] = []
+                instanceObject.data.trackedEntityInstances['dataValues'] = []
+                for (let x = 0; x < fromPromise.length; x++) {
+                    var inst = await axios.get(
+                        endpoints[1] + fromPromise[x] + filters[1],
+                        {
+                            headers: {
+                                'Access-Control-Allow-Origin': '*',
+                                Authorization: createAuthenticationHeader(
+                                    credentials.dhis.username,
+                                    credentials.dhis.password
+                                ),
+                                'Access-Control-Allow-Methods':
+                                    'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                                'Content-Type': 'application/json',
+                                crossDomain: true,
+                            },
+                        }
+                    )
+
+                    inst.data['id'] = inst.data.trackedEntityInstance
+                    inst.data['name'] =
+                        'Case ID: ' + inst.data.trackedEntityInstance
+                    inst.data['dataValues'] = []
+
+                    instanceObject.data.trackedEntityInstances.push(inst.data)
+                    //iterate(instanceObject.data.trackedEntityInstances)
+                }
+
+                console.log('contacts ' + JSON.stringify(instanceObject))
+            } else {
+                instanceObject = await axios.get(
+                    taskObject[0] + taskObject[2],
+                    {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                            Authorization: createAuthenticationHeader(
+                                credentials.dhis.username,
+                                credentials.dhis.password
+                            ),
+                            'Access-Control-Allow-Methods':
+                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                            'Content-Type': 'application/json',
+                            crossDomain: true,
+                        },
+                    }
+                )
+            }
+
+            message = StatusAlertService.showSuccess(
+                i18n.t('Reading sender data - Success.')
+            )
+            setAlertId({
+                message,
+            })
+            console.log(
+                'instanceObject.data' + JSON.stringify(instanceObject.data)
+            )
+            console.log('jsonCollectionName ' + taskObject[7])
+            var tmp = JSON.parse(
+                JSON.stringify(instanceObject.data[taskObject[7]])
+            )
+            setSenderData(tmp)
+
+            instanceObject.data[taskObject[7]].sort((a, b) =>
+                a.level > b.level
+                    ? 1
+                    : a.level === b.level
+                    ? a.size > b.size
+                        ? 1
+                        : -1
+                    : -1
+            )
+
+            instance = []
+            parentChild = []
+            instanceObject.data[taskObject[7]].map(function(object, i) {
+                instance.push({
+                    name: object.name,
+                    id: object.id,
+                })
+                //compute lon/lat coordinates
+                var lon = 0,
+                    lat = 0
+
+                if (object.geometry) {
+                    if (
+                        object.geometry.type === 'Polygon' ||
+                        object.geometry.type === 'MultiPolygon'
+                    ) {
+                        //get centroid
+                        var centroidPoint = centroid(
+                            dot.pick('geometry', object)
+                        )
+                        lon = centroidPoint.geometry.coordinates[0]
+                        lat = centroidPoint.geometry.coordinates[1]
+                    } else if ((object.geometry.type = 'Point')) {
+                        var point = dot.pick('geometry.coordinates', object)
+                        lat = point[0]
+                        lon = point[1]
+                    } else if (Number.isNaN(lon)) {
+                        lon = 0
+                    }
+                }
+
+                //create Go.Data format of each org unit
+
+                parentChild.push(
+                    //{'id': object.id, 'parentId': object?.parent?.id }
+                    {
+                        location: {
+                            name: object.name,
+                            synonyms: [object.displayName],
+                            identifiers: [object.code],
+                            active: true,
+                            populationDensity: 0,
+                            parentLocationId: object?.parent?.id,
+                            geoLocation: {
+                                lat: lat,
+                                lng: lon,
+                            },
+                            geographicalLevelId:
+                                'LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_' +
+                                (object.level - 1),
+                            id: object.id,
+                            createdOn: 'System API',
+                        },
+                    }
+                )
+            }) //MAP AND SHOW MODAL FOR SELECTION
+
+            instance = JSON.parse(JSON.stringify(instance))
+            if (taskObject[6] == 'Go.Data Location') {
+                parentChild = JSON.parse(JSON.stringify(parentChild)) //get real copy from promise
+                console.log(
+                    parentChild.length + ' pc ' + JSON.stringify(parentChild)
+                )
+                //reduce relationships of org units
+                const idMapping = parentChild.reduce((acc, el, i) => {
+                    acc[el.location.id] = i
+                    return acc
+                }, {})
+                //now link them together so we have one hierarchy
+                let root
+                parentChild.forEach(el => {
+                    // Handle the root element
+                    if (el.location.parentLocationId === undefined) {
+                        root = el
+                        console.log('root id ' + root.location.id)
+                        return
+                    }
+                    // Use our mapping to locate the parent element in our data array
+                    const parentEl =
+                        parentChild[idMapping[el.location.parentLocationId]]
+                    // Add our current el to its parent's `children` array
+                    parentEl.children = [...(parentEl.children || []), el]
+                })
+
+                console.log('root ' + JSON.stringify(root))
+                //send org units to the server
+
+                const json = JSON.stringify([root])
+                const file = new File([json], 'orgunits.json', {
+                    type: 'application/json',
+                    lastModified: new Date(),
+                })
+                const formData = new FormData()
+                formData.append('file', file)
+                setFile(formData)
+                //sendOrgUnits(data)
+
+                //download json hierarchy of org units
+
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(file)
+                link.download = 'orgunits.json'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            }
+
+            setInst(instance)
+            setParentChildRelations([root])
+            setLoading(false)
+            setOpen(true)
+        }
+    }
+
+    const processAll = useCallback(async () => {
+        message = StatusAlertService.showInfo(
             i18n.t('Start reading task configurations.')
         )
         setAlertId({
-            messg,
+            message,
         })
 
-        setCredentialsValuesGodata({
-            urlTemplate: godataUrl,
-            username: godataUser,
-            password: godataUserPass,
-        })
+        const credentials = await getCredentialsFromUserDataStore()
+        console.log({ credentials })
 
-        console.log('gcreds ' + JSON.stringify(loginDetailsGodata))
-        //    const loginDetailsGodata = data && data.constants.constants.length > 0 ? JSON.parse(data.constants.constants[0].description) : {};
-
-        let dhisBaseUrl = config.baseUrl
-
-        setCredentialsValuesDhis({
-            urlTemplate: dhisBaseUrl,
-            username: dhisUser,
-            password: dhisUserPass,
-        })
-
-        console.log('dcreds ' + JSON.stringify(loginDetailsDhis))
-        //const loginDetailsDhis = progData && progData.constants.constants.length > 0 ? JSON.parse(progData.constants.constants[0].description) : {};
-
-        //    console.log('loginDetailsDhis ' + JSON.stringify(loginDetailsDhis));
-        //    console.log('loginDetailsGodata ' + JSON.stringify(loginDetailsGodata));
-        setGodataLogin(loginDetailsGodata)
-        messg = StatusAlertService.showSuccess(
+        message = StatusAlertService.showSuccess(
             i18n.t('Reading task configurations - Success.')
         )
         setAlertId({
-            messg,
+            message,
         })
 
-        if (data) {
-            messg = StatusAlertService.showInfo(
+        if (!!data) {
+            message = StatusAlertService.showInfo(
                 i18n.t(
-                    'Loging in to Go.Data Instance.' +
-                        loginDetailsGodata.urlTemplate
+                    'Loging in to Go.Data Instance.' + credentials.godata.url
                 )
             )
             setAlertId({
-                messg,
-            }) //GET GO.DATA LOGIN TOKEN
+                message,
+            })
+            //GET GO.DATA LOGIN TOKEN
 
-            async function loginGodata() {
-                try {
-                    let res = await axios({
-                        method: 'POST',
-                        data: {
-                            email: loginDetailsGodata.username,
-                            password: loginDetailsGodata.password,
-                        },
-                        url:
-                            loginDetailsGodata.urlTemplate + '/api/users/login',
-                    })
+            message = StatusAlertService.showSuccess(
+                i18n.t('Loging to Go.Data Instance Success.')
+            )
+            setAlertId({
+                message,
+            })
 
-                    if (res.status == 200) {
-                        console.log('res.data.id ' + res.data.id) //setToken(res.data.id)//in promise??
+            //GET TASK DEFINITION
+            const taskObject = (await dataStore.getValue('tasks'))[id].task
+            console.log({ taskObject })
+            message = StatusAlertService.showSuccess(
+                i18n.t('Read Task config - Success.')
+            )
+            setAlertId({
+                message,
+            }) //GET TASK'S MAPPINGS DEFINITIONS
 
-                        console.log('token ' + token)
-                        messg = StatusAlertService.showSuccess(
-                            i18n.t('Loging to Go.Data Instance Success.')
-                        )
-                        setAlertId({
-                            messg,
-                        }) //GET TASK DEFINITION
-
-                        const getTask = async id => {
-                            var taskObject = await axios.get(
-                                loginDetailsDhis.urlTemplate +
-                                    '/api/constants/' +
-                                    id +
-                                    '?paging=false&fields=id,displayName,code,description,shortName,name',
-                                {
-                                    crossDomain: true,
-                                    headers: {
-                                        'Access-Control-Allow-Origin': '*',
-                                        'Access-Control-Allow-Methods':
-                                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                        'Content-Type': 'application/json',
-                                        Authorization: createAuthenticationHeader(
-                                            loginDetailsDhis.username,
-                                            loginDetailsDhis.password
-                                        ),
-                                    },
-                                }
-                            )
-                            const taskObjectMeta = JSON.parse(
-                                taskObject.data.description
-                            )
-                            console.log(
-                                'taskObjectId ' + JSON.stringify(taskObjectMeta)
-                            )
-                            messg = StatusAlertService.showSuccess(
-                                i18n.t('Read Task config - Success.')
-                            )
-                            setAlertId({
-                                messg,
-                            }) //GET TASK'S MAPPINGS DEFINITIONS
-
-                            messg = StatusAlertService.showInfo(
-                                i18n.t('Reading mappings config.')
-                            )
-                            setAlertId({
-                                messg,
-                            })
-
-                            const getMappings = async id => {
-                                var mappingObject = await axios.get(
-                                    loginDetailsDhis.urlTemplate +
-                                        '/api/constants/' +
-                                        id +
-                                        '?paging=false&fields=id,displayName,code,description,shortName,name',
-                                    {
-                                        crossDomain: true,
-                                        headers: {
-                                            'Access-Control-Allow-Origin': '*',
-                                            'Access-Control-Allow-Methods':
-                                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                            'Content-Type': 'application/json',
-                                            Authorization: createAuthenticationHeader(
-                                                loginDetailsDhis.username,
-                                                loginDetailsDhis.password
-                                            ),
-                                        },
-                                    }
-                                )
-                                const mappingObjectMeta = JSON.parse(
-                                    mappingObject.data.description
-                                )
-                                //console.log('mappingObjectMeta promise ' + JSON.stringify(mappingObjectMeta));
-
-                                if (mappingObjectMeta) {
-                                    setMappings(
-                                        JSON.parse(
-                                            JSON.stringify(mappingObjectMeta)
-                                        )
-                                    )
-                                    console.log('usemapping ' + mappings)
-                                }
-
-                                messg = StatusAlertService.showSuccess(
-                                    i18n.t('Read mappings config - Success.')
-                                )
-                                setAlertId({
-                                    messg,
-                                }) //setTask(JSON.parse(taskObject.data))//in promise
-                                //setMappings(JSON.parse(mappingObject.data)) //in promise
-                                // taskConfig 0 - sender API, 1 - receiver API, 2 - sender API filters,
-                                // 3 - payload model, 4 - is DHIS2 receiver, 5 - mappingsObjectId, 6 - task type
-
-                                const iterate = obj => {
-                                    Object.keys(obj).forEach(key => {
-                                        if (key === 'dataValues') {
-                                            console.log(
-                                                `key: ${key}, value: ${obj[key]}`
-                                            )
-                                            instanceObject.data.trackedEntityInstances.dataValues.push(
-                                                obj[key]
-                                            )
-                                        }
-                                        if (typeof obj[key] === 'object') {
-                                            iterate(obj[key])
-                                        }
-                                    })
-                                }
-
-                                console.log(
-                                    '0 - sender API ' + taskObjectMeta[0]
-                                )
-                                setSender(taskObjectMeta[0])
-                                console.log(
-                                    '1 - receiver API ' + taskObjectMeta[1]
-                                )
-                                setReceiver(taskObjectMeta[1])
-                                console.log(
-                                    '2 - sender API filters ' +
-                                        taskObjectMeta[2]
-                                )
-                                setFilter(taskObjectMeta[2])
-                                console.log(
-                                    '3 - sender API payload model ' +
-                                        taskObjectMeta[3]
-                                )
-                                setPayloadModel(taskObjectMeta[3])
-                                console.log(
-                                    '4 - is DHIS2 receiver ' + taskObjectMeta[4]
-                                )
-                                setIsDhis(taskObjectMeta[4])
-                                console.log(
-                                    '5 - mappings object Id ' +
-                                        taskObjectMeta[5]
-                                )
-                                console.log(
-                                    '6 - task type ' + taskObjectMeta[6]
-                                )
-                                setTaskType(taskObjectMeta[6])
-                                console.log(
-                                    '7 - jsoncollectionname ' +
-                                        taskObjectMeta[7]
-                                )
-                                setJsonCollectionName(taskObjectMeta[7])
-                                //console.log(' - mapping object ' + JSON.stringify(mappingObjectMeta));
-                                setMappingModel(
-                                    JSON.parse(
-                                        JSON.stringify(mappingObjectMeta)
-                                    )
-                                )
-                                setTask(taskObjectMeta[6]) //const mappingJson =
-
-                                //console.log(JSON.stringify('mappingObjectMeta ' + mappingObjectMeta[0])); //if DHIS2 is receiving end
-
-                                if (isDhis) {
-                                    messg = StatusAlertService.showInfo(
-                                        i18n.t('DHIS2 is receiving endpoint.')
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    })
-                                    messg = StatusAlertService.showInfo(
-                                        i18n.t(
-                                            'Login in to Go.Data Instance.'
-                                        ) + loginDetailsGodata.urlTemplate
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    }) //get Go.Data security token
-
-                                    const loginObject = await axios.post(
-                                        loginDetailsGodata.urlTemplate +
-                                            '/api/users/login',
-                                        {
-                                            headers: {
-                                                'Access-Control-Allow-Origin':
-                                                    '*',
-                                                'Access-Control-Allow-Methods':
-                                                    'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                                'Content-Type':
-                                                    'application/json',
-                                                crossDomain: true,
-                                            },
-                                            data: {
-                                                email:
-                                                    loginDetailsGodata.username,
-                                                password:
-                                                    loginDetailsGodata.password,
-                                            },
-                                        }
-                                    )
-                                    messg = StatusAlertService.showSuccess(
-                                        i18n.t(
-                                            'Login in to Go.Data Instance - Success.'
-                                        )
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    })
-                                    messg = StatusAlertService.showInfo(
-                                        i18n.t('Reading sender data.')
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
-
-                                    instanceObject = await axios.get(
-                                        taskObjectMeta[0] + taskObjectMeta[2],
-                                        {
-                                            headers: {
-                                                'Access-Control-Allow-Origin':
-                                                    '*',
-                                                'Access-Control-Allow-Methods':
-                                                    'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                                'Content-Type':
-                                                    'application/json',
-                                                crossDomain: true,
-                                                Authorization:
-                                                    loginObject.data.id,
-                                            },
-                                        }
-                                    )
-                                    messg = StatusAlertService.showSuccess(
-                                        i18n.t('Reading sender data - Success.')
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    })
-                                    console.log(
-                                        JSON.stringify(instanceObject.data)
-                                    )
-                                    var tmp = JSON.parse(
-                                        JSON.stringify(instanceObject.data)
-                                    )
-                                    setSenderData(tmp)
-                                    instance = []
-                                    instanceObject.data.map(function(
-                                        object,
-                                        i
-                                    ) {
-                                        instance.push({
-                                            name: object.name,
-                                            id: object.id,
-                                        }) // console.log('name ' +object.name + ' id ' + object.id +' key ' + i)
-                                        // console.log(JSON.stringify('instance ' + instance))
-
-                                        instance = JSON.parse(
-                                            JSON.stringify(instance)
-                                        ) //MAP AND SHOW MODAL FOR SELECTION
-
-                                        setInst(instance)
-                                        setLoading(false)
-                                        setOpen(true) // console.log('after modal opened')
-                                    }) //if DHIS2 is not receiving end
-                                } else {
-                                    messg = StatusAlertService.showInfo(
-                                        i18n.t('Reading sender data.')
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    })
-
-                                    //GET DHIS2 INSTANCES AS PER API ENDPOINT
-                                    var currentTaskType = 'Go.Data Contact'
-                                    if (
-                                        taskObjectMeta[6] ===
-                                            'Go.Data Contact' ||
-                                        taskObjectMeta[6] === 'Go.Data Case' ||
-                                        taskObjectMeta[6] ===
-                                            'Go.Data Contact of Contact'
-                                    ) {
-                                        console.log(
-                                            'sender instance ' +
-                                                taskObjectMeta[6]
-                                        )
-
-                                        var endpoints = taskObjectMeta[0].split(
-                                            ' '
-                                        )
-                                        var filters = taskObjectMeta[2].split(
-                                            ' '
-                                        )
-
-                                        instanceIds = await axios.get(
-                                            endpoints[0] + filters[0],
-                                            {
-                                                headers: {
-                                                    'Access-Control-Allow-Origin':
-                                                        '*',
-                                                    Authorization: createAuthenticationHeader(
-                                                        loginDetailsDhis.username,
-                                                        loginDetailsDhis.password
-                                                    ),
-                                                    'Access-Control-Allow-Methods':
-                                                        'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                                    'Content-Type':
-                                                        'application/json',
-                                                    crossDomain: true,
-                                                },
-                                            }
-                                        )
-                                        console.log(
-                                            'ids of contacts ' +
-                                                JSON.stringify(instanceIds) +
-                                                ' ' +
-                                                JSON.stringify(
-                                                    instanceIds.data.rows[0][0]
-                                                )
-                                        )
-                                        var fromPromise = []
-                                        for (
-                                            let x = 0;
-                                            x < instanceIds.data.rows.length;
-                                            x++
-                                        ) {
-                                            fromPromise.push(
-                                                instanceIds.data.rows[x][0]
-                                            )
-                                        }
-                                        console.log('jinout ' + fromPromise)
-                                        instanceObject = {}
-                                        instanceObject['data'] = {}
-                                        instanceObject.data[
-                                            'trackedEntityInstances'
-                                        ] = []
-                                        instanceObject.data.trackedEntityInstances[
-                                            'dataValues'
-                                        ] = []
-                                        for (
-                                            let x = 0;
-                                            x < fromPromise.length;
-                                            x++
-                                        ) {
-                                            var inst = await axios.get(
-                                                endpoints[1] +
-                                                    fromPromise[x] +
-                                                    filters[1],
-                                                {
-                                                    headers: {
-                                                        'Access-Control-Allow-Origin':
-                                                            '*',
-                                                        Authorization: createAuthenticationHeader(
-                                                            loginDetailsDhis.username,
-                                                            loginDetailsDhis.password
-                                                        ),
-                                                        'Access-Control-Allow-Methods':
-                                                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                                        'Content-Type':
-                                                            'application/json',
-                                                        crossDomain: true,
-                                                    },
-                                                }
-                                            )
-
-                                            inst.data['id'] =
-                                                inst.data.trackedEntityInstance
-                                            inst.data['name'] =
-                                                'Case ID: ' +
-                                                inst.data.trackedEntityInstance
-                                            inst.data['dataValues'] = []
-
-                                            instanceObject.data.trackedEntityInstances.push(
-                                                inst.data
-                                            )
-                                            //iterate(instanceObject.data.trackedEntityInstances)
-                                        }
-
-                                        console.log(
-                                            'contacts ' +
-                                                JSON.stringify(instanceObject)
-                                        )
-                                    } else {
-                                        instanceObject = await axios.get(
-                                            taskObjectMeta[0] +
-                                                taskObjectMeta[2],
-                                            {
-                                                headers: {
-                                                    'Access-Control-Allow-Origin':
-                                                        '*',
-                                                    Authorization: createAuthenticationHeader(
-                                                        loginDetailsDhis.username,
-                                                        loginDetailsDhis.password
-                                                    ),
-                                                    'Access-Control-Allow-Methods':
-                                                        'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                                                    'Content-Type':
-                                                        'application/json',
-                                                    crossDomain: true,
-                                                },
-                                            }
-                                        )
-                                    }
-
-                                    messg = StatusAlertService.showSuccess(
-                                        i18n.t('Reading sender data - Success.')
-                                    )
-                                    setAlertId({
-                                        messg,
-                                    })
-                                    console.log(
-                                        'instanceObject.data' +
-                                            JSON.stringify(instanceObject.data)
-                                    )
-                                    console.log(
-                                        'jsonCollectionName ' +
-                                            taskObjectMeta[7]
-                                    )
-                                    var tmp = JSON.parse(
-                                        JSON.stringify(
-                                            instanceObject.data[
-                                                taskObjectMeta[7]
-                                            ]
-                                        )
-                                    )
-                                    setSenderData(tmp)
-
-                                    instanceObject.data[
-                                        taskObjectMeta[7]
-                                    ].sort((a, b) =>
-                                        a.level > b.level
-                                            ? 1
-                                            : a.level === b.level
-                                            ? a.size > b.size
-                                                ? 1
-                                                : -1
-                                            : -1
-                                    )
-
-                                    console.log(
-                                        'sortedObjs ' +
-                                            JSON.stringify(
-                                                instanceObject.data[
-                                                    taskObjectMeta[7]
-                                                ]
-                                            )
-                                    )
-
-                                    instance = []
-                                    parentChild = []
-                                    instanceObject.data[taskObjectMeta[7]].map(
-                                        function(object, i) {
-                                            instance.push({
-                                                name: object.name,
-                                                id: object.id,
-                                            })
-                                            //compute lon/lat coordinates
-                                            var lon = 0,
-                                                lat = 0
-
-                                            if (object.geometry) {
-                                                if (
-                                                    object.geometry.type ===
-                                                        'Polygon' ||
-                                                    object.geometry.type ===
-                                                        'MultiPolygon'
-                                                ) {
-                                                    //get centroid
-                                                    var centroidPoint = centroid(
-                                                        dot.pick(
-                                                            'geometry',
-                                                            object
-                                                        )
-                                                    )
-                                                    console.log(
-                                                        'centroid latitude ' +
-                                                            centroidPoint
-                                                                .geometry
-                                                                .coordinates[0]
-                                                    )
-                                                    lon =
-                                                        centroidPoint.geometry
-                                                            .coordinates[0]
-                                                    lat =
-                                                        centroidPoint.geometry
-                                                            .coordinates[1]
-                                                } else if (
-                                                    (object.geometry.type =
-                                                        'Point')
-                                                ) {
-                                                    var point = dot.pick(
-                                                        'geometry.coordinates',
-                                                        object
-                                                    )
-                                                    lat = point[0]
-                                                    lon = point[1]
-                                                } else if (Number.isNaN(lon)) {
-                                                    lon = 0
-                                                }
-                                            }
-
-                                            //create Go.Data format of each org unit
-
-                                            parentChild.push(
-                                                //{'id': object.id, 'parentId': object?.parent?.id }
-                                                {
-                                                    location: {
-                                                        name: object.name,
-                                                        synonyms: [
-                                                            object.displayName,
-                                                        ],
-                                                        identifiers: [
-                                                            object.code,
-                                                        ],
-                                                        active: true,
-                                                        populationDensity: 0,
-                                                        parentLocationId:
-                                                            object?.parent?.id,
-                                                        geoLocation: {
-                                                            lat: lat,
-                                                            lng: lon,
-                                                        },
-                                                        geographicalLevelId:
-                                                            'LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_' +
-                                                            (object.level - 1),
-                                                        id: object.id,
-                                                        createdOn: 'System API',
-                                                    },
-                                                }
-                                            )
-                                        }
-                                    ) //MAP AND SHOW MODAL FOR SELECTION
-
-                                    instance = JSON.parse(
-                                        JSON.stringify(instance)
-                                    )
-                                    if (
-                                        taskObjectMeta[6] == 'Go.Data Location'
-                                    ) {
-                                        parentChild = JSON.parse(
-                                            JSON.stringify(parentChild)
-                                        ) //get real copy from promise
-                                        console.log(
-                                            parentChild.length +
-                                                ' pc ' +
-                                                JSON.stringify(parentChild)
-                                        )
-                                        //reduce relationships of org units
-                                        const idMapping = parentChild.reduce(
-                                            (acc, el, i) => {
-                                                acc[el.location.id] = i
-                                                return acc
-                                            },
-                                            {}
-                                        )
-                                        console.log(JSON.stringify(idMapping))
-                                        //now link them together so we have one hierarchy
-                                        let root
-                                        parentChild.forEach(el => {
-                                            // Handle the root element
-                                            if (
-                                                el.location.parentLocationId ===
-                                                undefined
-                                            ) {
-                                                root = el
-                                                console.log(
-                                                    'root id ' +
-                                                        root.location.id
-                                                )
-                                                return
-                                            }
-                                            // Use our mapping to locate the parent element in our data array
-                                            const parentEl =
-                                                parentChild[
-                                                    idMapping[
-                                                        el.location
-                                                            .parentLocationId
-                                                    ]
-                                                ]
-                                            // Add our current el to its parent's `children` array
-                                            parentEl.children = [
-                                                ...(parentEl.children || []),
-                                                el,
-                                            ]
-                                        })
-
-                                        console.log(
-                                            'root ' + JSON.stringify(root)
-                                        )
-                                        //send org units to the server
-
-                                        const json = JSON.stringify([root])
-                                        const file = new File(
-                                            [json],
-                                            'orgunits.json',
-                                            {
-                                                type: 'application/json',
-                                                lastModified: new Date(),
-                                            }
-                                        )
-                                        const formData = new FormData()
-                                        formData.append('file', file)
-                                        setFile(formData)
-                                        //sendOrgUnits(data)
-
-                                        //download json hierarchy of org units
-
-                                        const link = document.createElement('a')
-                                        link.href = URL.createObjectURL(file)
-                                        link.download = 'orgunits.json'
-                                        document.body.appendChild(link)
-                                        link.click()
-                                        document.body.removeChild(link)
-                                    }
-
-                                    setInst(instance)
-                                    setParentChildRelations([root])
-                                    setLoading(false)
-                                    setOpen(true)
-                                }
-                            }
-                            getMappings(taskObjectMeta[5])
-                        }
-                        getTask(id)
-                    }
-                } catch (error) {
-                    messg = StatusAlertService.showError(
-                        i18n.t(
-                            'Loging into the Go.Data Instance Failed.' + error
-                        )
-                    )
-                    setAlertId({
-                        messg,
-                    })
-                    console.log(error)
-                }
-            }
-            loginGodata()
+            message = StatusAlertService.showInfo(
+                i18n.t('Reading mappings config.')
+            )
+            setAlertId({
+                message,
+            })
+            await getMappings(taskObject[5], taskObject)
         }
+        setLoading(false)
+    })
 
-        return () => {
-            console.log('This will be logged on unmount')
-        }
+    useEffect(() => {
+        processAll()
     }, [data, progData])
 
     if (loading) {
@@ -898,6 +590,7 @@ export const InteropRunTaskForm = () => {
     const toggleAll = () => {
         if (!allConstantsChecked) {
             const allConstantIds = inst.map(({ id }) => id)
+            console.log({allConstantIds})
             setCheckedConstants(allConstantIds)
         } else {
             setCheckedConstants([])
@@ -928,14 +621,7 @@ export const InteropRunTaskForm = () => {
         var model = JSON.parse(JSON.stringify(payloadModel))
 
         var mappings
-        console.log('senderData: ' + JSON.stringify(senderData))
         const senderObject = senderData.find(x => x.id === checkedConstants[y])
-        console.log(
-            'senderData.find ' +
-                JSON.stringify(
-                    senderData.find(x => x.id === checkedConstants[y])
-                )
-        )
         stmp = senderObject
         console.log('stmp here: ' + JSON.stringify(stmp))
         var currentTaskType = 'Go.Data Contact' || 'Go.Data Case'
@@ -1009,9 +695,9 @@ export const InteropRunTaskForm = () => {
         }
 
         //SEND PAYLOAD TO RECIEVER
-        messg = StatusAlertService.showInfo(i18n.t('Start sending data'))
+        message = StatusAlertService.showInfo(i18n.t('Start sending data'))
         setAlertId({
-            messg,
+            message,
         })
         login()
     }
@@ -1228,6 +914,7 @@ export const InteropRunTaskForm = () => {
     } //end of getTaskDone()
 
     async function login() {
+        const credentials = await getCredentialsFromUserDataStore()
         try {
             let res = await axios({
                 method: 'POST',
@@ -1239,10 +926,10 @@ export const InteropRunTaskForm = () => {
                     crossDomain: true,
                 },
                 data: {
-                    email: godataLogn.username,
-                    password: godataLogn.password,
+                    email: credentials.godata.username,
+                    password: credentials.godata.password,
                 },
-                url: godataLogn.urlTemplate + '/api/users/login',
+                url: credentials.godata.url + '/api/users/login',
             })
 
             if (res.status == 200) {
@@ -1265,7 +952,7 @@ export const InteropRunTaskForm = () => {
                         .then(function(response) {
                             //handle success
                             console.log('ou resp success ' + response)
-                            messg = StatusAlertService.showSuccess(
+                            message = StatusAlertService.showSuccess(
                                 i18n.t(
                                     'Locations send and processed successfully' +
                                         JSON.stringify(response?.data.length)
@@ -1275,13 +962,13 @@ export const InteropRunTaskForm = () => {
                                 }
                             )
                             setAlertId({
-                                messg,
+                                message,
                             })
                         })
                         .catch(function(response) {
                             //handle error
                             console.log('ou resp failed ' + response)
-                            messg = StatusAlertService.showError(
+                            message = StatusAlertService.showError(
                                 i18n.t(
                                     'Locations sending failed: ' +
                                         JSON.stringify(error?.response?.data)
@@ -1291,7 +978,7 @@ export const InteropRunTaskForm = () => {
                                 }
                             )
                             setAlertId({
-                                messg,
+                                message,
                             })
                         })
                 } else {
@@ -1312,7 +999,7 @@ export const InteropRunTaskForm = () => {
                     if (res.status == 200) {
                         console.log('res.data ' + JSON.stringify(ans.data))
 
-                        messg = StatusAlertService.showSuccess(
+                        message = StatusAlertService.showSuccess(
                             i18n.t(
                                 'Data send successfully. ' +
                                     JSON.stringify(ans.data)
@@ -1322,7 +1009,7 @@ export const InteropRunTaskForm = () => {
                             }
                         )
                         setAlertId({
-                            messg,
+                            message,
                         })
                     }
                 }
@@ -1331,7 +1018,7 @@ export const InteropRunTaskForm = () => {
             console.log('outer error: ' + JSON.stringify(error))
             //console.log('error message ' + JSON.stringify(error.response.data));
             //console.log(error.response.status);
-            messg = StatusAlertService.showError(
+            message = StatusAlertService.showError(
                 i18n.t(
                     'Data sending failed: ' +
                         JSON.stringify(error?.response?.data)
@@ -1341,7 +1028,7 @@ export const InteropRunTaskForm = () => {
                 }
             )
             setAlertId({
-                messg,
+                message,
             })
         }
     }

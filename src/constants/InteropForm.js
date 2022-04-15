@@ -15,7 +15,7 @@ import {
     InputField,
 } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
-import React, { useEffect, useState, useParams } from 'react'
+import React, { useEffect, useState, useCallback, useParams } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import {
     useReadMappingConfigConstantsQueryForConfig,
@@ -67,7 +67,7 @@ export const InteropForm = ({
     const [dhisReceiver, setDhisReceiver] = useState(false)
 
     const [converters, setConverters] = useState([])
-    const [converter, setConverter] = useState('')
+    const [converter, setConverter] = useState(0)
 
     const [taskType, setTaskType] = useState('')
 
@@ -99,7 +99,7 @@ export const InteropForm = ({
     const [addTaskConstant] = useCreateTaskConstantMutation()
     const [saveTaskConstant] = useUpdateTaskConstantMutation()
 
-    useEffect(() => {
+    const processAll = useCallback(async () => {
         const programInstance =
             progData && progData.programs.programs.length > 0
                 ? progData.programs.programs[0]
@@ -110,15 +110,15 @@ export const InteropForm = ({
             convt && convt.constants.constants.length > 0
                 ? convt.constants.constants
                 : []
-        //console.log('constants.constants ' + JSON.stringify(convts))
+        const mappings = await dataStore.getValue('mappings')
 
         setConverters(
-            convts.map(({ id, displayName }) => ({
-                label: displayName,
-                value: id,
+            mappings.map((m, i) => ({
+                label: m.displayName,
+                value: i,
             }))
         )
-        //console.log('converters '+JSON.stringify(converters))
+
         if (initialValues && initialValues.name != 'undefined') {
             console.log('initialValues called ' + initialValues.name)
             console.log(initialValues)
@@ -133,9 +133,15 @@ export const InteropForm = ({
             setTaskType(initialValues.task[6])
             setJsonCollectionName(initialValues.task[7])
         }
-        return () => {
-            console.log('This will be logged on unmount')
-        }
+    })
+
+    useEffect(() => {
+        const convts =
+            convt && convt.constants.constants.length > 0
+                ? convt.constants.constants
+                : []
+        console.log({ convts })
+        processAll()
     }, [data, progData, convt])
 
     if (loading) {
@@ -182,7 +188,7 @@ export const InteropForm = ({
         setDhisReceiver(ev.value == true ? false : true)
     }
     const onConvertorInput = ev => {
-        setConverter(ev)
+        setConverter(converters.map(c => c.label).indexOf(ev))
     }
     const onTaskTypeInput = ev => {
         setTaskType(ev)
@@ -202,10 +208,10 @@ export const InteropForm = ({
         allValues.push(taskType)
         allValues.push(jsonCollectionName)
         console.log('===============================')
-        console.log(nameInput)
-        console.log(initialValues.displayName)
-        console.log(allValues)
-        console.log(taskId)
+        console.log({
+            displayName: nameInput,
+            task: allValues,
+        })
         if (!!initialValues.displayName)
             await dataStore.editById('tasks', taskId, {
                 displayName: nameInput,
@@ -233,6 +239,7 @@ export const InteropForm = ({
                     <PageSubHeadline>{i18n.t('Task setup')}</PageSubHeadline>
 
                     <FormRow>
+                        {console.log({ taskType })}
                         <SingleSelectField
                             label={i18n.t('Type')}
                             onChange={({ selected }) =>
@@ -366,28 +373,33 @@ export const InteropForm = ({
                         />
                     </FormRow>
 
-                    <FormRow>
-                        <SingleSelectField
-                            label={i18n.t('Converter')}
-                            onChange={({ selected }) =>
-                                onConvertorInput(selected)
-                            }
-                            selected={converter}
-                            value={converters.filter(function(option) {
-                                return option.value === converter
-                            })}
-                        >
-                            {converters.map(function(object, i) {
-                                return (
-                                    <SingleSelectOption
-                                        value={object.value}
-                                        label={object.label}
-                                        key={i}
-                                    />
-                                )
-                            })}
-                        </SingleSelectField>
-                    </FormRow>
+                    {converter !== '' &&
+                    converter !== null &&
+                    converter !== undefined &&
+                    !!converters &&
+                    converters.length !== 0 ? (
+                        <FormRow>
+                            <SingleSelectField
+                                label={i18n.t('Converter')}
+                                onChange={({ selected }) =>
+                                    onConvertorInput(selected)
+                                }
+                                selected={converters[converter].label}
+                            >
+                                {converters.map(function(object, i) {
+                                    return (
+                                        <SingleSelectOption
+                                            label={object.label}
+                                            value={object.label}
+                                            key={i}
+                                        />
+                                    )
+                                })}
+                            </SingleSelectField>
+                        </FormRow>
+                    ) : (
+                        <></>
+                    )}
 
                     <FormRow>
                         <Editor
