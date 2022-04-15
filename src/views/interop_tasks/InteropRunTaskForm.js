@@ -108,11 +108,9 @@ export const InteropRunTaskForm = () => {
     } = useReadMappingConfigConstantsQueryForConfig()
 
     const getMappings = async (map_id, taskObject) => {
-        console.log({ map_id })
         const credentials = await getCredentialsFromUserDataStore()
         const mappingObject = (await dataStore.getValue('mappings'))[map_id]
             .mapping
-        console.log({ mappingObject })
         setMappings(mappingObject)
 
         message = StatusAlertService.showSuccess(
@@ -129,7 +127,6 @@ export const InteropRunTaskForm = () => {
         const iterate = obj => {
             Object.keys(obj).forEach(key => {
                 if (key === 'dataValues') {
-                    console.log(`key: ${key}, value: ${obj[key]}`)
                     instanceObject.data.trackedEntityInstances.dataValues.push(
                         obj[key]
                     )
@@ -140,26 +137,26 @@ export const InteropRunTaskForm = () => {
             })
         }
 
-        console.log('0 - sender API ' + taskObject[0])
         setSender(taskObject[0])
-        console.log('1 - receiver API ' + taskObject[1])
         setReceiver(taskObject[1])
-        console.log('2 - sender API filters ' + taskObject[2])
         setFilter(taskObject[2])
-        console.log('3 - sender API payload model ' + taskObject[3])
         setPayloadModel(taskObject[3])
-        console.log('4 - is DHIS2 receiver ' + taskObject[4])
         setIsDhis(taskObject[4])
-        console.log('5 - mappings object Id ' + taskObject[5])
-        console.log('6 - task type ' + taskObject[6])
         setTaskType(taskObject[6])
-        console.log('7 - jsoncollectionname ' + taskObject[7])
         setJsonCollectionName(taskObject[7])
-        //console.log(' - mapping object ' + JSON.stringify(mappingObjectMeta));
+        console.log('TASK OBJECT SET:')
+        console.log({
+            'Sender API': taskObject[0],
+            'Receiver API': taskObject[1],
+            'Sender API filters': taskObject[2],
+            'Sender API payload model': taskObject[3],
+            'Is DHIS2 receiver': taskObject[4],
+            'mappings object Id': taskObject[5],
+            'task type': taskObject[6],
+            'json Collection Name': taskObject[7],
+        })
         setMappingModel(mappingObject)
         setTask(taskObject[6]) //const mappingJson =
-
-        //console.log(JSON.stringify('mappingObjectMeta ' + mappingObjectMeta[0])); //if DHIS2 is receiving end
 
         if (isDhis) {
             message = StatusAlertService.showInfo(
@@ -220,7 +217,6 @@ export const InteropRunTaskForm = () => {
             setAlertId({
                 message,
             })
-            console.log(JSON.stringify(instanceObject.data))
             var tmp = JSON.parse(JSON.stringify(instanceObject.data))
             setSenderData(tmp)
             instance = []
@@ -228,14 +224,13 @@ export const InteropRunTaskForm = () => {
                 instance.push({
                     name: object.name,
                     id: object.id,
-                }) // console.log('name ' +object.name + ' id ' + object.id +' key ' + i)
-                // console.log(JSON.stringify('instance ' + instance))
+                })
 
                 instance = JSON.parse(JSON.stringify(instance)) //MAP AND SHOW MODAL FOR SELECTION
 
                 setInst(instance)
                 setLoading(false)
-                setOpen(true) // console.log('after modal opened')
+                setOpen(true)
             }) //if DHIS2 is not receiving end
         } else {
             message = StatusAlertService.showInfo(
@@ -246,14 +241,11 @@ export const InteropRunTaskForm = () => {
             })
 
             //GET DHIS2 INSTANCES AS PER API ENDPOINT
-            var currentTaskType = 'Go.Data Contact'
             if (
                 taskObject[6] === 'Go.Data Contact' ||
                 taskObject[6] === 'Go.Data Case' ||
                 taskObject[6] === 'Go.Data Contact of Contact'
             ) {
-                console.log('sender instance ' + taskObject[6])
-
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
 
@@ -302,10 +294,7 @@ export const InteropRunTaskForm = () => {
                     inst.data['dataValues'] = []
 
                     instanceObject.data.trackedEntityInstances.push(inst.data)
-                    //iterate(instanceObject.data.trackedEntityInstances)
                 }
-
-                console.log('contacts ' + JSON.stringify(instanceObject))
             } else {
                 instanceObject = await axios.get(
                     taskObject[0] + taskObject[2],
@@ -331,10 +320,7 @@ export const InteropRunTaskForm = () => {
             setAlertId({
                 message,
             })
-            console.log(
-                'instanceObject.data' + JSON.stringify(instanceObject.data)
-            )
-            console.log('jsonCollectionName ' + taskObject[7])
+
             var tmp = JSON.parse(
                 JSON.stringify(instanceObject.data[taskObject[7]])
             )
@@ -410,9 +396,7 @@ export const InteropRunTaskForm = () => {
             instance = JSON.parse(JSON.stringify(instance))
             if (taskObject[6] == 'Go.Data Location') {
                 parentChild = JSON.parse(JSON.stringify(parentChild)) //get real copy from promise
-                console.log(
-                    parentChild.length + ' pc ' + JSON.stringify(parentChild)
-                )
+
                 //reduce relationships of org units
                 const idMapping = parentChild.reduce((acc, el, i) => {
                     acc[el.location.id] = i
@@ -424,7 +408,6 @@ export const InteropRunTaskForm = () => {
                     // Handle the root element
                     if (el.location.parentLocationId === undefined) {
                         root = el
-                        console.log('root id ' + root.location.id)
                         return
                     }
                     // Use our mapping to locate the parent element in our data array
@@ -434,7 +417,6 @@ export const InteropRunTaskForm = () => {
                     parentEl.children = [...(parentEl.children || []), el]
                 })
 
-                console.log('root ' + JSON.stringify(root))
                 //send org units to the server
 
                 const json = JSON.stringify([root])
@@ -473,7 +455,6 @@ export const InteropRunTaskForm = () => {
         })
 
         const credentials = await getCredentialsFromUserDataStore()
-        console.log({ credentials })
 
         message = StatusAlertService.showSuccess(
             i18n.t('Reading task configurations - Success.')
@@ -502,7 +483,6 @@ export const InteropRunTaskForm = () => {
 
             //GET TASK DEFINITION
             const taskObject = (await dataStore.getValue('tasks'))[id].task
-            console.log({ taskObject })
             message = StatusAlertService.showSuccess(
                 i18n.t('Read Task config - Success.')
             )
@@ -590,7 +570,6 @@ export const InteropRunTaskForm = () => {
     const toggleAll = () => {
         if (!allConstantsChecked) {
             const allConstantIds = inst.map(({ id }) => id)
-            console.log({allConstantIds})
             setCheckedConstants(allConstantIds)
         } else {
             setCheckedConstants([])
@@ -601,7 +580,6 @@ export const InteropRunTaskForm = () => {
 
     const runAllTasks = () => {
         for (var y = 0; y < checkedConstants.length; y++) {
-            console.log('yofchecked ' + y)
             if (taskType === 'Go.Data Location' && y === 1) {
                 return
             }
@@ -611,19 +589,12 @@ export const InteropRunTaskForm = () => {
 
     const getTaskDone = y => {
         setOpen(false)
-        console.log('sender ' + sender)
-        console.log('receiver ' + receiver)
-        console.log('filter ' + filter)
-        console.log('payloadModel ' + payloadModel)
-        console.log('isDhis ' + isDhis)
-        console.log('taskType ' + taskType)
 
         var model = JSON.parse(JSON.stringify(payloadModel))
 
         var mappings
         const senderObject = senderData.find(x => x.id === checkedConstants[y])
         stmp = senderObject
-        console.log('stmp here: ' + JSON.stringify(stmp))
         var currentTaskType = 'Go.Data Contact' || 'Go.Data Case'
         if (taskType === currentTaskType) {
             stmp['dataElements'] = []
@@ -672,9 +643,6 @@ export const InteropRunTaskForm = () => {
                             }
                         } else {
                             i++
-                            console.log(
-                                'payloadItem ' + item.stack + '.' + property
-                            )
                             dot.str(
                                 (item.stack + '.' + property)
                                     .substr(1)
@@ -709,22 +677,16 @@ export const InteropRunTaskForm = () => {
         }
 
         //GET MAPPING MODEL
-        var dataArray = mappingModel[0].godataValue[1] // console.log('dataArray ' + JSON.stringify(dataArray))
+        var dataArray = mappingModel[0].godataValue[1]
 
-        //console.log('parentChildRelations ' + JSON.stringify(parentChildRelations))
 
         if (isDhis) {
             //IF DHIS2 IS RCEIVING END
-            let tmp = dataArray.find(x => x.godata === dotnot) //console.log(JSON.stringify(tmp))
-
+            let tmp = dataArray.find(x => x.godata === dotnot)
             if (tmp) {
                 //IF MAPPING FOUND AND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
                 // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
                 if (tmp.props.conversion === 'true') {
-                    //console.log('senderData' + senderData)
-                    console.log(
-                        'selected object ' + JSON.stringify(checkedConstants)
-                    )
                     stmp = senderData[0] //TO BE DYNAMIC
 
                     let val = dot.pick(tmp.dhis2, stmp) //IN CASE OF GO.DATA, PROPERTY IS USED FOR SEARCHING CONVERSION VALUE
@@ -736,13 +698,6 @@ export const InteropRunTaskForm = () => {
                     } else {
                         stringBoolean = val
                     }
-
-                    console.log(
-                        'false ' +
-                            JSON.stringify(tmp) +
-                            ' props.values.false ' +
-                            JSON.stringify(tmp.props.values[stringBoolean])
-                    )
 
                     if (tmp.props.values[stringBoolean]) {
                         //RETURN CONVERTED VALUE
@@ -762,22 +717,16 @@ export const InteropRunTaskForm = () => {
         } else {
             //DHIS2 IS SENDER
 
-            let tmp = dataArray.find(x => x.godata === dotnot) //console.log(JSON.stringify(tmp))
-
-            //console.log('selected object ' + JSON.stringify(checkedConstants[0]));
+            let tmp = dataArray.find(x => x.godata === dotnot) 
 
             if (tmp) {
                 //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
                 // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
-                console.log('conversion ' + tmp.props.conversion)
-
                 if (
                     tmp.props.conversion === 'true' ||
                     typeof tmp.props.conversion == 'boolean'
                 ) {
-                    //console.log('senderData' + senderData)
                     let val = dot.pick(tmp.dhis2, stmp)
-                    console.log('val ' + val)
                     //set val to string if its number
                     if (typeof val === 'number') {
                         val = val.toString()
@@ -791,20 +740,12 @@ export const InteropRunTaskForm = () => {
                         stringBoolean = val
                     } //IN CASE OF DHIS2 PROPERTY VALUE IS USED FOR SEARCHING CONVERSION VALUE
                     if (tmp.dhis2 === 'id') {
-                        console.log('existying val ' + val)
                         thisId = val
                         setExistingId(val)
                     }
-                    //console.log('false/true ' + JSON.stringify(tmp) + ' props.values.false ' + JSON.stringify(tmp.props.values))
 
                     let keys = Object.keys(tmp.props.values)
                     for (let i = 0; i < keys.length; i++) {
-                        console.log(
-                            'keys[] ' +
-                                tmp.props.values[keys[i]] +
-                                ' stbool ' +
-                                stringBoolean
-                        )
                         if (stringBoolean == tmp.props.values[keys[i]]) {
                             return keys[i]
                         }
@@ -812,7 +753,6 @@ export const InteropRunTaskForm = () => {
                     //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
                     return val
                 } else if (tmp.props.conversion === 'geo') {
-                    //console.log('dotnot geometry ' + JSON.stringify(dot.pick('geometry', stmp)))
                     const geom = dot.pick('geometry', stmp)
 
                     if (geom) {
@@ -821,12 +761,8 @@ export const InteropRunTaskForm = () => {
                             var centroidPoint = centroid(
                                 dot.pick('geometry', stmp)
                             )
-                            console.log(
-                                'centroid latitude ' +
-                                    centroidPoint.geometry.coordinates[0]
-                            )
                             var lon = centroidPoint.geometry.coordinates[0]
-                            var lat = centroidPoint.geometry.coordinates[1] //console.log('tmp.godata ' + tmp.godata)
+                            var lat = centroidPoint.geometry.coordinates[1]
                             if (Number.isNaN(centroidPoint)) {
                                 //try to get Point instead
                                 var point = dot.pick(
@@ -852,35 +788,27 @@ export const InteropRunTaskForm = () => {
                         } else if ((geom.type = 'Point')) {
                             var point = dot.pick('geometry.coordinates', stmp)
                             if (tmp.godata === 'geoLocation.lat') {
-                                console.log(point[0])
                                 return point[0]
                             } else if (tmp.godata === 'geoLocation.lng') {
-                                console.log(point[1])
                                 return point[1]
                             }
                         } else {
                             return 0
                         }
-                        console.log(JSON.stringify('geom ' + geom.type))
                     }
                     //none of tries are successful, simply return 0
                     return 0
                 } else if (tmp.props.conversion === 'delm') {
-                    console.log(
-                        'processing delm ' + stmp.enrollments[0].events.length
-                    )
                     for (
                         var i = 0;
                         i < stmp.enrollments[0].events.length;
                         i++
                     ) {
-                        //console.log('processing delm2 ' + stmp.enrollments[0].events[i].dataValues.length)
                         for (
                             var y = 0;
                             y < stmp.enrollments[0].events[i].dataValues.length;
                             y++
                         ) {
-                            //console.log('deiy ' + stmp.enrollments[0].events[i].dataValues[y].dataElement)
                             if (
                                 stmp.enrollments[0].events[i].dataValues[y]
                                     .dataElement == tmp.dhis2
@@ -892,20 +820,12 @@ export const InteropRunTaskForm = () => {
                         }
                     }
                 } else if (tmp.props.conversion === 'attr') {
-                    console.log('processing attr ' + stmp.attributes.length)
                     for (var i = 0; i < stmp.attributes.length; i++) {
                         if (stmp.attributes[i].attribute == tmp.dhis2) {
-                            console.log(
-                                'process atrr val ' +
-                                    stmp.attributes[i].value +
-                                    ' dhis ' +
-                                    tmp.dhis2
-                            )
                             return stmp.attributes[i].value
                         }
                     }
                 } else {
-                    //console.log('tmp.dhis2 ' + tmp.dhis2)
                     //nothing could help, simply return what was given
                     return tmp.dhis2
                 }
@@ -933,11 +853,9 @@ export const InteropRunTaskForm = () => {
             })
 
             if (res.status == 200) {
-                console.log('res.data.id ' + res.data.id)
                 setToken(JSON.parse(JSON.stringify(res.data.id)))
 
                 if (taskType === 'Go.Data Location') {
-                    console.log('Go.Data Location sending' + file)
                     axios({
                         method: 'post',
                         url: receiver + '?access_token=' + res.data.id,
@@ -951,7 +869,6 @@ export const InteropRunTaskForm = () => {
                     })
                         .then(function(response) {
                             //handle success
-                            console.log('ou resp success ' + response)
                             message = StatusAlertService.showSuccess(
                                 i18n.t(
                                     'Locations send and processed successfully' +
@@ -967,7 +884,6 @@ export const InteropRunTaskForm = () => {
                         })
                         .catch(function(response) {
                             //handle error
-                            console.log('ou resp failed ' + response)
                             message = StatusAlertService.showError(
                                 i18n.t(
                                     'Locations sending failed: ' +
@@ -982,7 +898,6 @@ export const InteropRunTaskForm = () => {
                             })
                         })
                 } else {
-                    console.log('payloadModel ' + JSON.stringify(payloadModel))
                     let ans = await axios({
                         method: 'POST',
                         data: payloadModel,
@@ -997,8 +912,6 @@ export const InteropRunTaskForm = () => {
                     })
 
                     if (res.status == 200) {
-                        console.log('res.data ' + JSON.stringify(ans.data))
-
                         message = StatusAlertService.showSuccess(
                             i18n.t(
                                 'Data send successfully. ' +
@@ -1015,9 +928,6 @@ export const InteropRunTaskForm = () => {
                 }
             }
         } catch (error) {
-            console.log('outer error: ' + JSON.stringify(error))
-            //console.log('error message ' + JSON.stringify(error.response.data));
-            //console.log(error.response.status);
             message = StatusAlertService.showError(
                 i18n.t(
                     'Data sending failed: ' +
