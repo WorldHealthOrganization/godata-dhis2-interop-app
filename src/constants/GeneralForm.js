@@ -1,13 +1,22 @@
-import {
+/**
+ * @file General Form
+ * @author Antoni Bergas Galmés <antoni.bergas@upc.edu>
+ * @copyright Antoni Bergas Galmés - 2022
+ * 
+ */
+
+ import {
     Button,
     ButtonStrip,
     ReactFinalForm,
+    TextArea,
     CenteredContent,
     CircularLoader,
     composeValidators,
     hasValue,
     string,
     InputField,
+    TextAreaField,
 } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useCallback } from 'react'
@@ -17,7 +26,7 @@ import * as dataStore from '../utils/dataStore.js'
 
 const { Field } = ReactFinalForm
 
-import { getCredentialsFromDataStore } from '../utils/get'
+import { getCredentialsFromUserDataStore } from '../utils/get'
 
 import axios from 'axios'
 
@@ -32,7 +41,9 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import { useReadProgramsQueryForMappings } from '.'
+import { GODATA_OUTBREAK_MODEL } from './GodataMetaModels.js'
 const { Form } = ReactFinalForm
+import { composeJSONFromGodataModel, iterate2 } from '../utils/index.js'
 
 export const GeneralForm = ({
     onCancelClick,
@@ -40,84 +51,6 @@ export const GeneralForm = ({
     initialValues,
     converterType,
 }) => {
-    const iterate = obj => {
-        var walked = []
-        var stack = [{ obj: obj, stack: '' }]
-        mappings = []
-        var i = 0
-        while (stack.length > 0) {
-            var item = stack.pop()
-            var obj = item.obj
-            for (var property in obj) {
-                if (obj.hasOwnProperty(property)) {
-                    if (typeof obj[property] == 'object') {
-                        var alreadyFound = false
-                        for (var i = 0; i < walked.length; i++) {
-                            if (walked[i] === obj[property]) {
-                                alreadyFound = true
-                                break
-                            }
-                        }
-                        if (!alreadyFound) {
-                            walked.push(obj[property])
-                            stack.push({
-                                obj: obj[property],
-                                stack: item.stack + '.' + property,
-                            })
-                        }
-                    } else {
-                        i++
-                        mappings.push({
-                            godata: (item.stack + '.' + property).substr(1),
-                            dhis2: '',
-                            props: {
-                                conversion: 'true',
-                                values: {},
-                            },
-                        })
-                    }
-                }
-                console.log('mappings length ' + mappings.length)
-                const pattern = /\.\d*\./
-                reducedGodataMappings = mappings.filter(
-                    obj => !pattern.test(String(obj.godata))
-                )
-            }
-        }
-    }
-    const iterate2 = obj => {
-        var walked = []
-        var stack = [{ obj: obj, stack: '' }]
-        dhismappings = []
-        while (stack.length > 0) {
-            var item = stack.pop()
-            var obj = item.obj
-            for (var property in obj) {
-                if (obj.hasOwnProperty(property)) {
-                    if (typeof obj[property] == 'object') {
-                        var alreadyFound = false
-                        for (var i = 0; i < walked.length; i++) {
-                            if (walked[i] === obj[property]) {
-                                alreadyFound = true
-                                break
-                            }
-                        }
-                        if (!alreadyFound) {
-                            walked.push(obj[property])
-                            stack.push({
-                                obj: obj[property],
-                                stack: item.stack + '.' + property,
-                            })
-                        }
-                    } else {
-                        dhismappings.push({
-                            dhis2: (item.stack + '.' + property).substr(1),
-                        })
-                    }
-                }
-            }
-        }
-    }
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -126,65 +59,43 @@ export const GeneralForm = ({
 
     const [nameInput, setNameInput] = useState(initialValues.displayName)
 
-    var mappings, dhismappings, reducedGodataMappings
+    var dhisMappings, reducedGodataMappings
     const [loading, setLoading] = useState(true)
 
-    const {
-        lloading,
-        data: progData,
-        lerror,
-    } = useReadProgramsQueryForMappings()
+    const { loading: loadingProgramsData, data: programs, error: error } = useReadProgramsQueryForMappings()
+
 
     const processAll = useCallback(async () => {
-        const credentials = await getCredentialsFromDataStore().catch(
-            console.error
-        )
-        const loginDetails = {
-            urlTemplate: credentials.godata.url,
-            username: credentials.godata.username,
-            password: credentials.godata.password,
-        }
-
-        const programInstance =
-            progData && progData.programs.programs.length > 0
-                ? progData.programs.programs[0]
-                : {}
-        const instanceObject = await axios({
-            method: 'POST',
-            data: {
-                email: loginDetails.username,
-                password: loginDetails.password,
-            },
-            url: `${loginDetails.urlTemplate}/api/users/login`,
+        console.log({
+            loadingProgramsData,
+            programs,
+            error,
         })
-            .then(res => {
-                return axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
-                    headers: {
-                        Authorization: res.data.id,
-                    },
-                })
-            })
-            .catch(console.error)
+        if (!loadingProgramsData) {
+            const programInstance =
+                programs && programs.programs.programs.length > 0
+                    ? programs.programs.programs[0]
+                    : {}
+            console.log({ programInstance })
+            const caseMeta = []
+            caseMeta.push([{ conversionType: 'Go.Data Outbreak' }])
+            caseMeta.push(composeJSONFromGodataModel(GODATA_OUTBREAK_MODEL))
+            setGodataValue(caseMeta)
 
-        iterate(instanceObject.data[0])
-        const caseMeta = []
-        caseMeta.push([{ conversionType: 'Go.Data Outbreak' }])
-        caseMeta.push(reducedGodataMappings)
-        setGodataValue(caseMeta)
+            dhisMappings = iterate2(programInstance)
+            setDhisValue(dhisMappings)
 
-        iterate2(programInstance)
-        setDhisValue(dhismappings)
-
-        if (!!initialValues.displayName) {
-            setGodataValue(initialValues.mapping[0].godataValue)
-            setNameInput(initialValues.displayName)
+            if (!!initialValues.displayName) {
+                setGodataValue(initialValues.mapping[0].godataValue)
+                setNameInput(initialValues.displayName)
+            }
+            setLoading(false)
         }
-        setLoading(false)
     })
 
     useEffect(() => {
         processAll()
-    }, [progData])
+    }, [loadingProgramsData])
 
     if (loading)
         return (
@@ -200,16 +111,25 @@ export const GeneralForm = ({
         : i18n.t('Add mappings')
 
     const editNode = instance => {
+        console.log(
+            JSON.stringify(
+                'inst ns ' + instance.namespace + ' name ' + instance.name
+            )
+        )
         setGodataValue(godataValue => {
-            const Obj = [...godataValue]
+            const Outbreak = [...godataValue]
             var tmp = Outbreak[1][instance.namespace[1]]
             var path = ''
             instance.namespace.shift()
             instance.namespace.shift()
             instance.namespace.forEach(element => (path = path + element + '.'))
             path = path + instance.name
+            //for(var p in instance.namespace){path+p+'.'}
+            console.log('path' + path)
             dot.str(path, instance.new_value, tmp)
-            return Obj
+
+            //tmp.dhis2 = instance.new_value
+            return Outbreak
         })
 
         return true
@@ -217,6 +137,7 @@ export const GeneralForm = ({
 
     const copyFromPopup = instance => {
         if (instance.name == 'dhis2') {
+            console.log(instance.src)
             //read and replace dhuis2 placeholder and update ui
             var ths = dot.str(
                 'dhis2',
@@ -252,14 +173,16 @@ export const GeneralForm = ({
         setOpen(false)
     }
     const addNode = () => {
-        console.log('addjsoneditor')
+        console.log('addJsoneditor')
     }
 
     const deleteNode = instance => {
+        console.log('deleteEsoneditor ' + JSON.stringify(instance.namespace))
         const wanted = godataValue[1][instance.namespace[1]]
-        const newgodata = godataValue[1].filter(item => item !== wanted)
+        console.log('wanted ' + JSON.stringify(wanted))
+        const newGodata = godataValue[1].filter(item => item !== wanted)
         let Outbreak = [...godataValue]
-        Outbreak[1] = newgodata
+        Outbreak[1] = newGodata
         setGodataValue(Outbreak)
 
         return true
@@ -268,20 +191,12 @@ export const GeneralForm = ({
     const onNameInput = ev => {
         setNameInput(ev)
     }
-    const onDhisModelInput = ev => {
-        setDhisModelInput(ev)
-    }
-    const onGodataModelInput = ev => {
-        setGodataModelInput(ev)
-    }
 
     //console.log(nameInput)
     const saveConstant = async godataValue => {
         const allValues = []
         allValues.push(godataValue)
-
-        console.log({ initialValues })
-        if (initialValues.name) {
+        if (initialValues.displayName) {
             var id = initialValues.id
             await dataStore.editById('mappings', id, {
                 displayName: nameInput,
@@ -316,23 +231,18 @@ export const GeneralForm = ({
                         <Field
                             required
                             name="name"
+                            //value=''
+                            //component={InputFieldFF}
                             render={() => (
                                 <InputField
                                     id="name"
                                     label={i18n.t('Name')}
-                                    className=""
                                     type="text"
                                     value={nameInput}
-                                    //component={InputField}
                                     onChange={ev => onNameInput(ev.value)}
-                                    validate={composeValidators(
-                                        string,
-                                        hasValue
-                                    )}
                                     required
                                 />
                             )}
-                            validate={composeValidators(string, hasValue)}
                         />
                     </FormRow>
 
@@ -379,3 +289,19 @@ export const GeneralForm = ({
         </Form>
     )
 }
+
+OutbreaksForm.defaultProps = {
+    initialValues: {
+        parameters: [],
+    },
+    converterType: '',
+}
+
+OutbreaksForm.propTypes = {
+    onCancelClick: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    initialValues: PropTypes.object,
+    converterType: PropTypes.string,
+}
+
+

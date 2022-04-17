@@ -63,7 +63,7 @@ export const InteropForm = ({
     const [senderEndpointInput, setSenderEndpointInput] = useState('')
     const [receiverEndpointInput, setReceiverEndpointInput] = useState('')
     const [senderParamsInput, setSenderParamsInput] = useState('')
-    const [payloadInput, setPayloadInput] = useState({})
+    const [payloadInput, setPayloadInput] = useState(undefined)
     const [dhisReceiver, setDhisReceiver] = useState(false)
 
     const [converters, setConverters] = useState([])
@@ -96,9 +96,6 @@ export const InteropForm = ({
     const loading = loadingReadConstants || loadingData || laodingConf
     const error = errorReadConstants || loadError || confError
 
-    const [addTaskConstant] = useCreateTaskConstantMutation()
-    const [saveTaskConstant] = useUpdateTaskConstantMutation()
-
     const processAll = useCallback(async () => {
         const programInstance =
             progData && progData.programs.programs.length > 0
@@ -120,8 +117,6 @@ export const InteropForm = ({
         )
 
         if (initialValues && initialValues.name != 'undefined') {
-            console.log('initialValues called ' + initialValues.name)
-            console.log(initialValues)
             setNameInput(initialValues.displayName)
 
             setSenderEndpointInput(initialValues.task[0])
@@ -144,7 +139,7 @@ export const InteropForm = ({
         processAll()
     }, [data, progData, convt])
 
-    if (loading) {
+    if (loading || (!!initialValues && !payloadInput)) {
         return (
             <>
                 <CenteredContent>
@@ -400,7 +395,6 @@ export const InteropForm = ({
                     ) : (
                         <></>
                     )}
-
                     <FormRow>
                         <Editor
                             mode="text"

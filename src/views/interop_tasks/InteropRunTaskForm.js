@@ -156,8 +156,7 @@ export const InteropRunTaskForm = () => {
             'json Collection Name': taskObject[7],
         })
         setMappingModel(mappingObject)
-        setTask(taskObject[6]) //const mappingJson =
-
+        setTask(taskObject[6])
         if (isDhis) {
             message = StatusAlertService.showInfo(
                 i18n.t('DHIS2 is receiving endpoint.')
@@ -659,7 +658,9 @@ export const InteropRunTaskForm = () => {
         }
 
         if (!taskType != 'Go.Data Location') {
+            console.log({pre: payloadModel})
             iterate(payloadModel)
+            console.log({post: payloadModel})
         }
 
         //SEND PAYLOAD TO RECIEVER
@@ -898,6 +899,7 @@ export const InteropRunTaskForm = () => {
                             })
                         })
                 } else {
+                    console.log({payloadModel})
                     let ans = await axios({
                         method: 'POST',
                         data: payloadModel,

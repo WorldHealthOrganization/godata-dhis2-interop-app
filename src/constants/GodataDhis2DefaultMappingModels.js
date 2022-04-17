@@ -4,158 +4,384 @@ export const GODATA_DHIS_OUTBREAK_MODEL = [
             [{ conversionType: 'Go.Data Outbreak' }],
             [
                 {
-                    godata: 'name',
                     dhis2: 'name',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'name',
                 },
                 {
-                    godata: 'startDate',
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'description',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'disease',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'countries[0].id',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'locationIds[0]',
+                },
+                {
                     dhis2: 'created',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'startDate',
                 },
                 {
-                    godata: 'longPeriodsBetweenCaseOnset',
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'endDate',
+                },
+                {
                     dhis2: '12',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'longPeriodsBetweenCaseOnset',
                 },
                 {
-                    godata: 'periodOfFollowup',
                     dhis2: '14',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'periodOfFollowup',
                 },
                 {
-                    godata: 'frequencyOfFollowUp',
                     dhis2: '2',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'frequencyOfFollowUp',
                 },
                 {
-                    godata: 'frequencyOfFollowUpPerDay',
                     dhis2: '1',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'frequencyOfFollowUpPerDay',
                 },
                 {
+                    dhis2: 'true',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
                     godata: 'generateFollowUpsOverwriteExisting',
-                    dhis2: 'true',
-                    props: { conversion: 'false', values: {} },
                 },
                 {
+                    dhis2: 'true',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
                     godata: 'generateFollowUpsKeepTeamAssignment',
-                    dhis2: 'true',
-                    props: { conversion: 'false', values: {} },
                 },
                 {
-                    godata: 'generateFollowUpsTeamAssignmentAlgorithm',
                     dhis2:
                         'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'generateFollowUpsTeamAssignmentAlgorithm',
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'generateFollowUpsDateOfLastContact',
+                },
+                {
                     dhis2: '',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'intervalOfFollowUp',
                 },
                 {
-                    godata: 'noDaysAmongContacts',
-                    dhis2: '5',
-                    props: { conversion: 'false', values: {} },
-                },
-                {
-                    godata: 'noDaysInChains',
-                    dhis2: '1',
-                    props: { conversion: 'false', values: {} },
-                },
-                {
-                    godata: 'noDaysNotSeen',
-                    dhis2: '0',
-                    props: { conversion: 'false', values: {} },
-                },
-                {
-                    godata: 'noLessContacts',
                     dhis2: '2',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'noDaysAmongContacts',
                 },
                 {
+                    dhis2: '1',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'noDaysInChains',
+                },
+                {
+                    dhis2: '0',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'noDaysNotSeen',
+                },
+                {
+                    dhis2: '0',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'noLessContacts',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'noDaysNewContacts',
-                    dhis2: '',
-                    props: { conversion: 'true', values: {} },
                 },
                 {
-                    godata: 'caseIdMask',
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'fieldsToDisplayNode[0]',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'caseInvestigationTemplate',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'contactInvestigationTemplate',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'contactFollowUpTemplate',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'labResultsTemplate',
+                },
+                {
                     dhis2: '5555555555',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'caseIdMask',
                 },
                 {
-                    godata: 'contactIdMask',
                     dhis2: '44444444444444',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'contactIdMask',
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'arcGisServers[0].name',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'arcGisServers[0].url',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'arcGisServers[0].type',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'arcGisServers[0].styleUrl',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'arcGisServers[0].styleUrlSource',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'reportingGeographicalLevelId',
-                    dhis2: '',
-                    props: { conversion: 'true', values: {} },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'isContactLabResultsActive',
-                    dhis2: '',
-                    props: { conversion: 'true', values: {} },
                 },
                 {
-                    godata: 'contactOfContactIdMask',
                     dhis2: '111111111111111',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'contactOfContactIdMask',
                 },
                 {
+                    dhis2: 'true',
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
                     godata: 'isContactsOfContactsActive',
-                    dhis2: 'true',
-                    props: { conversion: 'false', values: {} },
                 },
                 {
-                    godata: 'isDateOfOnsetRequired',
                     dhis2: 'no',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'isDateOfOnsetRequired',
                 },
                 {
-                    godata: 'applyGeographicRestrictions',
                     dhis2: 'true',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'false',
+                    },
+                    godata: 'applyGeographicRestrictions',
                 },
                 {
-                    godata: 'id',
                     dhis2: 'id',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'id',
                 },
                 {
+                    dhis2: 'created',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'createdAt',
-                    dhis2: 'created',
-                    props: { conversion: 'true', values: {} },
                 },
                 {
-                    godata: 'createdBy',
                     dhis2: 'createdBy.name',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'createdBy',
                 },
                 {
-                    godata: 'updatedAt',
                     dhis2: 'lastUpdated',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'updatedAt',
                 },
                 {
-                    godata: 'updatedBy',
                     dhis2: 'lastUpdatedBy.displayName',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'updatedBy',
                 },
                 {
-                    godata: 'createdOn',
                     dhis2: 'created',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'createdOn',
                 },
                 {
-                    godata: 'deleted',
                     dhis2: 'skipOffline',
                     props: {
+                        values: {
+                            true: 'yes',
+                            false: 'no',
+                        },
                         conversion: 'true',
-                        values: { true: 'yes', fasle: 'no', false: 'no' },
                     },
+                    godata: 'deleted',
+                },
+                {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
+                    godata: 'deletedAt',
                 },
             ],
         ],
@@ -171,22 +397,74 @@ export const GODATA_DHIS_LOCATION_MODEL = [
                 {
                     godata: 'name',
                     dhis2: 'name',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
+                },
+                {
+                    godata: 'synonyms[0]',
+                    dhis2: 'displayFormName',
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
+                },
+                {
+                    godata: 'identifiers[0].code',
+                    dhis2: 'code',
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
+                },
+                {
+                    godata: 'identifiers[0].description',
+                    dhis2: 'displayFormName',
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'active',
                     dhis2: 'true',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'populationDensity',
                     dhis2: '0',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'parentLocationId',
                     dhis2: 'parent.id',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
+                },
+                {
+                    godata: 'geoLocation.lat',
+                    dhis2: 'geometry.type',
+                    props: {
+                        conversion: 'geo',
+                        values: {},
+                    },
+                },
+                {
+                    godata: 'geoLocation.lng',
+                    dhis2: 'geometry.type',
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'geographicalLevelId',
@@ -194,78 +472,77 @@ export const GODATA_DHIS_LOCATION_MODEL = [
                     props: {
                         conversion: 'true',
                         values: {
-                            'Admin Level 1': '2',
-                            'Admin Level 0': '1',
-                            'Admin Level 2': '3',
-                            'Admin Level 3': '4',
-                            'Admin Level 4': '5',
+                            "Admin Level 0": "1",
+                            "Admin Level 1": "2",
+                            "Admin Level 2": "3",
+                            "Admin Level 3": "4",
+                            "Admin Level 4": "5"
                         },
                     },
                 },
                 {
                     godata: 'id',
                     dhis2: 'id',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'createdAt',
                     dhis2: 'openingDate',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'createdBy',
                     dhis2: 'system',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'updatedAt',
                     dhis2: 'lastUpdated',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'updatedBy',
                     dhis2: 'system',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'createdOn',
                     dhis2: 'created',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'true',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'deleted',
                     dhis2: 'false',
-                    props: { conversion: 'false', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
                 {
                     godata: 'deletedAt',
                     dhis2: '',
-                    props: { conversion: 'false', values: {} },
-                },
-                {
-                    godata: 'geoLocation.lat',
-                    dhis2: 'geometry.type',
-                    props: { conversion: 'geo', values: {} },
-                },
-                {
-                    godata: 'geoLocation.lng',
-                    dhis2: 'geometry.type',
-                    props: { conversion: 'geo', values: {} },
-                },
-                {
-                    godata: 'identifiers.0.code',
-                    dhis2: 'code',
-                    props: { conversion: 'true', values: {} },
-                },
-                {
-                    godata: 'identifiers.0.description',
-                    dhis2: 'displayFormName',
-                    props: { conversion: 'true', values: {} },
-                },
-                {
-                    godata: 'synonyms.0',
-                    dhis2: 'displayFormName',
-                    props: { conversion: 'true', values: {} },
+                    props: {
+                        conversion: 'false',
+                        values: {},
+                    },
                 },
             ],
         ],

@@ -5,3 +5,5 @@ src/locales
 build
 cypress.env.json
 cypress/screenshots
+.vscode
+yarn-error.log

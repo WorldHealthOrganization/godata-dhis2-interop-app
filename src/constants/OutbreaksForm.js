@@ -34,7 +34,9 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import { useReadProgramsQueryForMappings } from '.'
+import { GODATA_OUTBREAK_MODEL } from './GodataMetaModels.js'
 const { Form } = ReactFinalForm
+import { composeJSONFromGodataModel, iterate2 } from '../utils/index.js'
 
 export const OutbreaksForm = ({
     onCancelClick,
@@ -42,85 +44,6 @@ export const OutbreaksForm = ({
     initialValues,
     converterType,
 }) => {
-    const iterate = obj => {
-        var walked = []
-        var stack = [{ obj: obj, stack: '' }]
-        mappings = []
-        var i = 0
-        while (stack.length > 0) {
-            var item = stack.pop()
-            var obj = item.obj
-            for (var property in obj) {
-                if (obj.hasOwnProperty(property)) {
-                    if (typeof obj[property] == 'object') {
-                        var alreadyFound = false
-                        for (var i = 0; i < walked.length; i++) {
-                            if (walked[i] === obj[property]) {
-                                alreadyFound = true
-                                break
-                            }
-                        }
-                        if (!alreadyFound) {
-                            walked.push(obj[property])
-                            stack.push({
-                                obj: obj[property],
-                                stack: item.stack + '.' + property,
-                            })
-                        }
-                    } else {
-                        i++
-                        mappings.push({
-                            godata: (item.stack + '.' + property).substr(1),
-                            dhis2: '',
-                            props: {
-                                conversion: 'true',
-                                values: {},
-                            },
-                        })
-                    }
-                }
-                console.log('mappings length ' + mappings.length)
-                const pattern = /\.\d*\./
-                reducedGodataMappings = mappings.filter(
-                    obj => !pattern.test(String(obj.godata))
-                )
-            }
-        }
-    }
-    const iterate2 = obj => {
-        var walked = []
-        var stack = [{ obj: obj, stack: '' }]
-        dhismappings = []
-        while (stack.length > 0) {
-            var item = stack.pop()
-            var obj = item.obj
-            for (var property in obj) {
-                if (obj.hasOwnProperty(property)) {
-                    if (typeof obj[property] == 'object') {
-                        var alreadyFound = false
-                        for (var i = 0; i < walked.length; i++) {
-                            if (walked[i] === obj[property]) {
-                                alreadyFound = true
-                                break
-                            }
-                        }
-                        if (!alreadyFound) {
-                            walked.push(obj[property])
-                            stack.push({
-                                obj: obj[property],
-                                stack: item.stack + '.' + property,
-                            })
-                        }
-                    } else {
-                        dhismappings.push({
-                            dhis2: (item.stack + '.' + property).substr(1),
-                        })
-                    }
-                }
-            }
-        }
-        console.log('dhis2 mappings length ' + dhismappings.length)
-    }
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -129,62 +52,35 @@ export const OutbreaksForm = ({
 
     const [nameInput, setNameInput] = useState(initialValues.displayName)
 
-
-    var mappings, dhismappings, reducedGodataMappings
+    var dhisMappings
     const [loading, setLoading] = useState(true)
 
-    const {
-        lloading,
-        data: progData,
-        lerror,
-    } = useReadProgramsQueryForMappings()
+    const { loading: loadingProgramsData, data: programs, error: error } = useReadProgramsQueryForMappings()
+
 
     const processAll = useCallback(async () => {
-        const credentials = await getCredentialsFromUserDataStore().catch(
-            console.error
-        )
-        const loginDetails = {
-            urlTemplate: credentials.godata.url,
-            username: credentials.godata.username,
-            password: credentials.godata.password,
-        }
-
-        const programInstance =
-            progData && progData.programs.programs.length > 0
-                ? progData.programs.programs[0]
-                : {}
-        const instanceObject = await axios({
-            method: 'POST',
-            data: {
-                email: loginDetails.username,
-                password: loginDetails.password,
-            },
-            url: `${loginDetails.urlTemplate}/api/users/login`,
+        console.log({
+            loadingProgramsData,
+            programs,
+            error,
         })
-            .then(res => {
-                console.log(res.data.id)
-                return axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
-                    headers: {
-                        Authorization: res.data.id,
-                    },
-                })
-            })
-            .catch(console.error)
-        if (!!instanceObject) {
-            iterate(instanceObject.data[0])
+        if (!loadingProgramsData) {
+            const programInstance =
+                programs && programs.programs.programs.length > 0
+                    ? programs.programs.programs[0]
+                    : {}
+            console.log({ programInstance })
             const caseMeta = []
             caseMeta.push([{ conversionType: 'Go.Data Outbreak' }])
-            caseMeta.push(reducedGodataMappings)
+            caseMeta.push(composeJSONFromGodataModel(GODATA_OUTBREAK_MODEL))
             setGodataValue(caseMeta)
 
-            iterate2(programInstance)
-            setDhisValue(dhismappings)
+            dhisMappings = iterate2(programInstance)
+            setDhisValue(dhisMappings)
 
             if (!!initialValues.displayName) {
-                console.log({ initialValues })
                 setGodataValue(initialValues.mapping[0].godataValue)
                 setNameInput(initialValues.displayName)
-
             }
             setLoading(false)
         }
@@ -192,7 +88,7 @@ export const OutbreaksForm = ({
 
     useEffect(() => {
         processAll()
-    }, [progData])
+    }, [loadingProgramsData])
 
     if (loading)
         return (
@@ -270,16 +166,16 @@ export const OutbreaksForm = ({
         setOpen(false)
     }
     const addNode = () => {
-        console.log('addjsoneditor')
+        console.log('addJsoneditor')
     }
 
     const deleteNode = instance => {
-        console.log('deletejsoneditor ' + JSON.stringify(instance.namespace))
+        console.log('deleteEsoneditor ' + JSON.stringify(instance.namespace))
         const wanted = godataValue[1][instance.namespace[1]]
         console.log('wanted ' + JSON.stringify(wanted))
-        const newgodata = godataValue[1].filter(item => item !== wanted)
+        const newGodata = godataValue[1].filter(item => item !== wanted)
         let Outbreak = [...godataValue]
-        Outbreak[1] = newgodata
+        Outbreak[1] = newGodata
         setGodataValue(Outbreak)
 
         return true
@@ -334,19 +230,12 @@ export const OutbreaksForm = ({
                                 <InputField
                                     id="name"
                                     label={i18n.t('Name')}
-                                    className=""
                                     type="text"
                                     value={nameInput}
-                                    //component={InputField}
                                     onChange={ev => onNameInput(ev.value)}
-                                    validate={composeValidators(
-                                        string,
-                                        hasValue
-                                    )}
                                     required
                                 />
                             )}
-                            validate={composeValidators(string, hasValue)}
                         />
                     </FormRow>
 
