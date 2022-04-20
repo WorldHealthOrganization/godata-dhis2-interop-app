@@ -66,12 +66,12 @@ In the mapping editor we must assign a name to our mapping, and we can add, modi
 
 A modified version of figure 4 can be consulted in the right. There, the different items have been highlighted to illustrate the structure of the mapping. Note that only a fraction of the mapping is shown.
 
-The first item (labeled as 0, highlighted green) inside of the "Outbreak" element specifies the type of conversion we are performing. In the example in figure 4, the type "Go.Data Location" is specified. 
+The first item (labeled as 0, highlighted green) inside of the "Outbreak" element specifies the type of conversion we are performing. In the example in figure 4, the type "Go.Data Outbreak" is specified. 
 
-The second item (labeled as 1, highlighted in orange) contains a series of items with the elements that we want to convert/map between DHIS2 and Go.Data. For each of these items we want to convert (like the two items highlighted in yellow), we first specify the entity's name in Go.Data, then we specify the entity's name in DHIS2, and lastly we specify some properties (or "props") regarding this conversion.
+The second item (labeled as 1, highlighted in orange) contains a series of items with the elements that we want to convert/map between DHIS2 and Go.Data. For each of these items we want to convert (like the two items highlighted in yellow), we have three elements: "godata", "dhis", and "props". Let's start explaining the last. 
 
 #### The "props" element
-Inside of the "props" element of each item, we can have two elements. The element "conversion" can be set to values "true" or "false" to tell the app if we need or not to convert this element, respectively. In some cases, "conversion" can be other than those two values to signal that we do want a conversion, but a conversion of a specific type. Sometimes, conversions require a more complex procedure, such as geographical conversions (DHIS2 and Go.Data use different geometries to represent). In these cases, a specific conversion can be set: in the case of geographical conversion, we set "conversion" to "geo".
+Inside of the "props" element of each item, we can have two keys: "conversion" and "values". The element "conversion" can be set to values "true" or "false" to tell the app if we need or not to convert this element, respectively. In some cases, "conversion" can be other than "true" if we want a conversion that includes a transformation over the data. For example, when we want to share locations between DHIS2 and Go.Data, a geographical conversion can be specified by setting "conversion" to "geo". The app will perform a transformation over the geometries, since DHIS2 and Go.Data use different geometries to represent orgUnits/locations. 
 
 <img
   align="right"
@@ -83,6 +83,12 @@ Besides "conversion", inside of the "props" element we can also set a series of 
 
 In the example in the right, we can see how when we map DHIS2's "level" to Go.Data's "geographicalLevelId", we need to map the element's names but also some of the values inside: while the root of the organization unit is labeled "1" in DHIS2, the same concept in Go.Data is labeled "Admin Level 0". By entering those values in the "values" element, we are telling the app to map the different "level" names  and not only the "level" element label.
 
+#### The "godata" and "dhis" elements
+Depending on whether the "conversion" element is set to true or false, these elements can behave in two different ways. 
+
+When we have a data column that is equivalent in both DHIS2 and Go.Data, we set conversion to "true". Then, both "godata" and "dhis" should be set to the names of the columns in each of the instances that we want to convert. In the example in Figure 4, we would be converting the DHIS2 column "name" to a Go.Data column named "name". 
+
+Sometimes we will not have a column that is equivalent in both systems. In those cases we set "conversion" to "false", which allows us to 'hard-code' a default value for this column. When we set "conversion" to false, the receiving endpoint's element (currently only "godata") should contain the name of the column that we want to 'hard-code' a value for, and the sending endpoint's element (currently only "dhis") should contain the default value that we want to assign to the column in the receiving endpoint. 
 
 ## Interoperability Tasks
 The Interoperability Tasks section is dedicated for managing the integration tasks. Tasks are composed of “name”, “conversionType”, “senderAPIEndpoint”, “receiverAPIEndpoint”, “converter”, “referenceModel”, “senderAPIParams” and “sender” elements. 
