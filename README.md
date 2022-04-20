@@ -1,4 +1,4 @@
-# DHIS2-Go.Data Interoperability App <img src="assets/godata-dhis2-icon.png" align="right" height="260"/>
+# DHIS2-Go.Data Interoperability App 
 Documentation site here: [https://worldhealthorganization.github.io/godata-dhis2-interop-app/](https://worldhealthorganization.github.io/godata-dhis2-interop-app/)
 
 ## Overview
