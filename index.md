@@ -4,66 +4,93 @@
 
 
 # Introduction
-The Go.Data-DHIS2 Interoperability App enables metadata to be securely exchanged between [Go.Data](https://www.who.int/tools/godata) (an outbreak response tool developed by WHO) and [DHIS2](https://dhis2.org/) (a widely used system for national health information management developed by the University of Oslo). This includes bi-directional exchange of reference medadata used across both platforms (i.e. location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). Such an integration enables field teams to make use of additional visualizations for chains of transmission and contact tracing follow up in Go.Data during an acute outbreak scenario while ensuring key field intel gets reflected back into overarching DHIS2 system. 
+The Go.Data-DHIS2 Interoperability App enables metadata to be securely exchanged between [Go.Data](https://www.who.int/tools/godata) (an outbreak response tool developed by WHO) and [DHIS2](https://dhis2.org/) (a widely used system for national health information management developed by the University of Oslo). This includes bi-directional exchange of reference metadata used across both platforms (i.e. location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). Such an integration enables field teams to make use of additional visualizations for chains of transmission and contact tracing follow up in Go.Data during an acute outbreak scenario while ensuring key field intel gets reflected back into overarching DHIS2 system. 
 
 # Requirements
 ## Which  are the minimum IT requirements for the app to be installed / worked?
-This app requires installation of the DHIS2 software and the Go.Data software (see version requirements above). 
+The app requires one functioning instance of DHIS2 one of Go.Data from which to exchange data.
 
 ## What  versions of Go.Data and DHIS2 is it compatible with?
-The current app is compatible with Go.Data V40.1 and above [testing to be performed for lower versions], and compatible with DHIS2 version 2.34 and above.
+The current app is compatible with Go.Data V40.1 and above (testing to be performed for lower versions), and compatible with DHIS2 versions 2.34 and above.
 
 ## What DHIS2  modules is it compatible with?
-The current app is compatible with DHIS2 Tracker and Event Capture, across all types of Program Attributes and Data Elements.
+The current app is compatible with the DHIS2 Tracker and Event Capture modules, across all types of Program Attributes and Data Elements.
 
 # Installation 
 ## How do I install the app?
-Until the app is made available on the DHIS2 App Hub, you can download the .zip file directly from the WHO Github here: https://github.com/WorldHealthOrganization/godata-dhis2-interop-app
+Until the app is made available on the DHIS2 App Hub, you can download the GitHub's repository .zip file directly from [WHO Github](https://github.com/WorldHealthOrganization/godata-dhis2-interop-app)'s page for the interoperability app. Then, a .zip file containing the app needs to be built using [Yarn](https://yarnpkg.com/). 
 
-Then, go to the App Management app in your DHIS2 instance and upload the .zip file.
+After building and locating the zip, go to the App Management app in your DHIS2 instance and upload the .zip file.
 
-# Configuration
+# App functionality
 ## What are the main functionalities within the app?
-The app module consists of four main menu options to navigate and a main pane for performing and viewing various actions within the module.
+The app module consists of a main menu from which we can navigate to the four panels of the app where we can set our configuration and perform various actions.
 
-![Imagen1](https://user-images.githubusercontent.com/91990504/156535570-6dc5450e-e2ae-4153-9b78-9e920c6fecfa.png)
-*Figure 1. View of module menu system*
+![Screenshot_MainMenu](https://user-images.githubusercontent.com/91990504/161969701-ba9f8cf0-6f08-4cb0-963f-7154113b39b6.png)
+*__Figure 1__. View of the main menu with the four different panels.*
 
-1. **Go.Data Server Configuration menu**: used for configuring the connection to the Go.Data server with which you want to exchange data.
-2. **Metadata Configuration menu**: used to create, modify, or delete metadata mappings. For all mappings and throughout subsequent system development, dot notation is used (a way of accessing JSON objects of any depth).
-3. **Interoperability Tasks menu**: used to add and manage tasks for data exchange across platforms.
-4. **Scheduled Task menu**: used to set up and run scheduled tasks at given intervals.
+1. **Go.Data Configuration panel**: used to configure the connection to the Go.Data server with which you want to exchange data with. The user's Go.Data credentials need to be introduced here.
+2. **DHIS2 Configuration panel**: used to configure the connection to the DHIS2 server. By default, the URL placeholder '../../..' refers to the same server from which we are working, although we could potentially connect to other servers. The user's DHIS credentials need to be introduced here for the app to work.   
+3. **Metadata Mapping panel**: used to create, modify, or delete metadata mappings. For all mappings, and throughout subsequent system development, dot notation is used (a way of accessing JSON objects of any depth).
+4. **Interoperability Tasks panel**: used to add and manage tasks for data exchange across platforms.
+
 
 ## Does the app enable bi-directional data exchange?
-No, at present, data exchange is moving only from DHIS2 to Go.Data. However, this additional functionality will be incorporated into subsequent versions soon.
- 
-## What is the basic infrastructure of the app?
-At present, the entirety of the app configuration is within the “constant” table within the DHIS2 PostgreSQL database. This “constant” table has few columns, and most are designed for storing numeric value. However, the description column is of type “text” and can hold large amount of textual data. Here, the all objects used by module are stored stringified js object notation (JSON) and arrays. 
+No, at present data exchange is only from DHIS2 to Go.Data. However, two-way data exchange will be incorporated into subsequent versions soon.
 
-![Imagen2](https://user-images.githubusercontent.com/91990504/156534998-300c0095-616b-4d6c-aeb5-3abc02cf75d3.png)
-*Figure 2. "constant" table of DHIS2 showing "description" column*
+# Configuring the app
+The app configuration should only need to be done once, at installation time, by your DHIS2 administrator. The person configuring the mapping should be aware of use-cases and metadata collected by both DHIS2 and Go.Data.
 
-This approach provides significant flexibility while retaining a little overhead for validating objects on and from database read/writes. In this way, “description” column of table “constant” of DHIS2 becomes the “nano mongo DB”.  
+Besides the connections to the Go.Data and DHIS2 instances, the app requires the configuration of two types of elements: Metadata Mappings, and Interoperability Tasks
 
-In the same table, the column “value” was then used to group different object types. For example, value -1000000 is used for configuring Go.Data instance, -1000001 used for mapping of Go.Data metadata with DHIS2 metadata, -1000002 is used for creating tasks. Columns “name” and “shortName” are used for naming created entities. 
+## Metadata Mapping
+### Mapping Overview
+In the Metadata Mapping section's overview screen, we can add, edit, and delete metadata mappings.
 
-Of note,  this infrastructure will be soon moved to Data Store, which was introduced by DHIS2 development team for storing of configuration of a single app and accessible by users, which may be more desirable from an ongoing maintenance perspective.
+Metadata Mappings represent the associations between DHIS2 and Go.Data entities, and they are used by the app to map the data elements from one software to the other. The mappings are built using JSON, a human-readable data format that uses key-value pairs and nested structures. This mapping is necessary because the schemas of DHIS2 and Go.Data can be similar, but not fully equivalent. For example, a DHIS2 "organization unit" is called a "Location" in Go.Data. 
 
-## How does the app configuration work?
-The app configuration should only need to be done once, at the outset, by your DHIS2 administrator. The person configuring the mapping should be aware of use-cases and metadata collected by both DHIS2 and Go.Data.
+![MetadataMappingOverview](https://user-images.githubusercontent.com/91990504/161981359-96d753bc-43e0-4bc7-924d-72a2bf01ded8.png)
+*__Figure 3__. Metadata Mapping overview screen.*
 
-### Metadata Configuration
-The Metadata configuration section is built with slightly modified version of React JSON Viewer to enable flexible matting of metadata across the platforms regardless of metadata configuration. 
+We can load two built-in default mappings by clicking on the 'Load default config' button: one mapping for geographical metadata (Location Mapping), and one for outbreak metadata (Outbreak Mapping). Those two mappings can be seen in figure 3.
 
-![Imagen3](https://user-images.githubusercontent.com/91990504/156535193-cad7db65-a8cc-46c0-8cff-01a1612dad1b.png)
-*Figure 3. Mapping screen*
+### Mapping Editor
 
-Pair values JSON are presented with commands. Each command in this editor has specific role of select/add/delete/edit. Select button opens modal with DHIS2 instance of the corresponding Go.Data object instance. While user selects corresponding DHIS2 attribute, it will be linked to pair elements of intermediary JSON object. 
+When we add or or edit a mapping, the mapping editor is opened.  The mapping editor is built using a slightly modified version of React's JSON Viewer, and it enables flexible matching of metadata across the two platforms.
 
-**If there are cases of Go.Data metadata where no corresponding DHIS2 metadata available**, the user can simply add the required value by typing it in. In the example of Outbreak, element “caseIdMask” does not have corresponding DHIS2 element. In this case, user adds “9999999” as value for the “caseIDMask”. There are two types of values: byValue and byReference. ByValue instances simple read DHIS2 “dhis2” element value and byReference reads dot notation from “dhis2” and reads the value from actual object passing dot notation. Result is placed for new instance element. 
+![MetadataMappingEditor](https://user-images.githubusercontent.com/91990504/161988280-67a42c60-124e-4988-bafb-7e84e7d68ceb.png)
+*__Figure 4__. Mapping editor with the default Location mapping open.*
 
-### Scheduled Tasks
-The Scheduled Tasks section is dedicated for managing the integration tasks. Tasks are composed of “name”, “conversionType”, “senderAPIEndpoint”, “receiverAPIEndpoint”, “converter”, “referenceModel”, “senderAPIParams” and “sender” elements. 
+In the mapping editor we must assign a name to our mapping, and we can add, modify, and delete elements in the mapping by hovering the mouse over the different elements and clicking on the buttons that appear, as can be seen in figure 4.
+
+<img
+  align="right"
+  width="278"
+  height="412"
+  src="https://user-images.githubusercontent.com/91990504/161992124-215878ae-5ddd-4b07-832e-78df9efb19b4.png">
+
+A modified version of figure 4 can be consulted in the right. There, the different items have been highlighted to illustrate the structure of the mapping. Note that only a fraction of the mapping is shown.
+
+The first item (labeled as 0, highlighted green) inside of the "Outbreak" element specifies the type of conversion we are performing. In the example in figure 4, the type "Go.Data Location" is specified. 
+
+The second item (labeled as 1, highlighted in orange) contains a series of items with the elements that we want to convert/map between DHIS2 and Go.Data. For each of these items we want to convert (like the two items highlighted in yellow), we first specify the entity's name in Go.Data, then we specify the entity's name in DHIS2, and lastly we specify some properties (or "props") regarding this conversion.
+
+#### The "props" element
+Inside of the "props" element of each item, we can have two elements. The element "conversion" can be set to values "true" or "false" to tell the app if we need or not to convert this element, respectively. In some cases, "conversion" can be other than those two values to signal that we do want a conversion, but a conversion of a specific type. Sometimes, conversions require a more complex procedure, such as geographical conversions (DHIS2 and Go.Data use different geometries to represent). In these cases, a specific conversion can be set: in the case of geographical conversion, we set "conversion" to "geo".
+
+<img
+  align="right"
+  width="278"
+  height="246"
+  src="https://user-images.githubusercontent.com/91990504/161996588-31672078-3f97-4f60-8291-2b2ff611485c.png">
+
+Besides "conversion", inside of the "props" element we can also set a series of values under the "values" element. By doing this, we are not only mapping the names of the two softwares' schemas, but also modifying some of the values inside that schema. 
+
+In the example in the right, we can see how when we map DHIS2's "level" to Go.Data's "geographicalLevelId", we need to map the element's names but also some of the values inside: while the root of the organization unit is labeled "1" in DHIS2, the same concept in Go.Data is labeled "Admin Level 0". By entering those values in the "values" element, we are telling the app to map the different "level" names  and not only the "level" element label.
+
+
+## Interoperability Tasks
+The Interoperability Tasks section is dedicated for managing the integration tasks. Tasks are composed of “name”, “conversionType”, “senderAPIEndpoint”, “receiverAPIEndpoint”, “converter”, “referenceModel”, “senderAPIParams” and “sender” elements. 
 
 ![Imagen4](https://user-images.githubusercontent.com/91990504/156535781-73d73b27-4d04-4bec-9418-7561c4da982e.png)
 *Figure 4. Tasks screen*
@@ -77,7 +104,10 @@ The Scheduled Tasks section is dedicated for managing the integration tasks. Tas
 - “senderAPIParams” – parameters to be send to sender endpoint, filters=created.eq.”25/11/2021”&paging=false
 - “sender” – determines which instance is sender (true – DHIS2, false – Go.Data)
 
+????? Will have to explain this better! How to get stuff from the api using the link and going from resources. 
 
+
+# FAQ
 ## Is it possible to add new variables to be migrated between DIHS2 and Go.Data?
 …..
 
@@ -94,9 +124,6 @@ Not yet implemented, but will be incorporated into subsequent versions.
 
 ## Approximately what volume of case/contact records would this work well for?
 More testing is needed, but only limitation would be on side of browser and server capacity side.
-
-
-
 
 
 
