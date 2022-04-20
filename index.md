@@ -105,7 +105,7 @@ The Interoperability Tasks section is dedicated for managing the integration tas
 - “senderAPIParams” – parameters to be send to sender endpoint, filters=created.eq.”25/11/2021”&paging=false
 - “sender” – determines which instance is sender (true – DHIS2, false – Go.Data)
 
-????? Will have to explain this better! How to get stuff from the api using the link and going from resources. 
+
 
 
 # FAQ
