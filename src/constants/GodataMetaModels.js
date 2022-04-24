@@ -58,6 +58,121 @@ export const GODATA_OUTBREAK_MODEL = {
     deletedAt: '2022-04-17T08:25:05.194Z',
 }
 
+export const GODATA_CASE_MODEL = {
+    firstName: 'string',
+    gender: 'string',
+    isDateOfOnsetApproximate: true,
+    wasContact: false,
+    outcomeId: 'string',
+    safeBurial: false,
+    burialPlaceName: 'string',
+    burialLocationId: 'string',
+    classification: 'string',
+    riskLevel: 'string',
+    riskReason: 'string',
+    transferRefused: false,
+    questionnaireAnswers: {},
+    questionnaireAnswersContact: {},
+    vaccinesReceived: [
+        {
+            vaccine: 'string',
+            date: '2022-04-18T08:21:40.912Z',
+            status: 'string',
+        },
+    ],
+    pregnancyStatus: 'string',
+    id: 'string',
+    outbreakId: 'string',
+    visualId: 'string',
+    middleName: 'string',
+    lastName: 'string',
+    dob: '2022-04-18T08:21:40.912Z',
+    age: {
+        years: 0,
+        months: 0,
+    },
+    occupation: 'string',
+    documents: [
+        {
+            type: 'string',
+            number: 'string',
+        },
+    ],
+    addresses: [
+        {
+            typeId:
+                'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
+            country: 'string',
+            city: 'string',
+            addressLine1: 'string',
+            postalCode: 'string',
+            locationId: 'string',
+            geoLocation: {
+                lat: 0,
+                lng: 0,
+            },
+            geoLocationAccurate: false,
+            date: '2022-04-18T08:21:40.912Z',
+            phoneNumber: 'string',
+            emailAddress: 'string',
+        },
+    ],
+    dateOfReporting: '2022-04-18T08:21:40.912Z',
+    isDateOfReportingApproximate: false,
+    dateOfLastContact: '2022-04-18T08:21:40.912Z',
+    dateOfInfection: '2022-04-18T08:21:40.912Z',
+    dateOfOnset: '2022-04-18T08:21:40.912Z',
+    dateBecomeCase: '2022-04-18T08:21:40.912Z',
+    dateRanges: [
+        {
+            typeId: 'string',
+            centerName: 'string',
+            locationId: 'string',
+            comments: 'string',
+            startDate: '2022-04-18T08:21:40.912Z',
+            endDate: '2022-04-18T08:21:40.912Z',
+        },
+    ],
+    classificationHistory: [
+        {
+            classification: 'string',
+            startDate: '2022-04-18T08:21:40.912Z',
+            endDate: '2022-04-18T08:21:40.912Z',
+        },
+    ],
+    dateOfOutcome: '2022-04-18T08:21:40.912Z',
+    dateOfBurial: '2022-04-18T08:21:40.912Z',
+    followUpTeamId: 'string',
+    deletedByParent: 'string',
+    hasRelationships: false,
+    relationshipsRepresentation: [
+        {
+            id: 'string',
+            active: true,
+            otherParticipantType: 'string',
+            otherParticipantId: 'string',
+            target: true,
+            source: true,
+        },
+    ],
+    numberOfExposures: 0,
+    numberOfContacts: 0,
+    notDuplicatesIds: ['string'],
+    usualPlaceOfResidenceLocationId: 'string',
+    duplicateKeys: {
+        name: ['string'],
+        document: ['string'],
+    },
+    responsibleUserId: 'string',
+    createdAt: '2022-04-18T08:21:40.912Z',
+    createdBy: 'string',
+    updatedAt: '2022-04-18T08:21:40.912Z',
+    updatedBy: 'string',
+    createdOn: 'string',
+    deleted: false,
+    deletedAt: '2022-04-18T08:21:40.912Z',
+}
+
 export const GODATA_CONTACT_MODEL = [
     {
         contact: {

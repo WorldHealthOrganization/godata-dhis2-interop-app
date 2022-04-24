@@ -44,6 +44,8 @@ export const LocationsForm = ({
     initialValues,
     converterType,
 }) => {
+    const JSON_TITLE = 'Location'
+    const CONVERSION_TYPE = 'Go.Data Location'
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -71,7 +73,7 @@ export const LocationsForm = ({
                     : {}
             console.log({ programInstance })
             const caseMeta = []
-            caseMeta.push([{ conversionType: 'Go.Data Location' }])
+            caseMeta.push([{ conversionType: CONVERSION_TYPE }])
             caseMeta.push(composeJSONFromGodataModel(GODATA_LOCATION_MODEL))
             setGodataValue(caseMeta)
 
@@ -248,7 +250,7 @@ export const LocationsForm = ({
                                 onDelete={deleteNode}
                                 enableClipboard={selectedNode}
                                 theme="apathy:inverted"
-                                name={'Location'}
+                                name={JSON_TITLE}
                                 displayArrayKey={true}
                             />
                         </div>

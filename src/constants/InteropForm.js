@@ -13,14 +13,13 @@ import {
     hasValue,
     string,
     InputField,
+    TextArea,
+    Label,
 } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useCallback, useParams } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {
-    useReadMappingConfigConstantsQueryForConfig,
-    useReadProgramsQueryForMappings,
-} from '.'
+import { useConfig } from '@dhis2/app-runtime'
 import { INTEROP_LIST_PATH } from '../views'
 import {
     GODATA_OUTBREAK,
@@ -32,17 +31,10 @@ import {
 
 const { Field } = ReactFinalForm
 
-import axios from 'axios'
-
 import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 import 'react-responsive-modal/styles.css'
 
-import {
-    useReadMappingConfigConstantsQueryForMappings,
-    useCreateTaskConstantMutation,
-    useUpdateTaskConstantMutation,
-} from '.'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
@@ -58,6 +50,7 @@ export const InteropForm = ({
     taskId,
 }) => {
     const history = useHistory()
+    const { baseUrl } = useConfig()
 
     const [nameInput, setNameInput] = useState('')
     const [senderEndpointInput, setSenderEndpointInput] = useState('')
@@ -65,6 +58,7 @@ export const InteropForm = ({
     const [senderParamsInput, setSenderParamsInput] = useState('')
     const [payloadInput, setPayloadInput] = useState(undefined)
     const [dhisReceiver, setDhisReceiver] = useState(false)
+    const [description, setDescription] = useState('')
 
     const [converters, setConverters] = useState([])
     const [converter, setConverter] = useState(0)
@@ -73,40 +67,9 @@ export const InteropForm = ({
 
     const [jsonCollectionName, setJsonCollectionName] = useState('')
 
-    var instanceObject
-
-    const {
-        loading: loadingReadConstants,
-        data: convt,
-        error: errorReadConstants,
-    } = useReadMappingConfigConstantsQueryForMappings()
-
-    const {
-        loading: loadingData,
-        data: progData,
-        error: loadError,
-    } = useReadProgramsQueryForMappings()
-
-    const {
-        loading: laodingConf,
-        data: data,
-        error: confError,
-    } = useReadMappingConfigConstantsQueryForConfig()
-
-    const loading = loadingReadConstants || loadingData || laodingConf
-    const error = errorReadConstants || loadError || confError
-
     const processAll = useCallback(async () => {
-        const programInstance =
-            progData && progData.programs.programs.length > 0
-                ? progData.programs.programs[0]
-                : {}
         // console.log('programInstance ' + JSON.stringify(programInstance))
 
-        const convts =
-            convt && convt.constants.constants.length > 0
-                ? convt.constants.constants
-                : []
         const mappings = await dataStore.getValue('mappings')
 
         setConverters(
@@ -118,7 +81,6 @@ export const InteropForm = ({
 
         if (initialValues && initialValues.name != 'undefined') {
             setNameInput(initialValues.displayName)
-
             setSenderEndpointInput(initialValues.task[0])
             setReceiverEndpointInput(initialValues.task[1])
             setSenderParamsInput(initialValues.task[2])
@@ -127,35 +89,20 @@ export const InteropForm = ({
             setConverter(initialValues.task[5])
             setTaskType(initialValues.task[6])
             setJsonCollectionName(initialValues.task[7])
+            setDescription(initialValues.task[8])
         }
     })
 
     useEffect(() => {
-        const convts =
-            convt && convt.constants.constants.length > 0
-                ? convt.constants.constants
-                : []
-        console.log({ convts })
         processAll()
-    }, [data, progData, convt])
+    }, [])
 
-    if (loading || (!!initialValues && !payloadInput)) {
+    if (!!initialValues && !payloadInput) {
         return (
             <>
                 <CenteredContent>
                     <CircularLoader />
                 </CenteredContent>
-            </>
-        )
-    }
-    if (error) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
             </>
         )
     }
@@ -167,6 +114,7 @@ export const InteropForm = ({
     const onNameInput = ev => {
         setNameInput(ev)
     }
+
     const onSenderEndpointInput = ev => {
         setSenderEndpointInput(ev)
     }
@@ -202,6 +150,7 @@ export const InteropForm = ({
         allValues.push(converter)
         allValues.push(taskType)
         allValues.push(jsonCollectionName)
+        allValues.push(description)
         console.log('===============================')
         console.log({
             displayName: nameInput,
@@ -234,7 +183,6 @@ export const InteropForm = ({
                     <PageSubHeadline>{i18n.t('Task setup')}</PageSubHeadline>
 
                     <FormRow>
-                        {console.log({ taskType })}
                         <SingleSelectField
                             label={i18n.t('Type')}
                             onChange={({ selected }) =>
@@ -293,6 +241,27 @@ export const InteropForm = ({
                             )}
                         />
                     </FormRow>
+                    <FormRow>
+                        <Label>Description</Label>
+
+                        <Field
+                            name="description"
+                            render={() => (
+                                <TextArea
+                                    id="description"
+                                    label="Description"
+                                    type="text"
+                                    value={description}
+                                    onChange={ev => setDescription(ev.value)}
+                                    required
+                                    validate={composeValidators(
+                                        string,
+                                        hasValue
+                                    )}
+                                />
+                            )}
+                        />
+                    </FormRow>
 
                     <FormRow>
                         <Field
@@ -300,10 +269,10 @@ export const InteropForm = ({
                             render={() => (
                                 <InputField
                                     id="senderendpoint"
-                                    label={i18n.t('Sender API endpoint')}
+                                    label={"DHIS2 endpoint pathname"}
                                     className=""
                                     type="text"
-                                    helpText="Fully qualified URL of sender API endpoint (e.g. https://somesite.org/api/somevalues)"
+                                    helpText="Pathname of the URL of sender API endpoint (e.g. if https://somesite.org/api/somevalues -> /api/somevalues)"
                                     value={senderEndpointInput}
                                     onChange={ev =>
                                         onSenderEndpointInput(ev.value)
@@ -398,7 +367,7 @@ export const InteropForm = ({
                     <FormRow>
                         <Editor
                             mode="text"
-                            value={payloadInput}
+                            value={!!payloadInput ? payloadInput : {}}
                             onChange={ev => onPayloadInput(ev)}
                         />
                     </FormRow>
@@ -422,7 +391,7 @@ export const InteropForm = ({
                         />
                     </FormRow>
 
-                    <FormRow>
+                    {/* <FormRow>
                         <Field
                             name="dhisReceiver"
                             label={i18n.t('DHIS2 Receiving End')}
@@ -444,7 +413,7 @@ export const InteropForm = ({
                                 />
                             )}
                         />
-                    </FormRow>
+                    </FormRow> */}
 
                     <ButtonStrip>
                         <Button primary onClick={() => saveConstant()}>

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-17T23:01:09.539Z\n"
-"PO-Revision-Date: 2022-04-17T23:01:09.539Z\n"
+"POT-Creation-Date: 2022-04-24T15:44:07.473Z\n"
+"PO-Revision-Date: 2022-04-24T15:44:07.473Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -81,9 +81,6 @@ msgid "Add task"
 msgstr ""
 
 msgid "Task setup"
-msgstr ""
-
-msgid "Sender API endpoint"
 msgstr ""
 
 msgid "Sender json object\"s collection name"

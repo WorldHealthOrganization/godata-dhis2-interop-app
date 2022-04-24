@@ -16,6 +16,7 @@ import {
 } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
 import React, { useState, useEffect, useCallback } from 'react'
+import { useConfig } from '@dhis2/app-runtime'
 
 import axios from 'axios'
 
@@ -44,6 +45,7 @@ import * as dataStore from '../../utils/dataStore.js'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
+    const { baseUrl } = useConfig()
     const { id } = useParams()
 
     const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -146,7 +148,7 @@ export const InteropRunTaskForm = () => {
         setJsonCollectionName(taskObject[7])
         console.log('TASK OBJECT SET:')
         console.log({
-            'Sender API': taskObject[0],
+            'Sender API': new URL(taskObject[0], baseUrl).href,
             'Receiver API': taskObject[1],
             'Sender API filters': taskObject[2],
             'Sender API payload model': taskObject[3],
@@ -200,16 +202,19 @@ export const InteropRunTaskForm = () => {
                 message,
             }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
 
-            instanceObject = await axios.get(taskObject[0] + taskObject[2], {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods':
-                        'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                    'Content-Type': 'application/json',
-                    crossDomain: true,
-                    Authorization: loginObject.data.id,
-                },
-            })
+            instanceObject = await axios.get(
+                new URL(taskObject[0], baseUrl).href.href + taskObject[2],
+                {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods':
+                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                        'Content-Type': 'application/json',
+                        crossDomain: true,
+                        Authorization: loginObject.data.id,
+                    },
+                }
+            )
             message = StatusAlertService.showSuccess(
                 i18n.t('Reading sender data - Success.')
             )
@@ -248,19 +253,22 @@ export const InteropRunTaskForm = () => {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
 
-                instanceIds = await axios.get(endpoints[0] + filters[0], {
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        Authorization: createAuthenticationHeader(
-                            credentials.dhis.username,
-                            credentials.dhis.password
-                        ),
-                        'Access-Control-Allow-Methods':
-                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                        'Content-Type': 'application/json',
-                        crossDomain: true,
-                    },
-                })
+                instanceIds = await axios.get(
+                    new URL(endpoints[0], baseUrl).href + filters[0],
+                    {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                            Authorization: createAuthenticationHeader(
+                                credentials.dhis.username,
+                                credentials.dhis.password
+                            ),
+                            'Access-Control-Allow-Methods':
+                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                            'Content-Type': 'application/json',
+                            crossDomain: true,
+                        },
+                    }
+                )
                 var fromPromise = []
                 for (let x = 0; x < instanceIds.data.rows.length; x++) {
                     fromPromise.push(instanceIds.data.rows[x][0])
@@ -296,7 +304,7 @@ export const InteropRunTaskForm = () => {
                 }
             } else {
                 instanceObject = await axios.get(
-                    taskObject[0] + taskObject[2],
+                    new URL(taskObject[0], baseUrl).href + taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -658,9 +666,9 @@ export const InteropRunTaskForm = () => {
         }
 
         if (!taskType != 'Go.Data Location') {
-            console.log({pre: payloadModel})
+            console.log({ pre: payloadModel })
             iterate(payloadModel)
-            console.log({post: payloadModel})
+            console.log({ post: payloadModel })
         }
 
         //SEND PAYLOAD TO RECIEVER
@@ -679,7 +687,6 @@ export const InteropRunTaskForm = () => {
 
         //GET MAPPING MODEL
         var dataArray = mappingModel[0].godataValue[1]
-
 
         if (isDhis) {
             //IF DHIS2 IS RCEIVING END
@@ -718,7 +725,7 @@ export const InteropRunTaskForm = () => {
         } else {
             //DHIS2 IS SENDER
 
-            let tmp = dataArray.find(x => x.godata === dotnot) 
+            let tmp = dataArray.find(x => x.godata === dotnot)
 
             if (tmp) {
                 //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
@@ -899,7 +906,7 @@ export const InteropRunTaskForm = () => {
                             })
                         })
                 } else {
-                    console.log({payloadModel})
+                    console.log({ payloadModel })
                     let ans = await axios({
                         method: 'POST',
                         data: payloadModel,

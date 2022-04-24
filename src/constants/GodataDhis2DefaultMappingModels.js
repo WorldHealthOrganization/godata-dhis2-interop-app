@@ -551,7 +551,7 @@ export const GODATA_DHIS_LOCATION_MODEL = [
     {},
 ]
 export const GODATA_DHIS_OUTBREAK_TASK = [
-    'http://localhost:8080/dhis/api/32/programs',
+    '/api/32/programs',
     'https://godata-r12.who.int/api/outbreaks',
     '?paging=false&fields=*',
     {
@@ -613,9 +613,10 @@ export const GODATA_DHIS_OUTBREAK_TASK = [
     1,
     'Go.Data Outbreak',
     'programs',
+    'Transference of locations from DHIS to Go.Data instance after selecting the desired value to be sent.'
 ]
 export const GODATA_DHIS_LOCATION_TASK = [
-    'http://localhost:8080/dhis/api/organisationUnits.json',
+    '/api/organisationUnits.json',
     'https://localhost:8000/api/locations/import',
     '?paging=false&fields=*,geography&?order=level:asc',
     {
@@ -640,4 +641,5 @@ export const GODATA_DHIS_LOCATION_TASK = [
     0,
     'Go.Data Location',
     'organisationUnits',
+    'Transference of locations from DHIS to Go.Data instance after selecting the desired value to be sent.'
 ]

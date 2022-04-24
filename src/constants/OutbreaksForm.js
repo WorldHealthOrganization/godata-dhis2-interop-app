@@ -44,6 +44,8 @@ export const OutbreaksForm = ({
     initialValues,
     converterType,
 }) => {
+    const JSON_TITLE = 'Outbreak'
+    const CONVERSION_TYPE = 'Go.Data Outbreak'
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -71,7 +73,7 @@ export const OutbreaksForm = ({
                     : {}
             console.log({ programInstance })
             const caseMeta = []
-            caseMeta.push([{ conversionType: 'Go.Data Outbreak' }])
+            caseMeta.push([{ conversionType: CONVERSION_TYPE }])
             caseMeta.push(composeJSONFromGodataModel(GODATA_OUTBREAK_MODEL))
             setGodataValue(caseMeta)
 
@@ -248,7 +250,7 @@ export const OutbreaksForm = ({
                                 onDelete={deleteNode}
                                 enableClipboard={selectedNode}
                                 theme="apathy:inverted"
-                                name={'Outbreak'}
+                                name={JSON_TITLE}
                                 displayArrayKey={true}
                             />
                         </div>
