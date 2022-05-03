@@ -552,7 +552,7 @@ export const GODATA_DHIS_LOCATION_MODEL = [
 ]
 export const GODATA_DHIS_OUTBREAK_TASK = [
     '/api/32/programs',
-    'https://godata-r12.who.int/api/outbreaks',
+    '/api/outbreaks',
     '?paging=false&fields=*',
     {
         name: 'string',
@@ -617,7 +617,7 @@ export const GODATA_DHIS_OUTBREAK_TASK = [
 ]
 export const GODATA_DHIS_LOCATION_TASK = [
     '/api/organisationUnits.json',
-    'https://localhost:8000/api/locations/import',
+    '/api/locations/import',
     '?paging=false&fields=*,geography&?order=level:asc',
     {
         name: 'string',

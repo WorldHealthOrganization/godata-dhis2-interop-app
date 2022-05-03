@@ -19,7 +19,6 @@ import {
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useCallback, useParams } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import { useConfig } from '@dhis2/app-runtime'
 import { INTEROP_LIST_PATH } from '../views'
 import {
     GODATA_OUTBREAK,
@@ -50,7 +49,6 @@ export const InteropForm = ({
     taskId,
 }) => {
     const history = useHistory()
-    const { baseUrl } = useConfig()
 
     const [nameInput, setNameInput] = useState('')
     const [senderEndpointInput, setSenderEndpointInput] = useState('')

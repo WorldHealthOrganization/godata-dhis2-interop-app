@@ -45,11 +45,11 @@ import * as dataStore from '../../utils/dataStore.js'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
-    const { baseUrl } = useConfig()
     const { id } = useParams()
 
     const [showCancelDialog, setShowCancelDialog] = useState(false)
-
+    const [dhisBaseUrl, setDhisBaseUrl] = useState("")
+    const [godataBaseUrl, setGodataBaseUrl] = useState("")
     const onCancelClick = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
 
@@ -140,7 +140,8 @@ export const InteropRunTaskForm = () => {
         }
 
         setSender(taskObject[0])
-        setReceiver(taskObject[1])
+        const urlString = new URL(taskObject[1], credentials.godata.url).href
+        setReceiver(urlString)
         setFilter(taskObject[2])
         setPayloadModel(taskObject[3])
         setIsDhis(taskObject[4])
@@ -148,7 +149,7 @@ export const InteropRunTaskForm = () => {
         setJsonCollectionName(taskObject[7])
         console.log('TASK OBJECT SET:')
         console.log({
-            'Sender API': new URL(taskObject[0], baseUrl).href,
+            'Sender API': new URL(taskObject[0], credentials.dhis.url).href,
             'Receiver API': taskObject[1],
             'Sender API filters': taskObject[2],
             'Sender API payload model': taskObject[3],
@@ -203,7 +204,7 @@ export const InteropRunTaskForm = () => {
             }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
 
             instanceObject = await axios.get(
-                new URL(taskObject[0], baseUrl).href.href + taskObject[2],
+                new URL(taskObject[0], credentials.dhis.url).href + taskObject[2],
                 {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
@@ -254,7 +255,7 @@ export const InteropRunTaskForm = () => {
                 var filters = taskObject[2].split(' ')
 
                 instanceIds = await axios.get(
-                    new URL(endpoints[0], baseUrl).href + filters[0],
+                    new URL(endpoints[0], credentials.dhis.url).href + filters[0],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -304,7 +305,7 @@ export const InteropRunTaskForm = () => {
                 }
             } else {
                 instanceObject = await axios.get(
-                    new URL(taskObject[0], baseUrl).href + taskObject[2],
+                    new URL(taskObject[0], credentials.dhis.url).href + taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -463,6 +464,8 @@ export const InteropRunTaskForm = () => {
 
         const credentials = await getCredentialsFromUserDataStore()
 
+        setDhisBaseUrl(credentials.dhis.url)
+        setGodataBaseUrl(credentials.godata.url)
         message = StatusAlertService.showSuccess(
             i18n.t('Reading task configurations - Success.')
         )

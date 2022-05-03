@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-24T15:44:07.473Z\n"
-"PO-Revision-Date: 2022-04-24T15:44:07.473Z\n"
+"POT-Creation-Date: 2022-05-03T21:35:44.741Z\n"
+"PO-Revision-Date: 2022-05-03T21:35:44.741Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -17,13 +17,19 @@ msgstr ""
 msgid "Yes, cancel"
 msgstr ""
 
+msgid "Something went wrong whilst loading gateways"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
 msgid "Save mappings"
 msgstr ""
 
 msgid "Add mappings"
 msgstr ""
 
-msgid "Outbreaks mappings setup"
+msgid "Cases mappings setup"
 msgstr ""
 
 msgid "Name"
@@ -33,12 +39,6 @@ msgid "Cancel"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Edit"
-msgstr ""
-
-msgid "Something went wrong whilst loading gateways"
 msgstr ""
 
 msgid "Contacts mappings setup"
@@ -72,6 +72,9 @@ msgid "Url template"
 msgstr ""
 
 msgid "User name"
+msgstr ""
+
+msgid "Outbreaks mappings setup"
 msgstr ""
 
 msgid "Save task"
