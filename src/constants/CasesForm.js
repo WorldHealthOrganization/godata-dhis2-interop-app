@@ -2,26 +2,23 @@ import {
     Button,
     ButtonStrip,
     ReactFinalForm,
-    TextArea,
     CenteredContent,
     CircularLoader,
     composeValidators,
     hasValue,
     string,
     InputField,
-    TextAreaField,
 } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
+import {
+    useReadMappingConfigConstantsQueryForConfig,
+    useReadProgramsWithStagesQueryForMappings,
+} from '.'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
-import * as dataStore from '../utils/dataStore.js'
-import * as userDataStore from '../utils/userDataStore.js'
-
 
 const { Field } = ReactFinalForm
-
-import { getCredentialsFromUserDataStore } from '../utils/get'
 
 import axios from 'axios'
 
@@ -35,7 +32,9 @@ import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
-import { useReadProgramsQueryForMappings } from '.'
+import { getCredentialsFromUserDataStore } from '../utils/get'
+
+
 const { Form } = ReactFinalForm
 
 export const CasesForm = ({
@@ -44,7 +43,7 @@ export const CasesForm = ({
     initialValues,
     converterType,
 }) => {
-    const iterate = obj => {
+    function iterate(obj) {
         var walked = []
         var stack = [{ obj: obj, stack: '' }]
         mappings = []
@@ -81,12 +80,11 @@ export const CasesForm = ({
                         })
                     }
                 }
-                //  console.log('mappings length ' + mappings.length)
             }
         }
     }
 
-    const iterate2 = obj => {
+    function iterate2(obj) {
         var walked = []
         var stack = [{ obj: obj, stack: '' }]
         dhismappings = []
@@ -111,16 +109,69 @@ export const CasesForm = ({
                             })
                         }
                     } else {
-                        dhismappings.push({
-                            dhis2: (item.stack + '.' + property).substr(1),
-                        })
+                        const pattern = /\.\d*\./
+                        if (!pattern.test(item.stack + '.' + property)) {
+                            dhismappings.push({
+                                dhis2: (item.stack + '.' + property).substr(1),
+                                description:
+                                    dot.pick(
+                                        (item.stack + '.' + property).substr(1),
+                                        obj
+                                    ) === undefined
+                                        ? JSON.stringify(obj)
+                                        : dot.pick(
+                                              (
+                                                  item.stack +
+                                                  '.' +
+                                                  property
+                                              ).substr(1),
+                                              obj
+                                          ),
+                            })
+                        } else {
+                            if (property === 'id') {
+                                if (item.stack.includes('dataElement')) {
+                                    dhismappings.push({
+                                        dhis2: 'delm ' + obj.id,
+                                        'description: name': obj.name,
+                                        conversion: 'delm',
+                                    })
+                                } else if (
+                                    item.stack.includes(
+                                        'trackedEntityAttribute'
+                                    )
+                                ) {
+                                    dhismappings.push({
+                                        dhis2: 'attr ' + obj.id,
+                                        'description: name': obj.name,
+                                        conversion: 'attr',
+                                    })
+                                } else {
+                                    dhismappings.push({
+                                        dhis2: 'stage ' + obj.id,
+                                        'description: name': obj.name,
+                                        conversion: 'stage',
+                                    })
+                                }
+                            } else {
+                                dhismappings.push({
+                                    dhis2: (item.stack + '.' + property).substr(
+                                        1
+                                    ),
+                                    description: obj.name,
+                                })
+                            }
+                        }
                         //mappings.set(item.stack + '.' + property , 'to be other stuff');
-                        //console.log(item.stack + '.' + property /*+ "=" + obj[property]*/);
+                        //console.log('item.stack ' + item.stack + ' .property  ' + property /*+ "=" + obj[property]*/);
                     }
                 }
             }
         }
-        console.log('dhis2 mappings length ' + dhismappings.length)
+        const pattern = /\.\d*\./
+        reducedDhisMappings = dhismappings.filter(
+            obj => !pattern.test(String(obj.dhis2))
+        )
     }
     const history = useHistory()
     const [open, setOpen] = useState(false)
@@ -128,31 +179,37 @@ export const CasesForm = ({
     const [dhisValue, setDhisValue] = useState({})
     const [godataValue, setGodataValue] = useState([])
 
-    const [nameInput, setNameInput] = useState(initialValues.displayName)
+    const [nameInput, setNameInput] = useState('')
 
-    var mappings, dhismappings
-    const [loading, setLoading] = useState(true)
+    var mappings, dhismappings, reducedDhisMappings
 
     const {
         lloading,
         data: progData,
         lerror,
-    } = useReadProgramsQueryForMappings()
+    } = useReadProgramsWithStagesQueryForMappings()
+
+    const {
+        loading,
+        data,
+        error,
+    } = useReadMappingConfigConstantsQueryForConfig()
 
     const processAll = useCallback(async () => {
         const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
         )
+        console.log({credentials})
         const loginDetails = {
             urlTemplate: credentials.godata.url,
             username: credentials.godata.username,
             password: credentials.godata.password,
         }
-
         const programInstance =
             progData && progData.programs.programs.length > 0
                 ? progData.programs.programs[0]
                 : {}
+
         const outbreakObject = await axios({
             method: 'POST',
             data: {
@@ -161,18 +218,18 @@ export const CasesForm = ({
             },
             url: `${loginDetails.urlTemplate}/api/users/login`,
         })
-            .then(res => {
-                console.log(res.data.id)
-                return axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
+            .then(res => 
+                axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
                     headers: {
                         Authorization: res.data.id,
                     },
                 })
-            })
+            )
             .catch(console.error)
 
         if (!!outbreakObject) {
             const outBreakId = outbreakObject.data[0].id
+    
             const instanceObject = await axios
                 .post(loginDetails.urlTemplate + '/api/users/login', {
                     email: loginDetails.username,
@@ -190,34 +247,28 @@ export const CasesForm = ({
                             },
                         }
                     )
-                ).catch(console.error)
-            if (!!instanceObject) {
-                iterate(instanceObject.data[0])
-                const caseMeta = []
-                caseMeta.push([{ conversionType: 'Go.Data Case' }])
-                caseMeta.push(mappings)
-                setGodataValue(caseMeta)
-
-                iterate2(programInstance)
-                setDhisValue(dhismappings)
-
-                if (!!initialValues.displayName) {
-                    console.log({ initialValues })
-                    setGodataValue(initialValues.mapping[0].godataValue)
-                    setNameInput(initialValues.displayName)
-                    setGodataModelInput(initialValues[1])
-                    setDhisModelInput(initialValues[2])
-                }
-                setLoading(false)
+                )
+            iterate(instanceObject.data[0])
+            const caseMeta = []
+            caseMeta.push([{ conversionType: 'Go.Data Case' }])
+            caseMeta.push(mappings)
+            setGodataValue(caseMeta)
+    
+            iterate2(programInstance)
+            setDhisValue(reducedDhisMappings)
+    
+            if (!!initialValues.name) {
+                setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
+                setNameInput(initialValues.name)
             }
         }
     })
 
     useEffect(() => {
         processAll()
-    }, [progData])
+    }, [data, progData])
 
-    if (loading)
+    if (loading) {
         return (
             <>
                 <CenteredContent>
@@ -225,8 +276,41 @@ export const CasesForm = ({
                 </CenteredContent>
             </>
         )
+    }
+    if (error) {
+        const msg = i18n.t('Something went wrong whilst loading gateways')
+        return (
+            <>
+                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+                <NoticeBox error title={msg}>
+                    {loadError.message}
+                </NoticeBox>
+            </>
+        )
+    }
 
-    const submitText = initialValues.displayName
+    if (lloading) {
+        return (
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
+    }
+    if (lerror) {
+        const msg = i18n.t('Something went wrong whilst loading gateways')
+        return (
+            <>
+                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
+                <NoticeBox error title={msg}>
+                    {loadError.message}
+                </NoticeBox>
+            </>
+        )
+    }
+
+    const submitText = initialValues.name
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
@@ -239,6 +323,7 @@ export const CasesForm = ({
         setGodataValue(godataValue => {
             const Outbreak = [...godataValue]
             var tmp = Outbreak[1][instance.namespace[1]]
+            console.log('tmp' + JSON.stringify(tmp))
             var path = ''
             instance.namespace.shift()
             instance.namespace.shift()
@@ -257,12 +342,32 @@ export const CasesForm = ({
 
     const copyFromPopup = instance => {
         if (instance.name == 'dhis2') {
-            console.log(instance.src)
-            //read and replace dhuis2 placeholder and update ui
-            var ths = dot.str(
-                'dhis2',
-                instance.src,
-                godataValue[1][valueHolder[2]]
+            console.log('instance src ' + instance.src)
+            //split instance src as it holds combovalue
+            const values = instance.src.split(' ')
+            var ths = ''
+            if (values.length === 2) {
+                console.log('val0 ' + values[0] + ' val1 ' + values[1])
+                //read and replace dhis2 placeholder and update ui
+                ths = dot.str(
+                    'props.conversion',
+                    values[0],
+                    godataValue[1][valueHolder[2]]
+                )
+                ths = dot.str('dhis2', values[1], ths)
+            } else {
+                ths = dot.str(
+                    'dhis2',
+                    instance.src,
+                    godataValue[1][valueHolder[2]]
+                )
+            }
+
+            console.log(
+                'instance ' +
+                    JSON.stringify(instance) +
+                    ' str ths: ' +
+                    JSON.stringify(ths)
             )
             setGodataValue(godataValue => {
                 const Outbreak = [...godataValue]
@@ -312,7 +417,6 @@ export const CasesForm = ({
         setNameInput(ev)
     }
 
-    //console.log(nameInput)
     const saveConstant = async godataValue => {
         const allValues = []
         allValues.push(godataValue)
@@ -344,7 +448,7 @@ export const CasesForm = ({
                     data-test={dataTest('gateways-gatewaygenericform')}
                 >
                     <PageSubHeadline>
-                        {i18n.t('Outbreaks mappings setup')}
+                        {i18n.t('Cases mappings setup')}
                     </PageSubHeadline>
 
                     <FormRow>
@@ -395,7 +499,7 @@ export const CasesForm = ({
                                 src={dhisValue}
                                 enableClipboard={copyFromPopup}
                                 theme="apathy:inverted"
-                                name={'Program'}
+                                name={'Entity'}
                                 displayArrayKey={true}
                             />
                         </div>
