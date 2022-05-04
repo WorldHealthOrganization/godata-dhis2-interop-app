@@ -113,6 +113,11 @@ export const OutbreaksForm = ({
 
     const copyFromPopup = instance => {
         if (instance.name == 'dhis2') {
+            var ths = dot.str(
+                'dhis2',
+                instance.src,
+                godataValue[1][valueHolder[2]]
+            )
             setGodataValue(godataValue => {
                 const Outbreak = [...godataValue]
                 Outbreak[1][valueHolder[2]] = ths

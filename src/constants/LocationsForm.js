@@ -16,6 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import * as dataStore from '../utils/dataStore.js'
+import { useParams } from "react-router-dom"
 
 const { Field } = ReactFinalForm
 
@@ -44,6 +45,9 @@ export const LocationsForm = ({
     initialValues,
     converterType,
 }) => {
+    
+    const params = useParams();
+
     const JSON_TITLE = 'Location'
     const CONVERSION_TYPE = 'Go.Data Location'
     const history = useHistory()
@@ -106,27 +110,7 @@ export const LocationsForm = ({
         : i18n.t('Add mappings')
 
     const editNode = instance => {
-        console.log(
-            JSON.stringify(
-                'inst ns ' + instance.namespace + ' name ' + instance.name
-            )
-        )
-        setGodataValue(godataValue => {
-            const Outbreak = [...godataValue]
-            var tmp = Outbreak[1][instance.namespace[1]]
-            var path = ''
-            instance.namespace.shift()
-            instance.namespace.shift()
-            instance.namespace.forEach(element => (path = path + element + '.'))
-            path = path + instance.name
-            //for(var p in instance.namespace){path+p+'.'}
-            console.log('path' + path)
-            dot.str(path, instance.new_value, tmp)
-
-            //tmp.dhis2 = instance.new_value
-            return Outbreak
-        })
-
+        setGodataValue(instance.updated_src)
         return true
     }
 
@@ -188,12 +172,11 @@ export const LocationsForm = ({
     }
 
     //console.log(nameInput)
-    const saveConstant = async godataValue => {
+    const saveConstant = async () => {
         const allValues = []
         allValues.push(godataValue)
         if (initialValues.displayName) {
-            var id = initialValues.id
-            await dataStore.editById('mappings', id, {
+            await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
                 mapping: allValues,
             })
