@@ -16,7 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import * as dataStore from '../utils/dataStore.js'
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom'
 const { Field } = ReactFinalForm
 
 import { getCredentialsFromUserDataStore } from '../utils/get'
@@ -44,7 +44,7 @@ export const OutbreaksForm = ({
     initialValues,
     converterType,
 }) => {
-    const params = useParams();
+    const params = useParams()
     const JSON_TITLE = 'Outbreak'
     const CONVERSION_TYPE = 'Go.Data Outbreak'
     const history = useHistory()
@@ -58,8 +58,11 @@ export const OutbreaksForm = ({
     var dhisMappings
     const [loading, setLoading] = useState(true)
 
-    const { loading: loadingProgramsData, data: programs, error: error } = useReadProgramsQueryForMappings()
-
+    const {
+        loading: loadingProgramsData,
+        data: programs,
+        error: error,
+    } = useReadProgramsQueryForMappings()
 
     const processAll = useCallback(async () => {
         console.log({
@@ -72,7 +75,6 @@ export const OutbreaksForm = ({
                 programs && programs.programs.programs.length > 0
                     ? programs.programs.programs[0]
                     : {}
-            console.log({ programInstance })
             const caseMeta = []
             caseMeta.push([{ conversionType: CONVERSION_TYPE }])
             caseMeta.push(composeJSONFromGodataModel(GODATA_OUTBREAK_MODEL))
@@ -82,6 +84,7 @@ export const OutbreaksForm = ({
             setDhisValue(dhisMappings)
 
             if (!!initialValues.displayName) {
+                console.log(initialValues.mapping)
                 setGodataValue(initialValues.mapping[0].godataValue)
                 setNameInput(initialValues.displayName)
             }
@@ -92,15 +95,6 @@ export const OutbreaksForm = ({
     useEffect(() => {
         processAll()
     }, [loadingProgramsData])
-
-    if (loading)
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
 
     const submitText = initialValues.displayName
         ? i18n.t('Save mappings')
@@ -168,23 +162,28 @@ export const OutbreaksForm = ({
 
     //console.log(nameInput)
     const saveConstant = async () => {
-        const allValues = []
-        allValues.push(godataValue)
         if (initialValues.displayName) {
             await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         } else {
             await dataStore.appendValue('mappings', {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         }
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
-
+    if (loading)
+        return (
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
     return (
         <Form
             keepDirtyOnReinitialize
@@ -247,10 +246,7 @@ export const OutbreaksForm = ({
                         </div>
                     </Modal>
                     <ButtonStrip>
-                        <Button
-                            primary
-                            onClick={() => saveConstant()}
-                        >
+                        <Button primary onClick={() => saveConstant()}>
                             {submitText}
                         </Button>
                         <Button onClick={() => onCancelClick(pristine)}>

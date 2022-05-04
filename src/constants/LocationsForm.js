@@ -173,17 +173,15 @@ export const LocationsForm = ({
 
     //console.log(nameInput)
     const saveConstant = async () => {
-        const allValues = []
-        allValues.push(godataValue)
         if (initialValues.displayName) {
             await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         } else {
             await dataStore.appendValue('mappings', {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         }
 
