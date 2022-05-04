@@ -16,7 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import * as dataStore from '../utils/dataStore.js'
-
+import { useParams } from "react-router-dom";
 const { Field } = ReactFinalForm
 
 import { getCredentialsFromUserDataStore } from '../utils/get'
@@ -44,6 +44,7 @@ export const OutbreaksForm = ({
     initialValues,
     converterType,
 }) => {
+    const params = useParams();
     const JSON_TITLE = 'Outbreak'
     const CONVERSION_TYPE = 'Go.Data Outbreak'
     const history = useHistory()
@@ -106,39 +107,12 @@ export const OutbreaksForm = ({
         : i18n.t('Add mappings')
 
     const editNode = instance => {
-        console.log(
-            JSON.stringify(
-                'inst ns ' + instance.namespace + ' name ' + instance.name
-            )
-        )
-        setGodataValue(godataValue => {
-            const Outbreak = [...godataValue]
-            var tmp = Outbreak[1][instance.namespace[1]]
-            var path = ''
-            instance.namespace.shift()
-            instance.namespace.shift()
-            instance.namespace.forEach(element => (path = path + element + '.'))
-            path = path + instance.name
-            //for(var p in instance.namespace){path+p+'.'}
-            console.log('path' + path)
-            dot.str(path, instance.new_value, tmp)
-
-            //tmp.dhis2 = instance.new_value
-            return Outbreak
-        })
-
+        setGodataValue(instance.updated_src)
         return true
     }
 
     const copyFromPopup = instance => {
         if (instance.name == 'dhis2') {
-            console.log(instance.src)
-            //read and replace dhuis2 placeholder and update ui
-            var ths = dot.str(
-                'dhis2',
-                instance.src,
-                godataValue[1][valueHolder[2]]
-            )
             setGodataValue(godataValue => {
                 const Outbreak = [...godataValue]
                 Outbreak[1][valueHolder[2]] = ths
@@ -188,12 +162,11 @@ export const OutbreaksForm = ({
     }
 
     //console.log(nameInput)
-    const saveConstant = async godataValue => {
+    const saveConstant = async () => {
         const allValues = []
         allValues.push(godataValue)
         if (initialValues.displayName) {
-            var id = initialValues.id
-            await dataStore.editById('mappings', id, {
+            await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
                 mapping: allValues,
             })
@@ -271,7 +244,7 @@ export const OutbreaksForm = ({
                     <ButtonStrip>
                         <Button
                             primary
-                            onClick={() => saveConstant({ godataValue })}
+                            onClick={() => saveConstant()}
                         >
                             {submitText}
                         </Button>

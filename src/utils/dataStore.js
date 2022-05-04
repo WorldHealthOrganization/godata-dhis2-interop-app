@@ -43,10 +43,12 @@ export const appendValue = (key, value) => {
     )
 }
 
-export const editById = (key, i, value) => {
+export const editById = async (key, i, value) => {
     return getNamespace(NAMESPACE_APP).then(namespace => {
         namespace.get(key).then(arr => {
+            console.log({i});
             arr[i] = value;
+            console.log(arr);
             return namespace.update(key, arr)
         })
     })
