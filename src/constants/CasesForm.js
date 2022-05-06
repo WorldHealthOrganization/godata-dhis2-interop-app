@@ -16,6 +16,9 @@ import {
     useReadMappingConfigConstantsQueryForConfig,
     useReadProgramsWithStagesQueryForMappings,
 } from '.'
+import { useParams } from 'react-router-dom'
+import * as dataStore from '../utils/dataStore.js'
+
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 
 const { Field } = ReactFinalForm
@@ -189,7 +192,6 @@ export const CasesForm = ({
         lerror,
     } = useReadProgramsWithStagesQueryForMappings()
 
-
     const processAll = useCallback(async () => {
         const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
@@ -221,10 +223,8 @@ export const CasesForm = ({
                 })
             )
             .catch(console.error)
-        if (!!initialValues.displayName) {
-            setGodataValue(initialValues.mapping[0].godataValue)
-            setNameInput(initialValues.displayName)
-        } else if (!!outbreakObject) {
+
+        if (!!outbreakObject) {
             const outBreakId = outbreakObject.data[0].id
 
             const instanceObject = await axios
@@ -246,10 +246,15 @@ export const CasesForm = ({
                     )
                 )
             iterate(instanceObject.data[0])
-            const caseMeta = []
-            caseMeta.push([{ conversionType: 'Go.Data Case' }])
-            caseMeta.push(mappings)
-            setGodataValue(caseMeta)
+            if (!!initialValues.displayName) {
+                setGodataValue(initialValues.mapping[0].godataValue)
+                setNameInput(initialValues.displayName)
+            } else {
+                const caseMeta = []
+                caseMeta.push([{ conversionType: 'Go.Data Case' }])
+                caseMeta.push(mappings)
+                setGodataValue(caseMeta)
+            }
 
             iterate2(programInstance)
             setDhisValue(reducedDhisMappings)
@@ -259,27 +264,6 @@ export const CasesForm = ({
     useEffect(() => {
         processAll()
     }, [progData])
-
-    if (loading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-    if (error) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
 
     if (lloading) {
         return (

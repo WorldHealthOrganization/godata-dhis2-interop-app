@@ -24,6 +24,8 @@ import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 import {
     GODATA_DHIS_OUTBREAK_TASK,
     GODATA_DHIS_LOCATION_TASK,
+    GODATA_DHIS_CASE_TASK,
+    GODATA_DHIS_CONTACT_TASK
 } from '../../constants'
 
 import {
@@ -80,7 +82,6 @@ export const InteropList = () => {
         console.log('default clicked')
         var allValues = GODATA_DHIS_OUTBREAK_TASK
         var nameInput = 'Default Go.Data DHIS2 Outbreak Task'
-        console.log({ task: allValues, displayName: nameInput })
         await dataStore.appendValue('tasks', {
             task: allValues,
             displayName: nameInput,
@@ -93,6 +94,23 @@ export const InteropList = () => {
                 displayName: nameInput,
             })
         )
+        allValues = GODATA_DHIS_CASE_TASK
+        nameInput = 'Default Go.Data DHIS2 Case Task'
+        setTasks(
+            await dataStore.appendValue('tasks', {
+                task: allValues,
+                displayName: nameInput,
+            })
+        )
+        allValues = GODATA_DHIS_CONTACT_TASK
+        nameInput = 'Default Go.Data DHIS2 Contact Task'
+        setTasks(
+            await dataStore.appendValue('tasks', {
+                task: allValues,
+                displayName: nameInput,
+            })
+        )
+        
     }
 
     const loading = loadingReadConstants || loadingDelete

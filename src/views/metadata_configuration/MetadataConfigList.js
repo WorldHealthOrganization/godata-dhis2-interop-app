@@ -75,13 +75,13 @@ export const MetadataConfigList = () => {
             displayName: nameInput,
         })
         allValues = GODATA_DHIS_PROGRAM_TO_CASE_MODEL
-        nameInput = 'DHIS2 Program Stages to Go.Data Cases'
+        nameInput = 'Default Go.Data DHIS2 Cases Mapping'
         await dataStore.appendValue('mappings', {
             mapping: allValues,
             displayName: nameInput,
         })
         allValues = GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL
-        nameInput = 'DHIS2 Program Stages to Go.Data Contacts'
+        nameInput = 'Default Go.Data DHIS2 Contacts Mapping'
         await dataStore.appendValue('mappings', {
             mapping: allValues,
             displayName: nameInput,

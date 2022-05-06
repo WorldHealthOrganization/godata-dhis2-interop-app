@@ -21,6 +21,7 @@ import { METADATA_CONFIG_LIST_PATH } from '../views'
 const { Field } = ReactFinalForm
 
 import axios from 'axios'
+import * as dataStore from '../utils/dataStore.js'
 
 import 'jsoneditor-react/es/editor.min.css'
 import ReactJson from 'react-json-view'
@@ -33,7 +34,7 @@ import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import { getCredentialsFromUserDataStore } from '../utils/get'
-
+import { useParams } from 'react-router-dom'
 
 const { Form } = ReactFinalForm
 
@@ -178,7 +179,7 @@ export const ContactsForm = ({
     const [valueHolder, setValueHolder] = useState({})
     const [dhisValue, setDhisValue] = useState({})
     const [godataValue, setGodataValue] = useState([])
-
+    const params = useParams();
     const [nameInput, setNameInput] = useState('')
 
     var mappings, dhismappings, reducedDhisMappings
@@ -189,17 +190,12 @@ export const ContactsForm = ({
         lerror,
     } = useReadProgramsWithStagesQueryForMappings()
 
-    const {
-        loading,
-        data,
-        error,
-    } = useReadMappingConfigConstantsQueryForConfig()
 
     const processAll = useCallback(async () => {
         const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
         )
-        console.log({credentials})
+        console.log({ credentials })
         const loginDetails = {
             urlTemplate: credentials.godata.url,
             username: credentials.godata.username,
@@ -218,7 +214,7 @@ export const ContactsForm = ({
             },
             url: `${loginDetails.urlTemplate}/api/users/login`,
         })
-            .then(res => 
+            .then(res =>
                 axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
                     headers: {
                         Authorization: res.data.id,
@@ -226,13 +222,10 @@ export const ContactsForm = ({
                 })
             )
             .catch(console.error)
-        console.log({initialValues})
-        if (!!initialValues.displayName) {
-            setGodataValue(initialValues.mapping[0].godataValue)
-            setNameInput(initialValues.displayName)
-        } else if (!!outbreakObject) {
+        console.log({ initialValues })
+        if (!!outbreakObject) {
             const outBreakId = outbreakObject.data[0].id
-    
+
             const instanceObject = await axios
                 .post(loginDetails.urlTemplate + '/api/users/login', {
                     email: loginDetails.username,
@@ -252,11 +245,15 @@ export const ContactsForm = ({
                     )
                 )
             iterate(instanceObject.data[0])
-            const caseMeta = []
-            caseMeta.push([{ conversionType: 'Go.Data Contact' }])
-            caseMeta.push(mappings)
-            setGodataValue(caseMeta)
-    
+            if (!!initialValues.displayName) {
+                setGodataValue(initialValues.mapping[0].godataValue)
+                setNameInput(initialValues.displayName)
+            } else {
+                const caseMeta = []
+                caseMeta.push([{ conversionType: 'Go.Data Contact' }])
+                caseMeta.push(mappings)
+                setGodataValue(caseMeta)
+            }
             iterate2(programInstance)
             setDhisValue(reducedDhisMappings)
         }
@@ -264,28 +261,7 @@ export const ContactsForm = ({
 
     useEffect(() => {
         processAll()
-    }, [data, progData])
-
-    if (loading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-    if (error) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
+    }, [progData])
 
     if (lloading) {
         return (
