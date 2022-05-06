@@ -48,8 +48,8 @@ export const InteropRunTaskForm = () => {
     const { id } = useParams()
 
     const [showCancelDialog, setShowCancelDialog] = useState(false)
-    const [dhisBaseUrl, setDhisBaseUrl] = useState("")
-    const [godataBaseUrl, setGodataBaseUrl] = useState("")
+    const [dhisBaseUrl, setDhisBaseUrl] = useState('')
+    const [godataBaseUrl, setGodataBaseUrl] = useState('')
     const onCancelClick = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
 
@@ -97,17 +97,6 @@ export const InteropRunTaskForm = () => {
             new Buffer.from(username + ':' + password).toString('base64')
         )
     }
-
-    const {
-        lloading,
-        data: progData,
-        lerror,
-    } = useReadConstantsQueryForDhisConfig()
-    const {
-        loading,
-        data,
-        error,
-    } = useReadMappingConfigConstantsQueryForConfig()
 
     const getMappings = async (map_id, taskObject) => {
         const credentials = await getCredentialsFromUserDataStore()
@@ -204,7 +193,8 @@ export const InteropRunTaskForm = () => {
             }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
 
             instanceObject = await axios.get(
-                new URL(taskObject[0], credentials.dhis.url).href + taskObject[2],
+                new URL(taskObject[0], credentials.dhis.url).href +
+                    taskObject[2],
                 {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
@@ -255,7 +245,8 @@ export const InteropRunTaskForm = () => {
                 var filters = taskObject[2].split(' ')
 
                 instanceIds = await axios.get(
-                    new URL(endpoints[0], credentials.dhis.url).href + filters[0],
+                    new URL(endpoints[0], credentials.dhis.url).href +
+                        filters[0],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -305,7 +296,8 @@ export const InteropRunTaskForm = () => {
                 }
             } else {
                 instanceObject = await axios.get(
-                    new URL(taskObject[0], credentials.dhis.url).href + taskObject[2],
+                    new URL(taskObject[0], credentials.dhis.url).href +
+                        taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -428,6 +420,11 @@ export const InteropRunTaskForm = () => {
                 //send org units to the server
 
                 const json = JSON.stringify([root])
+                // const formData = new FormData();
+                // const file = new File([locationsData], "orgunits.json", {
+                //   type: "application/json",
+                // });
+                // formData.append("file", file);
                 const file = new File([json], 'orgunits.json', {
                     type: 'application/json',
                     lastModified: new Date(),
@@ -439,12 +436,12 @@ export const InteropRunTaskForm = () => {
 
                 //download json hierarchy of org units
 
-                const link = document.createElement('a')
-                link.href = URL.createObjectURL(file)
-                link.download = 'orgunits.json'
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+                // const link = document.createElement('a')
+                // link.href = URL.createObjectURL(file)
+                // link.download = 'orgunits.json'
+                // document.body.appendChild(link)
+                // link.click()
+                // document.body.removeChild(link)
             }
 
             setInst(instance)
@@ -473,91 +470,44 @@ export const InteropRunTaskForm = () => {
             message,
         })
 
-        if (!!data) {
-            message = StatusAlertService.showInfo(
-                i18n.t(
-                    'Loging in to Go.Data Instance.' + credentials.godata.url
-                )
-            )
-            setAlertId({
-                message,
-            })
-            //GET GO.DATA LOGIN TOKEN
+        message = StatusAlertService.showInfo(
+            i18n.t('Loging in to Go.Data Instance.' + credentials.godata.url)
+        )
+        setAlertId({
+            message,
+        })
+        //GET GO.DATA LOGIN TOKEN
 
-            message = StatusAlertService.showSuccess(
-                i18n.t('Loging to Go.Data Instance Success.')
-            )
-            setAlertId({
-                message,
-            })
+        message = StatusAlertService.showSuccess(
+            i18n.t('Loging to Go.Data Instance Success.')
+        )
+        setAlertId({
+            message,
+        })
 
-            //GET TASK DEFINITION
-            const taskObject = (await dataStore.getValue('tasks'))[id].task
-            message = StatusAlertService.showSuccess(
-                i18n.t('Read Task config - Success.')
-            )
-            setAlertId({
-                message,
-            }) //GET TASK'S MAPPINGS DEFINITIONS
+        //GET TASK DEFINITION
+        const taskObject = (await dataStore.getValue('tasks'))[id].task
+        message = StatusAlertService.showSuccess(
+            i18n.t('Read Task config - Success.')
+        )
+        setAlertId({
+            message,
+        }) //GET TASK'S MAPPINGS DEFINITIONS
 
-            message = StatusAlertService.showInfo(
-                i18n.t('Reading mappings config.')
-            )
-            setAlertId({
-                message,
-            })
-            await getMappings(taskObject[5], taskObject)
-        }
+        message = StatusAlertService.showInfo(
+            i18n.t('Reading mappings config.')
+        )
+        setAlertId({
+            message,
+        })
+        await getMappings(taskObject[5], taskObject)
+
         setLoading(false)
     })
 
     useEffect(() => {
         processAll()
-    }, [data, progData])
-
-    if (loading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-
-    if (error) {
-        const msg = i18n.t('Something went wrong whilst loading data')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
-
-    if (lloading) {
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-    }
-
-    if (lerror) {
-        const msg = i18n.t('Something went wrong whilst loading gateways')
-        return (
-            <>
-                <PageHeadline>{i18n.t('Edit')}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {loadError.message}
-                </NoticeBox>
-            </>
-        )
-    }
+    }, [])
 
     const allConstantsChecked = checkedConstants.length === inst.length
 

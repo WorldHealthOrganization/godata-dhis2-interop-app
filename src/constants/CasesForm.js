@@ -34,7 +34,6 @@ import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import { getCredentialsFromUserDataStore } from '../utils/get'
 
-
 const { Form } = ReactFinalForm
 
 export const CasesForm = ({
@@ -173,6 +172,7 @@ export const CasesForm = ({
             obj => !pattern.test(String(obj.dhis2))
         )
     }
+    const params = useParams()
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -189,17 +189,12 @@ export const CasesForm = ({
         lerror,
     } = useReadProgramsWithStagesQueryForMappings()
 
-    const {
-        loading,
-        data,
-        error,
-    } = useReadMappingConfigConstantsQueryForConfig()
 
     const processAll = useCallback(async () => {
         const credentials = await getCredentialsFromUserDataStore().catch(
             console.error
         )
-        console.log({credentials})
+        console.log({ credentials })
         const loginDetails = {
             urlTemplate: credentials.godata.url,
             username: credentials.godata.username,
@@ -218,7 +213,7 @@ export const CasesForm = ({
             },
             url: `${loginDetails.urlTemplate}/api/users/login`,
         })
-            .then(res => 
+            .then(res =>
                 axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
                     headers: {
                         Authorization: res.data.id,
@@ -226,10 +221,12 @@ export const CasesForm = ({
                 })
             )
             .catch(console.error)
-
-        if (!!outbreakObject) {
+        if (!!initialValues.displayName) {
+            setGodataValue(initialValues.mapping[0].godataValue)
+            setNameInput(initialValues.displayName)
+        } else if (!!outbreakObject) {
             const outBreakId = outbreakObject.data[0].id
-    
+
             const instanceObject = await axios
                 .post(loginDetails.urlTemplate + '/api/users/login', {
                     email: loginDetails.username,
@@ -253,20 +250,15 @@ export const CasesForm = ({
             caseMeta.push([{ conversionType: 'Go.Data Case' }])
             caseMeta.push(mappings)
             setGodataValue(caseMeta)
-    
+
             iterate2(programInstance)
             setDhisValue(reducedDhisMappings)
-    
-            if (!!initialValues.name) {
-                setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
-                setNameInput(initialValues.name)
-            }
         }
     })
 
     useEffect(() => {
         processAll()
-    }, [data, progData])
+    }, [progData])
 
     if (loading) {
         return (
@@ -417,25 +409,21 @@ export const CasesForm = ({
         setNameInput(ev)
     }
 
-    const saveConstant = async godataValue => {
-        const allValues = []
-        allValues.push(godataValue)
+    const saveConstant = async () => {
         if (initialValues.displayName) {
-            var id = initialValues.id
-            await dataStore.editById('mappings', id, {
+            await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         } else {
             await dataStore.appendValue('mappings', {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         }
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
-
     return (
         <Form
             keepDirtyOnReinitialize

@@ -1,21 +1,60 @@
 import dot from 'dot-object'
 
-export const composeJSONFromGodataModel = obj => {
-    return Object.keys(dot.dot(obj))
-            //.filter(obj => !/\[\d*\]./.test(obj))
-            .map(k => {
-                return {
-                    godata: k,
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
+export const formatCase = (obj) => {
+    var walked = []
+    var stack = [{ obj: obj, stack: '' }]
+    mappings = []
+    var i = 0
+    while (stack.length > 0) {
+        var item = stack.pop()
+        var obj = item.obj
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (typeof obj[property] == 'object') {
+                    var alreadyFound = false
+                    for (var i = 0; i < walked.length; i++) {
+                        if (walked[i] === obj[property]) {
+                            alreadyFound = true
+                            break
+                        }
+                    }
+                    if (!alreadyFound) {
+                        walked.push(obj[property])
+                        stack.push({
+                            obj: obj[property],
+                            stack: item.stack + '.' + property,
+                        })
+                    }
+                } else {
+                    i++
+                    mappings.push({
+                        godata: (item.stack + '.' + property).substr(1),
+                        dhis2: '',
+                        props: {
+                            conversion: 'true',
+                            values: {},
+                        },
+                    })
                 }
-            })
-    /**
-     * @deprecated part
-     */
+            }
+        }
+    }
+}
+
+
+export const composeJSONFromGodataModel = obj => {
+    // return Object.keys(dot.dot(obj))
+    //         //.filter(obj => !/\[\d*\]./.test(obj))
+    //         .map(k => {
+    //             return {
+    //                 godata: k,
+    //                 dhis2: '',
+    //                 props: {
+    //                     conversion: 'true',
+    //                     values: {},
+    //                 },
+    //             }
+    //         })
     let walked = []
     let stack = [{ obj: obj, stack: '' }]
     let mappings = []

@@ -6,12 +6,11 @@ const NAMESPACE_APP = 'dhis2-godata-interop-configuration'
  * DATA STORE
  */
 
-
 /**
  * @post set(key,{...currentValue, value})
  * @returns {Promise}
  */
-export const appendValue = (key, value) => {
+export const appendValue = async (key, value) => {
     return getNamespace(NAMESPACE_APP).then(namespace =>
         namespace
             .getKeys()
@@ -46,9 +45,9 @@ export const appendValue = (key, value) => {
 export const editById = async (key, i, value) => {
     return getNamespace(NAMESPACE_APP).then(namespace => {
         namespace.get(key).then(arr => {
-            console.log({i});
-            arr[i] = value;
-            console.log(arr);
+            console.log({ i })
+            arr[i] = value
+            console.log(arr)
             return namespace.update(key, arr)
         })
     })
@@ -58,8 +57,8 @@ export const editById = async (key, i, value) => {
  * Get namespace or create it if it does not exist
  * @returns {Promise.<DataStoreNamespace>}
  */
-export const getNamespace = namespaceName => {
-    return getInstance().then(d2 =>
+export const getNamespace = async namespaceName =>
+    getInstance().then(d2 =>
         d2.dataStore
             .has(namespaceName)
             .then(hasMappingNamespace =>
@@ -68,7 +67,6 @@ export const getNamespace = namespaceName => {
                     : d2.dataStore.create(namespaceName)
             )
     )
-}
 
 /**
  *
@@ -95,4 +93,3 @@ export const deleteByArrayIds = (key, ids) => {
         )
     )
 }
-

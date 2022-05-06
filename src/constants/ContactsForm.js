@@ -226,8 +226,11 @@ export const ContactsForm = ({
                 })
             )
             .catch(console.error)
-
-        if (!!outbreakObject) {
+        console.log({initialValues})
+        if (!!initialValues.displayName) {
+            setGodataValue(initialValues.mapping[0].godataValue)
+            setNameInput(initialValues.displayName)
+        } else if (!!outbreakObject) {
             const outBreakId = outbreakObject.data[0].id
     
             const instanceObject = await axios
@@ -256,11 +259,6 @@ export const ContactsForm = ({
     
             iterate2(programInstance)
             setDhisValue(reducedDhisMappings)
-    
-            if (!!initialValues.name) {
-                setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
-                setNameInput(initialValues.name)
-            }
         }
     })
 
@@ -417,19 +415,16 @@ export const ContactsForm = ({
         setNameInput(ev)
     }
 
-    const saveConstant = async godataValue => {
-        const allValues = []
-        allValues.push(godataValue)
+    const saveConstant = async () => {
         if (initialValues.displayName) {
-            var id = initialValues.id
-            await dataStore.editById('mappings', id, {
+            await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         } else {
             await dataStore.appendValue('mappings', {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         }
 

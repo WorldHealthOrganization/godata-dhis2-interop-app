@@ -21,6 +21,8 @@ import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from './MetadataConfigFormEdit'
 import {
     GODATA_DHIS_OUTBREAK_MODEL,
     GODATA_DHIS_LOCATION_MODEL,
+    GODATA_DHIS_PROGRAM_TO_CASE_MODEL,
+    GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL
 } from '../../constants'
 
 import { DeleteConstantsConfirmationDialog } from '../../constants'
@@ -60,19 +62,26 @@ export const MetadataConfigList = () => {
     }
 
     const onDefaultsClick = async () => {
-        console.log('default clicked')
         var allValues = GODATA_DHIS_OUTBREAK_MODEL
         var nameInput = 'Default Go.Data DHIS2 Outbreak Mapping'
-        console.log({
-            mapping: allValues,
-            displayName: nameInput,
-        })
         await dataStore.appendValue('mappings', {
             mapping: allValues,
             displayName: nameInput,
         })
         allValues = GODATA_DHIS_LOCATION_MODEL
         nameInput = 'Default Go.Data DHIS2 Location Mapping'
+        await dataStore.appendValue('mappings', {
+            mapping: allValues,
+            displayName: nameInput,
+        })
+        allValues = GODATA_DHIS_PROGRAM_TO_CASE_MODEL
+        nameInput = 'DHIS2 Program Stages to Go.Data Cases'
+        await dataStore.appendValue('mappings', {
+            mapping: allValues,
+            displayName: nameInput,
+        })
+        allValues = GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL
+        nameInput = 'DHIS2 Program Stages to Go.Data Contacts'
         await dataStore.appendValue('mappings', {
             mapping: allValues,
             displayName: nameInput,
