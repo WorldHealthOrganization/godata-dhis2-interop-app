@@ -146,6 +146,7 @@ export const InteropRunTaskForm = () => {
             'mappings object Id': taskObject[5],
             'task type': taskObject[6],
             'json Collection Name': taskObject[7],
+            description: taskObject[8],
         })
         setMappingModel(mappingObject)
         setTask(taskObject[6])
@@ -243,7 +244,10 @@ export const InteropRunTaskForm = () => {
             ) {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
-
+                console.log(
+                    new URL(endpoints[0], credentials.dhis.url).href +
+                        filters[0]
+                )
                 instanceIds = await axios.get(
                     new URL(endpoints[0], credentials.dhis.url).href +
                         filters[0],
@@ -265,13 +269,17 @@ export const InteropRunTaskForm = () => {
                 for (let x = 0; x < instanceIds.data.rows.length; x++) {
                     fromPromise.push(instanceIds.data.rows[x][0])
                 }
+                console.log({ fromPromise })
                 instanceObject = {}
                 instanceObject['data'] = {}
                 instanceObject.data['trackedEntityInstances'] = []
                 instanceObject.data.trackedEntityInstances['dataValues'] = []
+                console
                 for (let x = 0; x < fromPromise.length; x++) {
                     var inst = await axios.get(
-                        endpoints[1] + fromPromise[x] + filters[1],
+                        new URL(endpoints[1], credentials.dhis.url).href +
+                            fromPromise[x] +
+                            filters[1],
                         {
                             headers: {
                                 'Access-Control-Allow-Origin': '*',
@@ -313,7 +321,7 @@ export const InteropRunTaskForm = () => {
                     }
                 )
             }
-            console.log({instanceObject})
+            console.log({ instanceObject })
 
             message = StatusAlertService.showSuccess(
                 i18n.t('Reading sender data - Success.')
@@ -395,7 +403,7 @@ export const InteropRunTaskForm = () => {
             }) //MAP AND SHOW MODAL FOR SELECTION
 
             instance = JSON.parse(JSON.stringify(instance))
-            console.log({instance})
+            console.log({ instance })
             if (taskObject[6] == 'Go.Data Location') {
                 parentChild = JSON.parse(JSON.stringify(parentChild)) //get real copy from promise
 
@@ -556,18 +564,23 @@ export const InteropRunTaskForm = () => {
 
         var mappings
         const senderObject = senderData.find(x => x.id === checkedConstants[y])
-        console.log({senderObject})
+        console.log({ senderObject })
         stmp = senderObject
+        console.log({ stmp })
         var currentTaskType = 'Go.Data Contact' || 'Go.Data Case'
         if (taskType === currentTaskType) {
             stmp['dataElements'] = []
             //here we have some fixed linkage, need to formulate to make it generic too
-            for (
-                var i = 0, length = stmp.enrollments[0].events.length;
-                i < length;
-                i++
-            ) {
-                stmp.dataElements.push(stmp.enrollments[0].events[i].dataValues)
+            if (stmp.enrollments.length > 0) {
+                for (
+                    var i = 0, length = stmp.enrollments[0].events.length;
+                    i < length;
+                    i++
+                ) {
+                    stmp.dataElements.push(
+                        stmp.enrollments[0].events[i].dataValues
+                    )
+                }
             }
         }
         const iterate = obj => {
@@ -620,7 +633,7 @@ export const InteropRunTaskForm = () => {
                 }
             }
         }
-        console.log({taskType})
+        console.log({ taskType })
         if (!taskType != 'Go.Data Location') {
             console.log({ pre: payloadModel })
             iterate(payloadModel)
@@ -632,7 +645,7 @@ export const InteropRunTaskForm = () => {
         setAlertId({
             message,
         })
-        login()
+        run()
     }
 
     const getDotNotationByValue = dotnot => {
@@ -763,23 +776,25 @@ export const InteropRunTaskForm = () => {
                     //none of tries are successful, simply return 0
                     return 0
                 } else if (tmp.props.conversion === 'delm') {
-                    for (
-                        var i = 0;
-                        i < stmp.enrollments[0].events.length;
-                        i++
-                    ) {
+                    if (stmp.enrollments.length > 0) {
                         for (
-                            var y = 0;
-                            y < stmp.enrollments[0].events[i].dataValues.length;
-                            y++
+                            var i = 0;
+                            i < stmp.enrollments[0].events.length;
+                            i++
                         ) {
-                            if (
-                                stmp.enrollments[0].events[i].dataValues[y]
-                                    .dataElement == tmp.dhis2
+                            for (
+                                var y = 0;
+                                y < stmp.enrollments[0].events[i].dataValues.length;
+                                y++
                             ) {
-                                return stmp.enrollments[0].events[i].dataValues[
-                                    y
-                                ].value
+                                if (
+                                    stmp.enrollments[0].events[i].dataValues[y]
+                                        .dataElement == tmp.dhis2
+                                ) {
+                                    return stmp.enrollments[0].events[i].dataValues[
+                                        y
+                                    ].value
+                                }
                             }
                         }
                     }
@@ -797,7 +812,10 @@ export const InteropRunTaskForm = () => {
         }
     } //end of getTaskDone()
 
-    async function login() {
+    //Dependences: reciever, taskType and
+    // if locations: file
+    // else payloadModel
+    async function run() {
         const credentials = await getCredentialsFromUserDataStore()
         try {
             let res = await axios({
@@ -835,7 +853,7 @@ export const InteropRunTaskForm = () => {
                             //handle success
                             message = StatusAlertService.showSuccess(
                                 i18n.t(
-                                    'Locations send and processed successfully' +
+                                    'Locations send and processed successfully. ' +
                                         JSON.stringify(response?.data.length)
                                 ) + ' Organisation Units processed.',
                                 {
