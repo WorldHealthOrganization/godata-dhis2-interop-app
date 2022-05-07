@@ -9,6 +9,16 @@ export const GODATA_DHIS_OUTBREAK_MODEL = [
                     props: { conversion: 'true', values: {} },
                 },
                 {
+                    godata: 'disease',
+                    dhis2: 'LNG_REFERENCE_DATA_CATEGORY_DISEASE_2019_N_CO_V',
+                    props: { conversion: 'false', values: {} },
+                },
+                {
+                    godata: 'locationIds.0',
+                    dhis2: 'organisationUnits.0.id',
+                    props: { conversion: 'true', values: {} },
+                },
+                {
                     godata: 'startDate',
                     dhis2: 'created',
                     props: { conversion: 'true', values: {} },
@@ -21,6 +31,16 @@ export const GODATA_DHIS_OUTBREAK_MODEL = [
                 {
                     godata: 'periodOfFollowup',
                     dhis2: '14',
+                    props: { conversion: 'false', values: {} },
+                },
+                {
+                    godata: 'noDaysNewContacts',
+                    dhis2: '1',
+                    props: { conversion: 'false', values: {} },
+                },
+                {
+                    godata: 'reportingGeographicalLevelId',
+                    dhis2: "LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_0",
                     props: { conversion: 'false', values: {} },
                 },
                 {

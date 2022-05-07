@@ -313,6 +313,7 @@ export const InteropRunTaskForm = () => {
                     }
                 )
             }
+            console.log({instanceObject})
 
             message = StatusAlertService.showSuccess(
                 i18n.t('Reading sender data - Success.')
@@ -338,7 +339,7 @@ export const InteropRunTaskForm = () => {
 
             instance = []
             parentChild = []
-            instanceObject.data[taskObject[7]].map(function(object, i) {
+            instanceObject.data[taskObject[7]].map(object => {
                 instance.push({
                     name: object.name,
                     id: object.id,
@@ -394,6 +395,7 @@ export const InteropRunTaskForm = () => {
             }) //MAP AND SHOW MODAL FOR SELECTION
 
             instance = JSON.parse(JSON.stringify(instance))
+            console.log({instance})
             if (taskObject[6] == 'Go.Data Location') {
                 parentChild = JSON.parse(JSON.stringify(parentChild)) //get real copy from promise
 
@@ -554,6 +556,7 @@ export const InteropRunTaskForm = () => {
 
         var mappings
         const senderObject = senderData.find(x => x.id === checkedConstants[y])
+        console.log({senderObject})
         stmp = senderObject
         var currentTaskType = 'Go.Data Contact' || 'Go.Data Case'
         if (taskType === currentTaskType) {
@@ -617,7 +620,7 @@ export const InteropRunTaskForm = () => {
                 }
             }
         }
-
+        console.log({taskType})
         if (!taskType != 'Go.Data Location') {
             console.log({ pre: payloadModel })
             iterate(payloadModel)
