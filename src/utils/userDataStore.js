@@ -10,8 +10,8 @@ const NAMESPACE_APP = 'dhis2-godata-interop-configuration'
  *
  * @returns The stored value with key <key>
  */
-export const getValueUserDataStore = key => {
-    return getInstance().then(d2 =>
+export const getValueUserDataStore = async key =>
+    getInstance().then(d2 =>
         d2.currentUser.dataStore
             .has(NAMESPACE_APP)
             .then(hasNamespace =>
@@ -30,7 +30,6 @@ export const getValueUserDataStore = key => {
                     : ''
             )
     )
-}
 
 export const setKeyValueUserDataStore = (key, value) => {
     return getInstance().then(d2 =>

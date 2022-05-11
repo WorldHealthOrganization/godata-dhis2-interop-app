@@ -25,25 +25,38 @@ export const get = (path, object) => {
 }
 
 export const getCredentialsFromUserDataStore = async () => {
-    const godatauser = await getValueUserDataStore('godatauser');
-    const godatauserpass = await getValueUserDataStore('godatauserpass');
-    const godatabaseurl = await getValueUserDataStore('godatabaseurl');
-    const dhisuser = await getValueUserDataStore('dhisuser');
-    const dhisuserpass = await getValueUserDataStore('dhisuserpass');
-    const dhisbaseurl = await getValueUserDataStore('dhisbaseurl');
-
-    const res = {}
-    res.godata = {
-        username: godatauser,
-        password: godatauserpass,
-        url: godatabaseurl,
-    }
-
-    res.dhis = {
-        username: dhisuser,
-        password: dhisuserpass,
-        url: dhisbaseurl,
-    }
-    console.log(res);
-    return res
+    Promise.all(
+        [
+            'godatauser',
+            'godatauserpass',
+            'godatabaseurl',
+            'dhisuser',
+            'dhisuserpass',
+            'dhisbaseurl',
+        ].map(field => getValueUserDataStore(field))
+    ).then(
+        ([
+            godatauser,
+            godatauserpass,
+            godatabaseurl,
+            dhisuser,
+            dhisuserpass,
+            dhisbaseurl
+        ]) => {
+            const res = {
+                godata: {
+                    username: godatauser,
+                    password: godatauserpass,
+                    url: godatabaseurl,
+                },
+                dhis: {
+                    username: dhisuser,
+                    password: dhisuserpass,
+                    url: dhisbaseurl,
+                },
+            }
+            console.log(res)
+            return res;
+        }
+    )
 }
