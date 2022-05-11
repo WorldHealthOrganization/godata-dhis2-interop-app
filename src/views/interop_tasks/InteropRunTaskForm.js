@@ -1,8 +1,5 @@
 import {
     ReactFinalForm,
-    NoticeBox,
-    CenteredContent,
-    CircularLoader,
     Button,
     ButtonStrip,
     Checkbox,
@@ -10,106 +7,73 @@ import {
     TableHead,
     TableBody,
     TableRowHead,
+    CenteredContent,
+    CircularLoader,
     TableCellHead,
     TableRow,
     TableCell,
 } from '@dhis2/ui'
 import { useHistory, useParams } from 'react-router-dom'
 import React, { useState, useEffect, useCallback } from 'react'
-import { useConfig } from '@dhis2/app-runtime'
 
 import axios from 'axios'
 
 import { INTEROP_LIST_PATH } from './InteropList'
 import centroid from 'turf-centroid'
 import { FormRow } from '../../forms'
-import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import i18n from '../../locales'
 import styles from './InteropFormNew.module.css'
 import { css } from '@emotion/react'
-import ClipLoader from 'react-spinners/ClipLoader'
 import StatusAlert, { StatusAlertService } from 'react-status-alert'
 import 'react-status-alert/dist/status-alert.css'
 import { Modal } from 'react-responsive-modal'
 import dot from 'dot-object'
-import {
-    useReadMappingConfigConstantsQueryForConfig,
-    useReadConstantsQueryForDhisConfig,
-} from '../../constants'
 const { Form, useForm } = ReactFinalForm
 export const INTEROP_RUN_TASK_FORM_PATH_STATIC = '/interop/run'
 export const INTEROP_RUN_TASK_FORM_PATH = `${INTEROP_RUN_TASK_FORM_PATH_STATIC}/:id`
-import { getCredentialsFromUserDataStore } from '../../utils/get'
 import * as dataStore from '../../utils/dataStore.js'
+import {
+    getDotNotationByValue,
+    createAuthenticationHeader,
+    sendPayloadTo,
+    useCredentials,
+} from '../../constants/helpers/index.js'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
     const { id } = useParams()
-
-    const [showCancelDialog, setShowCancelDialog] = useState(false)
-    const [dhisBaseUrl, setDhisBaseUrl] = useState('')
-    const [godataBaseUrl, setGodataBaseUrl] = useState('')
+    const { loading, credentials } = useCredentials()
     const onCancelClick = pristine =>
         pristine ? history.goBack() : setShowCancelDialog(true)
 
     const [checkedConstants, setCheckedConstants] = useState([])
-    const [alertId, setAlertId] = useState('')
     const [task, setTask] = useState()
-    const [mappings, setMappings] = useState()
-    const [godataLogn, setGodataLogin] = useState()
-    const [token, setToken] = useState()
     const [inst, setInst] = useState([])
     const [open, setOpen] = useState(false)
-    var instanceObject,
-        instance,
-        message,
-        parentChild,
-        thisId,
-        stmp,
-        orgUnitHolder,
-        instanceIds,
-        instanceObjects
-    const [sender, setSender] = useState()
+    var instanceObject, instance, parentChild, stmp, instanceIds
     const [receiver, setReceiver] = useState()
-    const [filter, setFilter] = useState()
     const [file, setFile] = useState()
     const [payloadModel, setPayloadModel] = useState()
-    const [isDhis, setIsDhis] = useState()
+    const [isDhis, setIsDhis] = useState(false)
     const [taskType, setTaskType] = useState()
-    const [jsonCollectionName, setJsonCollectionName] = useState()
     const [senderData, setSenderData] = useState()
     const [mappingModel, setMappingModel] = useState()
-    const [parentChildRelations, setParentChildRelations] = useState([])
-    const [existingId, setExistingId] = useState()
-
+    const [finalMessage, setFinalMessage] = useState('')
     const override = css`
         display: block;
         margin: 0 auto;
         border-color: #36d7b7;
     `
     let [sloading, setLoading] = useState(true)
-    let [color, setColor] = useState('#ffffff')
-
-    const createAuthenticationHeader = (username, password) => {
-        return (
-            'Basic ' +
-            new Buffer.from(username + ':' + password).toString('base64')
-        )
-    }
 
     const getMappings = async (map_id, taskObject) => {
-        const credentials = await getCredentialsFromUserDataStore()
         const mappingObject = (await dataStore.getValue('mappings'))[map_id]
             .mapping
-        setMappings(mappingObject)
-
-        message = StatusAlertService.showSuccess(
+        setMappingModel(mappingObject)
+        StatusAlertService.showSuccess(
             i18n.t('Read mappings config - Success.')
         )
-        setAlertId({
-            message,
-        })
         //setTask(JSON.parse(taskObject.data))//in promise
         //setMappings(JSON.parse(mappingObject.data)) //in promise
         // taskConfig 0 - sender API, 1 - receiver API, 2 - sender API filters,
@@ -128,14 +92,10 @@ export const InteropRunTaskForm = () => {
             })
         }
 
-        setSender(taskObject[0])
-        const urlString = new URL(taskObject[1], credentials.godata.url).href
-        setReceiver(urlString)
-        setFilter(taskObject[2])
+        setReceiver(new URL(taskObject[1], credentials.godata.url).href)
         setPayloadModel(taskObject[3])
         setIsDhis(taskObject[4])
         setTaskType(taskObject[6])
-        setJsonCollectionName(taskObject[7])
         console.log('TASK OBJECT SET:')
         console.log({
             'Sender API': new URL(taskObject[0], credentials.dhis.url).href,
@@ -148,22 +108,12 @@ export const InteropRunTaskForm = () => {
             'json Collection Name': taskObject[7],
             description: taskObject[8],
         })
-        setMappingModel(mappingObject)
         setTask(taskObject[6])
         if (isDhis) {
-            message = StatusAlertService.showInfo(
-                i18n.t('DHIS2 is receiving endpoint.')
-            )
-            setAlertId({
-                message,
-            })
-            message = StatusAlertService.showInfo(
+            StatusAlertService.showInfo(i18n.t('DHIS2 is receiving endpoint.'))
+            StatusAlertService.showInfo(
                 i18n.t('Login in to Go.Data Instance.') + credentials.godata.url
             )
-            setAlertId({
-                message,
-            }) //get Go.Data security token
-
             const loginObject = await axios.post(
                 credentials.godata.url + '/api/users/login',
                 {
@@ -180,18 +130,11 @@ export const InteropRunTaskForm = () => {
                     },
                 }
             )
-            message = StatusAlertService.showSuccess(
+            StatusAlertService.showSuccess(
                 i18n.t('Login in to Go.Data Instance - Success.')
             )
-            setAlertId({
-                message,
-            })
-            message = StatusAlertService.showInfo(
-                i18n.t('Reading sender data.')
-            )
-            setAlertId({
-                message,
-            }) //GET GO.DATA INSTANCES AS PER API ENDPOINT
+            StatusAlertService.showInfo(i18n.t('Reading sender data.'))
+            //GET GO.DATA INSTANCES AS PER API ENDPOINT
 
             instanceObject = await axios.get(
                 new URL(taskObject[0], credentials.dhis.url).href +
@@ -207,16 +150,13 @@ export const InteropRunTaskForm = () => {
                     },
                 }
             )
-            message = StatusAlertService.showSuccess(
+            StatusAlertService.showSuccess(
                 i18n.t('Reading sender data - Success.')
             )
-            setAlertId({
-                message,
-            })
             var tmp = JSON.parse(JSON.stringify(instanceObject.data))
             setSenderData(tmp)
             instance = []
-            instanceObject.data.map(function(object, i) {
+            instanceObject.data.map(function (object, i) {
                 instance.push({
                     name: object.name,
                     id: object.id,
@@ -225,16 +165,11 @@ export const InteropRunTaskForm = () => {
                 instance = JSON.parse(JSON.stringify(instance)) //MAP AND SHOW MODAL FOR SELECTION
 
                 setInst(instance)
-                setLoading(false)
                 setOpen(true)
+                setLoading(false)
             }) //if DHIS2 is not receiving end
         } else {
-            message = StatusAlertService.showInfo(
-                i18n.t('Reading sender data.')
-            )
-            setAlertId({
-                message,
-            })
+            StatusAlertService.showInfo(i18n.t('Reading sender data.'))
 
             //GET DHIS2 INSTANCES AS PER API ENDPOINT
             if (
@@ -274,7 +209,7 @@ export const InteropRunTaskForm = () => {
                 instanceObject['data'] = {}
                 instanceObject.data['trackedEntityInstances'] = []
                 instanceObject.data.trackedEntityInstances['dataValues'] = []
-                console
+
                 for (let x = 0; x < fromPromise.length; x++) {
                     var inst = await axios.get(
                         new URL(endpoints[1], credentials.dhis.url).href +
@@ -323,12 +258,9 @@ export const InteropRunTaskForm = () => {
             }
             console.log({ instanceObject })
 
-            message = StatusAlertService.showSuccess(
+            StatusAlertService.showSuccess(
                 i18n.t('Reading sender data - Success.')
             )
-            setAlertId({
-                message,
-            })
 
             var tmp = JSON.parse(
                 JSON.stringify(instanceObject.data[taskObject[7]])
@@ -430,11 +362,6 @@ export const InteropRunTaskForm = () => {
                 //send org units to the server
 
                 const json = JSON.stringify([root])
-                // const formData = new FormData();
-                // const file = new File([locationsData], "orgunits.json", {
-                //   type: "application/json",
-                // });
-                // formData.append("file", file);
                 const file = new File([json], 'orgunits.json', {
                     type: 'application/json',
                     lastModified: new Date(),
@@ -442,82 +369,34 @@ export const InteropRunTaskForm = () => {
                 const formData = new FormData()
                 formData.append('file', file)
                 setFile(formData)
-                //sendOrgUnits(data)
-
-                //download json hierarchy of org units
-
-                // const link = document.createElement('a')
-                // link.href = URL.createObjectURL(file)
-                // link.download = 'orgunits.json'
-                // document.body.appendChild(link)
-                // link.click()
-                // document.body.removeChild(link)
             }
 
             setInst(instance)
-            setParentChildRelations([root])
-            setLoading(false)
             setOpen(true)
+            setLoading(false)
         }
     }
 
     const processAll = useCallback(async () => {
-        message = StatusAlertService.showInfo(
+        StatusAlertService.showInfo(
             i18n.t('Start reading task configurations.')
         )
-        setAlertId({
-            message,
-        })
-
-        const credentials = await getCredentialsFromUserDataStore()
-
-        setDhisBaseUrl(credentials.dhis.url)
-        setGodataBaseUrl(credentials.godata.url)
-        message = StatusAlertService.showSuccess(
-            i18n.t('Reading task configurations - Success.')
-        )
-        setAlertId({
-            message,
-        })
-
-        message = StatusAlertService.showInfo(
-            i18n.t('Loging in to Go.Data Instance.' + credentials.godata.url)
-        )
-        setAlertId({
-            message,
-        })
-        //GET GO.DATA LOGIN TOKEN
-
-        message = StatusAlertService.showSuccess(
-            i18n.t('Loging to Go.Data Instance Success.')
-        )
-        setAlertId({
-            message,
-        })
 
         //GET TASK DEFINITION
         const taskObject = (await dataStore.getValue('tasks'))[id].task
-        message = StatusAlertService.showSuccess(
-            i18n.t('Read Task config - Success.')
-        )
-        setAlertId({
-            message,
-        }) //GET TASK'S MAPPINGS DEFINITIONS
+        StatusAlertService.showSuccess(i18n.t('Read Task config - Success.'))
+        //GET TASK'S MAPPINGS DEFINITIONS
 
-        message = StatusAlertService.showInfo(
-            i18n.t('Reading mappings config.')
-        )
-        setAlertId({
-            message,
-        })
+        StatusAlertService.showInfo(i18n.t('Reading mappings config.'))
+
         await getMappings(taskObject[5], taskObject)
-
-        setLoading(false)
     })
 
     useEffect(() => {
-        processAll()
-    }, [])
+        if (!!credentials) {
+            processAll()
+        }
+    }, [loading])
 
     const allConstantsChecked = checkedConstants.length === inst.length
 
@@ -538,35 +417,40 @@ export const InteropRunTaskForm = () => {
     }
 
     const toggleAll = () => {
-        if (!allConstantsChecked) {
-            const allConstantIds = inst.map(({ id }) => id)
-            setCheckedConstants(allConstantIds)
-        } else {
-            setCheckedConstants([])
-        }
-    } //NOW WE HAVE EVERYTHING TO PROCESS CONVERSION
-
-    orgUnitHolder = [] //holds json objects of all org units
-
-    const runAllTasks = () => {
-        for (var y = 0; y < checkedConstants.length; y++) {
-            if (taskType === 'Go.Data Location' && y === 1) {
-                return
-            }
-            getTaskDone(y)
-        }
+        if (!allConstantsChecked) setCheckedConstants(inst.map(({ id }) => id))
+        else setCheckedConstants([])
     }
 
-    const getTaskDone = y => {
+    const runAllTasks = async () => {
+        const taskPromises = []
+        if (taskType === 'Go.Data Location') {
+            getTaskDone(1)
+                .then(res => {
+                    setFinalMessage(`Locations send and processed successfully. Organisation units: ${JSON.stringify(res?.data.length)}`)
+                    setLoading(false)
+                })
+                .catch(error =>{
+                    setFinalMessage(JSON.stringify(error?.response?.data))
+                    setLoading(false)
+                })
+            return
+        }
+
+        for (let y = 0; y < checkedConstants.length; ++y)
+            taskPromises.push(getTaskDone(y))
+
+        Promise.all(taskPromises).then(() => {
+            setLoading(false)
+        })
+    }
+
+    const getTaskDone = async y => {
+        let mappings = []
         setOpen(false)
+        setLoading(true)
 
-        var model = JSON.parse(JSON.stringify(payloadModel))
-
-        var mappings
         const senderObject = senderData.find(x => x.id === checkedConstants[y])
-        console.log({ senderObject })
         stmp = senderObject
-        console.log({ stmp })
         var currentTaskType = 'Go.Data Contact' || 'Go.Data Case'
         if (taskType === currentTaskType) {
             stmp['dataElements'] = []
@@ -624,7 +508,9 @@ export const InteropRunTaskForm = () => {
                                     .substr(1)
                                     .toString(),
                                 getDotNotationByValue(
-                                    (item.stack + '.' + property).substr(1)
+                                    (item.stack + '.' + property).substr(1),
+                                    mappingModel,
+                                    stmp
                                 ),
                                 payloadModel
                             )
@@ -635,311 +521,48 @@ export const InteropRunTaskForm = () => {
         }
         console.log({ taskType })
         if (!taskType != 'Go.Data Location') {
-            console.log({ pre: payloadModel })
             iterate(payloadModel)
-            console.log({ post: payloadModel })
         }
 
         //SEND PAYLOAD TO RECIEVER
-        message = StatusAlertService.showInfo(i18n.t('Start sending data'))
-        setAlertId({
-            message,
-        })
-        run()
-    }
+        StatusAlertService.showInfo(i18n.t('Start sending data'))
 
-    const getDotNotationByValue = dotnot => {
-        //set dotnot to string if its number
-        if (typeof dotnot === 'number') {
-            dotnot = dotnot.toString()
-        }
-
-        //GET MAPPING MODEL
-        var dataArray = mappingModel[0].godataValue[1]
-
-        if (isDhis) {
-            //IF DHIS2 IS RCEIVING END
-            let tmp = dataArray.find(x => x.godata === dotnot)
-            if (tmp) {
-                //IF MAPPING FOUND AND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
-                // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
-                if (tmp.props.conversion === 'true') {
-                    stmp = senderData[0] //TO BE DYNAMIC
-
-                    let val = dot.pick(tmp.dhis2, stmp) //IN CASE OF GO.DATA, PROPERTY IS USED FOR SEARCHING CONVERSION VALUE
-
-                    var stringBoolean = ''
-
-                    if (typeof val == 'boolean') {
-                        stringBoolean = val ? 'true' : 'false'
-                    } else {
-                        stringBoolean = val
-                    }
-
-                    if (tmp.props.values[stringBoolean]) {
-                        //RETURN CONVERTED VALUE
-                        return tmp.props.values[stringBoolean]
-                    } else {
-                        //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
-                        return val
-                    }
-                } else if (tmp.props.conversion === 'geo') {
-                    console.log('call a method here for geometry')
-                } else {
-                    return tmp.dhis2
-                }
-            } else {
-                return 'NO VALUE SET'
-            }
-        } else {
-            //DHIS2 IS SENDER
-
-            let tmp = dataArray.find(x => x.godata === dotnot)
-
-            if (tmp) {
-                //IF MAPPING FOUND HAS CONVERSION. THIS MEANS VALUE SHOULD BE FETCHED FROM OTHER
-                // PARTY OBJECT AND IF THERE IS CONVERSION OF VALUES TO PROCESS CONVERSION
-                if (
-                    tmp.props.conversion === 'true' ||
-                    typeof tmp.props.conversion == 'boolean'
-                ) {
-                    let val = dot.pick(tmp.dhis2, stmp)
-                    //set val to string if its number
-                    if (typeof val === 'number') {
-                        val = val.toString()
-                    }
-
-                    var stringBoolean = ''
-
-                    if (typeof val == 'boolean') {
-                        stringBoolean = val ? 'true' : 'false'
-                    } else {
-                        stringBoolean = val
-                    } //IN CASE OF DHIS2 PROPERTY VALUE IS USED FOR SEARCHING CONVERSION VALUE
-                    if (tmp.dhis2 === 'id') {
-                        thisId = val
-                        setExistingId(val)
-                    }
-
-                    let keys = Object.keys(tmp.props.values)
-                    for (let i = 0; i < keys.length; i++) {
-                        if (stringBoolean == tmp.props.values[keys[i]]) {
-                            return keys[i]
-                        }
-                    }
-                    //RETURN RAW VALUE IF NOT FOUND IN CONVERSION TABLE
-                    return val
-                } else if (tmp.props.conversion === 'geo') {
-                    const geom = dot.pick('geometry', stmp)
-
-                    if (geom) {
-                        if ((geom.type = 'Polygon')) {
-                            //get centroid
-                            var centroidPoint = centroid(
-                                dot.pick('geometry', stmp)
-                            )
-                            var lon = centroidPoint.geometry.coordinates[0]
-                            var lat = centroidPoint.geometry.coordinates[1]
-                            if (Number.isNaN(centroidPoint)) {
-                                //try to get Point instead
-                                var point = dot.pick(
-                                    'geometry.coordinates',
-                                    stmp
-                                )
-                                if (tmp.godata === 'geoLocation.lat') {
-                                    return point[0]
-                                } else if (tmp.godata === 'geoLocation.lng') {
-                                    return point[1]
-                                } else {
-                                    return 0
-                                }
-                            } else {
-                                if (tmp.godata === 'geoLocation.lat') {
-                                    return lat
-                                } else if (tmp.godata === 'geoLocation.lng') {
-                                    return lon
-                                } else {
-                                    return 0
-                                }
-                            }
-                        } else if ((geom.type = 'Point')) {
-                            var point = dot.pick('geometry.coordinates', stmp)
-                            if (tmp.godata === 'geoLocation.lat') {
-                                return point[0]
-                            } else if (tmp.godata === 'geoLocation.lng') {
-                                return point[1]
-                            }
-                        } else {
-                            return 0
-                        }
-                    }
-                    //none of tries are successful, simply return 0
-                    return 0
-                } else if (tmp.props.conversion === 'delm') {
-                    if (stmp.enrollments.length > 0) {
-                        for (
-                            var i = 0;
-                            i < stmp.enrollments[0].events.length;
-                            i++
-                        ) {
-                            for (
-                                var y = 0;
-                                y < stmp.enrollments[0].events[i].dataValues.length;
-                                y++
-                            ) {
-                                if (
-                                    stmp.enrollments[0].events[i].dataValues[y]
-                                        .dataElement == tmp.dhis2
-                                ) {
-                                    return stmp.enrollments[0].events[i].dataValues[
-                                        y
-                                    ].value
-                                }
-                            }
-                        }
-                    }
-                } else if (tmp.props.conversion === 'attr') {
-                    for (var i = 0; i < stmp.attributes.length; i++) {
-                        if (stmp.attributes[i].attribute == tmp.dhis2) {
-                            return stmp.attributes[i].value
-                        }
-                    }
-                } else {
-                    //nothing could help, simply return what was given
-                    return tmp.dhis2
-                }
-            }
-        }
-    } //end of getTaskDone()
-
-    //Dependences: reciever, taskType and
-    // if locations: file
-    // else payloadModel
-    async function run() {
-        const credentials = await getCredentialsFromUserDataStore()
-        try {
-            let res = await axios({
-                method: 'POST',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods':
-                        'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                    'Content-Type': 'application/json',
-                    crossDomain: true,
-                },
-                data: {
-                    email: credentials.godata.username,
-                    password: credentials.godata.password,
-                },
-                url: credentials.godata.url + '/api/users/login',
-            })
-
-            if (res.status == 200) {
-                setToken(JSON.parse(JSON.stringify(res.data.id)))
-
-                if (taskType === 'Go.Data Location') {
-                    axios({
-                        method: 'post',
-                        url: receiver + '?access_token=' + res.data.id,
-                        data: file,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*',
-                            'Access-Control-Allow-Methods':
-                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    })
-                        .then(function(response) {
-                            //handle success
-                            message = StatusAlertService.showSuccess(
-                                i18n.t(
-                                    'Locations send and processed successfully. ' +
-                                        JSON.stringify(response?.data.length)
-                                ) + ' Organisation Units processed.',
-                                {
-                                    autoHideTime: 10000000,
-                                }
-                            )
-                            setAlertId({
-                                message,
-                            })
-                        })
-                        .catch(function(response) {
-                            //handle error
-                            message = StatusAlertService.showError(
-                                i18n.t(
-                                    'Locations sending failed: ' +
-                                        JSON.stringify(error?.response?.data)
-                                ),
-                                {
-                                    autoHideTime: 10000000,
-                                }
-                            )
-                            setAlertId({
-                                message,
-                            })
-                        })
-                } else {
-                    console.log({ payloadModel })
-                    let ans = await axios({
-                        method: 'POST',
-                        data: payloadModel,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*',
-                            'Access-Control-Allow-Methods':
-                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                            'Content-Type': 'application/json',
-                            crossDomain: true, //Authorization: `bearer ${res.data.id}` ,
-                        },
-                        url: receiver + '?access_token=' + res.data.id,
-                    })
-
-                    if (res.status == 200) {
-                        message = StatusAlertService.showSuccess(
-                            i18n.t(
-                                'Data send successfully. ' +
-                                    JSON.stringify(ans.data)
-                            ),
-                            {
-                                autoHideTime: 10000000,
-                            }
-                        )
-                        setAlertId({
-                            message,
-                        })
-                    }
-                }
-            }
-        } catch (error) {
-            message = StatusAlertService.showError(
-                i18n.t(
-                    'Data sending failed: ' +
-                        JSON.stringify(error?.response?.data)
-                ),
-                {
-                    autoHideTime: 10000000,
-                }
-            )
-            setAlertId({
-                message,
-            })
-        }
+        if (taskType === 'Go.Data Location')
+            return sendPayloadTo(receiver, file, credentials)
+        return sendPayloadTo(receiver, payloadModel, credentials)
     }
 
     const onCloseModal = () => {
         setOpen(false)
+        setLoading(true)
     }
 
     const onSubmit = values => {
         history.push(INTEROP_LIST_PATH)
     }
 
+    if (!sloading && !open)
+        return (
+            <>
+                <h4>{finalMessage}</h4>
+                <Button onClick={() => history.push(INTEROP_LIST_PATH)}>
+                    {i18n.t('Go back to tasks')}
+                </Button>
+            </>
+        )
+
+    if (sloading)
+        return (
+            <CenteredContent>
+                <CircularLoader />
+            </CenteredContent>
+        )
+
     return (
         <div
             data-test={dataTest('views-gatewayconfigformnew')}
             className={styles.container}
         >
-            <StatusAlert />
             <Form destroyOnUnregister onSubmit={onSubmit}>
                 {({ handleSubmit, pristine }) => (
                     <form>
@@ -1034,12 +657,6 @@ export const InteropRunTaskForm = () => {
                     </form>
                 )}
             </Form>
-            <ClipLoader
-                color={color}
-                loading={sloading}
-                css={override}
-                size={150}
-            />
         </div>
     )
 }

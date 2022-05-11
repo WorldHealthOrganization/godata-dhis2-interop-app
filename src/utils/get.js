@@ -44,6 +44,5 @@ export const getCredentialsFromUserDataStore = async () => {
         password: dhisuserpass,
         url: dhisbaseurl,
     }
-    console.log(res);
     return res
 }

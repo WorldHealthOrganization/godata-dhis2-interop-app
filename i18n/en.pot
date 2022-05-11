@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-05-06T09:42:27.371Z\n"
-"PO-Revision-Date: 2022-05-06T09:42:27.371Z\n"
+"POT-Creation-Date: 2022-05-09T15:31:25.231Z\n"
+"PO-Revision-Date: 2022-05-09T15:31:25.231Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -234,12 +234,6 @@ msgid "Reading sender data - Success."
 msgstr ""
 
 msgid "Start reading task configurations."
-msgstr ""
-
-msgid "Reading task configurations - Success."
-msgstr ""
-
-msgid "Loging to Go.Data Instance Success."
 msgstr ""
 
 msgid "Read Task config - Success."
