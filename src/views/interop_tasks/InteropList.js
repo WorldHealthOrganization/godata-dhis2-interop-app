@@ -25,7 +25,8 @@ import {
     GODATA_DHIS_OUTBREAK_TASK,
     GODATA_DHIS_LOCATION_TASK,
     GODATA_DHIS_CASE_TASK,
-    GODATA_DHIS_CONTACT_TASK
+    GODATA_DHIS_CONTACT_TASK,
+    GODATA_DHIS_EVENT_TASK
 } from '../../constants'
 
 import {
@@ -104,6 +105,15 @@ export const InteropList = () => {
         )
         allValues = GODATA_DHIS_CONTACT_TASK
         nameInput = 'Default Go.Data DHIS2 Contact Task'
+        setTasks(
+            await dataStore.appendValue('tasks', {
+                task: allValues,
+                displayName: nameInput,
+            })
+        )
+
+        allValues = GODATA_DHIS_EVENT_TASK
+        nameInput = 'Default Go.Data DHIS2 Event Task'
         setTasks(
             await dataStore.appendValue('tasks', {
                 task: allValues,

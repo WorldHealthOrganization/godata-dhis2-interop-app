@@ -86,6 +86,13 @@ export const MetadataConfigList = () => {
             mapping: allValues,
             displayName: nameInput,
         })
+
+        allValues = GODATA_DHIS_PROGRAM_TO_EVENT_MODEL
+        nameInput = 'Default Go.Data DHIS2 Events Mapping'
+        await dataStore.appendValue('mappings', {
+            mapping: allValues,
+            displayName: nameInput,
+        })
         await dataStore
             .getValue('mappings')
             .then(mappings => setMappings(mappings))

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-05-09T15:31:25.231Z\n"
-"PO-Revision-Date: 2022-05-09T15:31:25.231Z\n"
+"POT-Creation-Date: 2022-05-14T17:58:19.182Z\n"
+"PO-Revision-Date: 2022-05-14T17:58:19.182Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -243,6 +243,9 @@ msgid "Reading mappings config."
 msgstr ""
 
 msgid "Start sending data"
+msgstr ""
+
+msgid "Go back to tasks"
 msgstr ""
 
 msgid "Proceed"
