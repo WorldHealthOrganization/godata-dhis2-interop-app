@@ -24,7 +24,7 @@ export const get = (path, object) => {
     return value
 }
 
-export const getCredentialsFromUserDataStore = async () => {
+export const getCredentialsFromUserDataStore = async () => 
     Promise.all(
         [
             'godatauser',
@@ -55,8 +55,7 @@ export const getCredentialsFromUserDataStore = async () => {
                     url: dhisbaseurl,
                 },
             }
-            console.log(res)
             return res;
         }
     )
-}
+
