@@ -26,7 +26,8 @@ import {
     GODATA_CONTACT,
     GODATA_CONTACT_OF_CONTACT,
     GODATA_ORG_UNIT,
-} from '../constants'
+    GODATA_EVENT
+} from '../constants/constantTypes.js'
 
 const { Field } = ReactFinalForm
 
@@ -195,25 +196,26 @@ export const InteropForm = ({
                                 value={GODATA_OUTBREAK}
                                 label={i18n.t(GODATA_OUTBREAK)}
                             />
-
                             <SingleSelectOption
                                 value={GODATA_CASE}
                                 label={i18n.t(GODATA_CASE)}
                             />
-
                             <SingleSelectOption
                                 value={GODATA_CONTACT}
                                 label={i18n.t(GODATA_CONTACT)}
                             />
-
                             <SingleSelectOption
                                 value={GODATA_CONTACT_OF_CONTACT}
                                 label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
                             />
-
                             <SingleSelectOption
                                 value={GODATA_ORG_UNIT}
                                 label={i18n.t(GODATA_ORG_UNIT)}
+                            />
+
+                            <SingleSelectOption
+                                value={GODATA_EVENT}
+                                label={i18n.t(GODATA_EVENT)}
                             />
                         </SingleSelectField>
                     </FormRow>
@@ -267,7 +269,7 @@ export const InteropForm = ({
                             render={() => (
                                 <InputField
                                     id="senderendpoint"
-                                    label={"DHIS2 endpoint pathname"}
+                                    label={'DHIS2 endpoint pathname'}
                                     className=""
                                     type="text"
                                     helpText="Pathname of the URL of sender API endpoint (e.g. if https://somesite.org/api/somevalues -> /api/somevalues)"
@@ -348,7 +350,7 @@ export const InteropForm = ({
                                 }
                                 selected={converters[converter].label}
                             >
-                                {converters.map(function(object, i) {
+                                {converters.map(function (object, i) {
                                     return (
                                         <SingleSelectOption
                                             label={object.label}

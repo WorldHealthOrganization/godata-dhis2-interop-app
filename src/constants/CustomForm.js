@@ -13,13 +13,11 @@ import {
     InputField,
     TextAreaField,
 } from '@dhis2/ui'
+import * as dataStore from '../utils/dataStore.js'
 import { useHistory } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {
-    useReadMappingConfigConstantsQueryForConfig,
-    useReadProgramsQueryForMappings,
-} from '.'
+
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import {
     GODATA_OUTBREAK,
@@ -27,26 +25,23 @@ import {
     GODATA_CONTACT,
     GODATA_CONTACT_OF_CONTACT,
     GODATA_ORG_UNIT,
-    GODATA_CUSTOM,
+    GODATA_EVENT,
+    mappingNames
 } from '../constants'
 import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 import 'react-responsive-modal/styles.css'
 const { Field } = ReactFinalForm
-import axios from 'axios'
 import 'jsoneditor-react/es/editor.min.css'
 import ReactJson from 'react-json-view'
 import 'react-responsive-modal/styles.css'
 import { Modal } from 'react-responsive-modal'
 import dot from 'dot-object'
-import {
-    useCreateCasesConstantMutation,
-    useUpdateCasesConstantMutation,
-} from '.'
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
+
 const { Form } = ReactFinalForm
 
 var mappings, dhismappings
@@ -165,34 +160,31 @@ export const CustomForm = ({
     const [objectType, setObjectType] = useState('')
     const [mappingName, setMappingName] = useState('')
     const [nameInput, setNameInput] = useState('')
-    const [dhisModelInput, setDhisModelInput] = useState('')
-    const [godataModelInput, setGodataModelInput] = useState('')
 
-    const [addCasesConstant] = useCreateCasesConstantMutation()
-    const [saveCasesConstant] = useUpdateCasesConstantMutation()
+
+
+
+    // const [godataModelInput, setGodataModelInput] = useState('')
+    // const [dhisModelInput, setDhisModelInput] = useState('')
+
+    const processAll = useCallback(async () => {
+        if (!!initialValues.displayName) {
+            console.log({ initialValues })
+            console.log({ converterType })
+            setMappingName(mappingNames[converterType])
+            setObjectType(converterType)
+            setNameInput(initialValues.displayName)
+            setGodataValue(initialValues.mapping[0].godataValue)
+            setGodataModel(initialValues.mapping[1])
+            setDhisModel(initialValues.mapping[2])
+        }
+    })
+
     useEffect(() => {
-        console.log('initialValues.name ' + initialValues.name)
-        //              iterate(instanceObject.data[0]);
-
-        if (initialValues.name === 'undefined') {
-            setGodataValue(JSON.parse(initialValues.description)[0].godataValue)
-            setNameInput(initialValues.name)
-            setGodataModelInput(
-                JSON.stringify(JSON.parse(initialValues.description)[1])
-            )
-            setDhisModelInput(
-                JSON.stringify(JSON.parse(initialValues.description)[2])
-            )
-        }
-
-        console.log('converterType ' + converterType)
-
-        return () => {
-            console.log('This will be logged on unmount')
-        }
+        processAll()
     }, [])
 
-    const submitText = initialValues.name
+    const submitText = !!initialValues.displayName
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
@@ -279,35 +271,10 @@ export const CustomForm = ({
     }
 
     const saveConstant = async godataValue => {
-        const godataModelJson =
-            Object.keys(godataModelInput).length != 0
-                ? JSON.parse(godataModelInput)
-                : {}
-        const dhisModelJson =
-            Object.keys(dhisModelInput).length != 0
-                ? JSON.parse(dhisModelInput)
-                : {}
-        const allValues = []
-        allValues.push(godataValue)
-        console.log('allValues godataValue ' + JSON.stringify(allValues))
-        allValues.push(godataModelJson)
-        console.log('allValues godataModelJson ' + JSON.stringify(allValues))
-        allValues.push(dhisModelJson)
-        console.log('allValues dhisModelJson ' + JSON.stringify(allValues))
-
-        if (initialValues.name) {
-            var id = initialValues.id
-            await saveCasesConstant({
-                allValues,
-                nameInput,
-                id,
-            })
-        } else {
-            await addCasesConstant({
-                allValues,
-                nameInput,
-            })
-        }
+        await dataStore.appendValue('mappings', {
+            displayName: nameInput,
+            mapping: [godataValue, godataModel, dhisModel],
+        })
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
@@ -316,18 +283,16 @@ export const CustomForm = ({
         setObjectType(selected)
         if (selected == GODATA_OUTBREAK) {
             setMappingName('Outbreak')
-        }
-        if (selected == GODATA_CASE) {
+        } else if (selected == GODATA_CASE) {
             setMappingName('Case')
-        }
-        if (selected == GODATA_CONTACT) {
+        } else if (selected == GODATA_CONTACT) {
             setMappingName('Contact')
-        }
-        if (selected == GODATA_CONTACT_OF_CONTACT) {
+        } else if (selected == GODATA_CONTACT_OF_CONTACT) {
             setMappingName('Contact-of-Contact')
-        }
-        if (selected == GODATA_ORG_UNIT) {
+        } else if (selected == GODATA_ORG_UNIT) {
             setMappingName('Location')
+        } else if (selected == GODATA_EVENT) {
+            setMappingName('Event')
         }
     }
     const getGodataModel = () => {
@@ -404,6 +369,11 @@ export const CustomForm = ({
                             <SingleSelectOption
                                 value={GODATA_ORG_UNIT}
                                 label={i18n.t(GODATA_ORG_UNIT)}
+                            />
+
+                            <SingleSelectOption
+                                value={GODATA_EVENT}
+                                label={i18n.t(GODATA_EVENT)}
                             />
                         </SingleSelectField>
                     </FormRow>

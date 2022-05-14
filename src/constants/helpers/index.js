@@ -133,7 +133,7 @@ export const getDotNotationByValue = (
                 //none of tries are successful, simply return 0
                 return 0
             } else if (tmp.props.conversion === 'delm') {
-                if (stmp.enrollments.length > 0) {
+                if (!!stmp.enrollments && stmp.enrollments.length > 0) {
                     for (
                         var i = 0;
                         i < stmp.enrollments[0].events.length;
@@ -154,13 +154,15 @@ export const getDotNotationByValue = (
                             }
                         }
                     }
-                }
+                } else return tmp.dhis2
             } else if (tmp.props.conversion === 'attr') {
-                for (var i = 0; i < stmp.attributes.length; i++) {
-                    if (stmp.attributes[i].attribute == tmp.dhis2) {
-                        return stmp.attributes[i].value
+                if (!!stmp.attributes) {
+                    for (var i = 0; i < stmp.attributes.length; i++) {
+                        if (stmp.attributes[i].attribute == tmp.dhis2) {
+                            return stmp.attributes[i].value
+                        }
                     }
-                }
+                } else return tmp.dhis2
             } else {
                 //nothing could help, simply return what was given
                 return tmp.dhis2
@@ -208,9 +210,9 @@ export const useCredentials = () => {
 
     const fetchNow = () => {
         setStatus({ loading: true })
-        getCredentialsFromUserDataStore().then(res =>
+        getCredentialsFromUserDataStore().then(res =>{
             setStatus({ credentials: res, loading: false })
-        )
+        })
     }
 
     useEffect(() => {

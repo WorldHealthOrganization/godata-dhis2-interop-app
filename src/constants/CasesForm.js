@@ -12,10 +12,7 @@ import {
 import { useHistory } from 'react-router-dom'
 import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
-import {
-    useReadMappingConfigConstantsQueryForConfig,
-    useReadProgramsWithStagesQueryForMappings,
-} from '.'
+import { useReadProgramsWithStagesQueryForMappings } from '.'
 import { useParams } from 'react-router-dom'
 import * as dataStore from '../utils/dataStore.js'
 
@@ -35,7 +32,7 @@ import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
-import { getCredentialsFromUserDataStore } from '../utils/get'
+import { useCredentials } from './helpers'
 
 const { Form } = ReactFinalForm
 
@@ -45,6 +42,17 @@ export const CasesForm = ({
     initialValues,
     converterType,
 }) => {
+    const params = useParams()
+    const history = useHistory()
+    const [open, setOpen] = useState(false)
+    const [valueHolder, setValueHolder] = useState({})
+    const [dhisValue, setDhisValue] = useState({})
+    const [godataValue, setGodataValue] = useState([])
+    
+    const [nameInput, setNameInput] = useState('')
+    
+    var mappings, dhismappings, reducedDhisMappings
+    const { loading, credentials } = useCredentials()
     function iterate(obj) {
         var walked = []
         var stack = [{ obj: obj, stack: '' }]
@@ -175,16 +183,6 @@ export const CasesForm = ({
             obj => !pattern.test(String(obj.dhis2))
         )
     }
-    const params = useParams()
-    const history = useHistory()
-    const [open, setOpen] = useState(false)
-    const [valueHolder, setValueHolder] = useState({})
-    const [dhisValue, setDhisValue] = useState({})
-    const [godataValue, setGodataValue] = useState([])
-
-    const [nameInput, setNameInput] = useState('')
-
-    var mappings, dhismappings, reducedDhisMappings
 
     const {
         lloading,
@@ -193,77 +191,77 @@ export const CasesForm = ({
     } = useReadProgramsWithStagesQueryForMappings()
 
     const processAll = useCallback(async () => {
-        const credentials = await getCredentialsFromUserDataStore().catch(
-            console.error
-        )
         console.log({ credentials })
-        const loginDetails = {
-            urlTemplate: credentials.godata.url,
-            username: credentials.godata.username,
-            password: credentials.godata.password,
-        }
-        const programInstance =
-            progData && progData.programs.programs.length > 0
-                ? progData.programs.programs[0]
-                : {}
+        if (!!credentials) {
+            console.log({ credentials })
+            const loginDetails = {
+                urlTemplate: credentials.godata.url,
+                username: credentials.godata.username,
+                password: credentials.godata.password,
+            }
+            const programInstance =
+                progData && progData.programs.programs.length > 0
+                    ? progData.programs.programs[0]
+                    : {}
 
-        const outbreakObject = await axios({
-            method: 'POST',
-            data: {
-                email: loginDetails.username,
-                password: loginDetails.password,
-            },
-            url: `${loginDetails.urlTemplate}/api/users/login`,
-        })
-            .then(res =>
-                axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
-                    headers: {
-                        Authorization: res.data.id,
-                    },
-                })
-            )
-            .catch(console.error)
-
-        if (!!outbreakObject) {
-            const outBreakId = outbreakObject.data[0].id
-
-            const instanceObject = await axios
-                .post(loginDetails.urlTemplate + '/api/users/login', {
+            const outbreakObject = await axios({
+                method: 'POST',
+                data: {
                     email: loginDetails.username,
                     password: loginDetails.password,
-                })
+                },
+                url: `${loginDetails.urlTemplate}/api/users/login`,
+            })
                 .then(res =>
-                    axios.get(
-                        loginDetails.urlTemplate +
-                            '/api/outbreaks/' +
-                            outBreakId +
-                            '/cases',
-                        {
-                            headers: {
-                                Authorization: res.data.id,
-                            },
-                        }
-                    )
+                    axios.get(`${loginDetails.urlTemplate}/api/outbreaks`, {
+                        headers: {
+                            Authorization: res.data.id,
+                        },
+                    })
                 )
-            iterate(instanceObject.data[0])
-            if (!!initialValues.displayName) {
-                setGodataValue(initialValues.mapping[0].godataValue)
-                setNameInput(initialValues.displayName)
-            } else {
-                const caseMeta = []
-                caseMeta.push([{ conversionType: 'Go.Data Case' }])
-                caseMeta.push(mappings)
-                setGodataValue(caseMeta)
-            }
+                .catch(console.error)
 
-            iterate2(programInstance)
-            setDhisValue(reducedDhisMappings)
+            if (!!outbreakObject) {
+                const outBreakId = outbreakObject.data[0].id
+
+                const instanceObject = await axios
+                    .post(loginDetails.urlTemplate + '/api/users/login', {
+                        email: loginDetails.username,
+                        password: loginDetails.password,
+                    })
+                    .then(res =>
+                        axios.get(
+                            loginDetails.urlTemplate +
+                                '/api/outbreaks/' +
+                                outBreakId +
+                                '/cases',
+                            {
+                                headers: {
+                                    Authorization: res.data.id,
+                                },
+                            }
+                        )
+                    )
+                iterate(instanceObject.data[0])
+                if (!!initialValues.displayName) {
+                    setGodataValue(initialValues.mapping[0].godataValue)
+                    setNameInput(initialValues.displayName)
+                } else {
+                    const caseMeta = []
+                    caseMeta.push([{ conversionType: 'Go.Data Case' }])
+                    caseMeta.push(mappings)
+                    setGodataValue(caseMeta)
+                }
+
+                iterate2(programInstance)
+                setDhisValue(reducedDhisMappings)
+            }
         }
     })
 
     useEffect(() => {
         processAll()
-    }, [progData])
+    }, [loading, progData])
 
     if (lloading) {
         return (
@@ -286,7 +284,7 @@ export const CasesForm = ({
         )
     }
 
-    const submitText = initialValues.name
+    const submitText = !!initialValues.displayName
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 

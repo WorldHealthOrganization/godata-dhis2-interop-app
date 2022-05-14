@@ -39,6 +39,14 @@ import {
     sendPayloadTo,
     useCredentials,
 } from '../../constants/helpers/index.js'
+import {
+    GODATA_OUTBREAK,
+    GODATA_CASE,
+    GODATA_CONTACT,
+    GODATA_CONTACT_OF_CONTACT,
+    GODATA_ORG_UNIT,
+    GODATA_EVENT,
+} from '../../constants/constantTypes.js'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
@@ -175,7 +183,8 @@ export const InteropRunTaskForm = () => {
             if (
                 taskObject[6] === 'Go.Data Contact' ||
                 taskObject[6] === 'Go.Data Case' ||
-                taskObject[6] === 'Go.Data Contact of Contact'
+                taskObject[6] === 'Go.Data Contact of Contact' ||
+                taskObject[6] === GODATA_EVENT
             ) {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
@@ -229,15 +238,22 @@ export const InteropRunTaskForm = () => {
                             },
                         }
                     )
-
-                    inst.data['id'] = inst.data.trackedEntityInstance
-                    inst.data['name'] =
-                        'Case ID: ' + inst.data.trackedEntityInstance
-                    inst.data['dataValues'] = []
+                    console.log({ inst })
+                    if (taskObject[6] === GODATA_EVENT) {
+                        inst.data['id'] = inst.data.event
+                        inst.data['name'] =
+                            'Case ID: ' + inst.data.event
+                        inst.data['dataValues'] = []
+                    } else {
+                        inst.data['id'] = inst.data.trackedEntityInstance
+                        inst.data['name'] =
+                            'Case ID: ' + inst.data.trackedEntityInstance
+                        inst.data['dataValues'] = []
+                    }
 
                     instanceObject.data.trackedEntityInstances.push(inst.data)
                 }
-            } else {
+            } else if (taskObject[6] === 'Go.Data Location') {
                 instanceObject = await axios.get(
                     new URL(taskObject[0], credentials.dhis.url).href +
                         taskObject[2],
@@ -426,10 +442,14 @@ export const InteropRunTaskForm = () => {
         if (taskType === 'Go.Data Location') {
             getTaskDone(1)
                 .then(res => {
-                    setFinalMessage(`Locations send and processed successfully. Organisation units: ${JSON.stringify(res?.data.length)}`)
+                    setFinalMessage(
+                        `Locations send and processed successfully. Organisation units: ${JSON.stringify(
+                            res?.data.length
+                        )}`
+                    )
                     setLoading(false)
                 })
-                .catch(error =>{
+                .catch(error => {
                     setFinalMessage(JSON.stringify(error?.response?.data))
                     setLoading(false)
                 })
@@ -440,6 +460,7 @@ export const InteropRunTaskForm = () => {
             taskPromises.push(getTaskDone(y))
 
         Promise.all(taskPromises).then(() => {
+            setFinalMessage("Process finished")
             setLoading(false)
         })
     }
@@ -553,9 +574,11 @@ export const InteropRunTaskForm = () => {
 
     if (sloading)
         return (
-            <CenteredContent>
-                <CircularLoader />
-            </CenteredContent>
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
         )
 
     return (

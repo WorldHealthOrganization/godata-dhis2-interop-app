@@ -1,11 +1,4 @@
-/**
- * @file General Form
- * @author Antoni Bergas Galmés <antoni.bergas@upc.edu>
- * @copyright Antoni Bergas Galmés - 2022
- * 
- */
-
- import {
+import {
     Button,
     ButtonStrip,
     ReactFinalForm,
@@ -23,7 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { PropTypes } from '@dhis2/prop-types'
 import { METADATA_CONFIG_LIST_PATH } from '../views'
 import * as dataStore from '../utils/dataStore.js'
-
+import { useParams } from 'react-router-dom'
 const { Field } = ReactFinalForm
 
 import { getCredentialsFromUserDataStore } from '../utils/get'
@@ -51,6 +44,9 @@ export const GeneralForm = ({
     initialValues,
     converterType,
 }) => {
+    const params = useParams()
+    const JSON_TITLE = 'Outbreak'
+    const CONVERSION_TYPE = 'Go.Data Outbreak'
     const history = useHistory()
     const [open, setOpen] = useState(false)
     const [valueHolder, setValueHolder] = useState({})
@@ -59,11 +55,14 @@ export const GeneralForm = ({
 
     const [nameInput, setNameInput] = useState(initialValues.displayName)
 
-    var dhisMappings, reducedGodataMappings
+    var dhisMappings
     const [loading, setLoading] = useState(true)
 
-    const { loading: loadingProgramsData, data: programs, error: error } = useReadProgramsQueryForMappings()
-
+    const {
+        loading: loadingProgramsData,
+        data: programs,
+        error: error,
+    } = useReadProgramsQueryForMappings()
 
     const processAll = useCallback(async () => {
         console.log({
@@ -76,9 +75,8 @@ export const GeneralForm = ({
                 programs && programs.programs.programs.length > 0
                     ? programs.programs.programs[0]
                     : {}
-            console.log({ programInstance })
             const caseMeta = []
-            caseMeta.push([{ conversionType: 'Go.Data Outbreak' }])
+            caseMeta.push([{ conversionType: CONVERSION_TYPE }])
             caseMeta.push(composeJSONFromGodataModel(GODATA_OUTBREAK_MODEL))
             setGodataValue(caseMeta)
 
@@ -86,6 +84,7 @@ export const GeneralForm = ({
             setDhisValue(dhisMappings)
 
             if (!!initialValues.displayName) {
+                console.log(initialValues.mapping)
                 setGodataValue(initialValues.mapping[0].godataValue)
                 setNameInput(initialValues.displayName)
             }
@@ -97,48 +96,17 @@ export const GeneralForm = ({
         processAll()
     }, [loadingProgramsData])
 
-    if (loading)
-        return (
-            <>
-                <CenteredContent>
-                    <CircularLoader />
-                </CenteredContent>
-            </>
-        )
-
     const submitText = initialValues.displayName
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
     const editNode = instance => {
-        console.log(
-            JSON.stringify(
-                'inst ns ' + instance.namespace + ' name ' + instance.name
-            )
-        )
-        setGodataValue(godataValue => {
-            const Outbreak = [...godataValue]
-            var tmp = Outbreak[1][instance.namespace[1]]
-            var path = ''
-            instance.namespace.shift()
-            instance.namespace.shift()
-            instance.namespace.forEach(element => (path = path + element + '.'))
-            path = path + instance.name
-            //for(var p in instance.namespace){path+p+'.'}
-            console.log('path' + path)
-            dot.str(path, instance.new_value, tmp)
-
-            //tmp.dhis2 = instance.new_value
-            return Outbreak
-        })
-
+        setGodataValue(instance.updated_src)
         return true
     }
 
     const copyFromPopup = instance => {
         if (instance.name == 'dhis2') {
-            console.log(instance.src)
-            //read and replace dhuis2 placeholder and update ui
             var ths = dot.str(
                 'dhis2',
                 instance.src,
@@ -193,25 +161,29 @@ export const GeneralForm = ({
     }
 
     //console.log(nameInput)
-    const saveConstant = async godataValue => {
-        const allValues = []
-        allValues.push(godataValue)
+    const saveConstant = async () => {
         if (initialValues.displayName) {
-            var id = initialValues.id
-            await dataStore.editById('mappings', id, {
+            await dataStore.editById('mappings', params.id, {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         } else {
             await dataStore.appendValue('mappings', {
                 displayName: nameInput,
-                mapping: allValues,
+                mapping: [{ godataValue: godataValue }, {}, {}],
             })
         }
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
-
+    if (loading)
+        return (
+            <>
+                <CenteredContent>
+                    <CircularLoader />
+                </CenteredContent>
+            </>
+        )
     return (
         <Form
             keepDirtyOnReinitialize
@@ -255,7 +227,7 @@ export const GeneralForm = ({
                                 onDelete={deleteNode}
                                 enableClipboard={selectedNode}
                                 theme="apathy:inverted"
-                                name={'Outbreak'}
+                                name={JSON_TITLE}
                                 displayArrayKey={true}
                             />
                         </div>
@@ -274,10 +246,7 @@ export const GeneralForm = ({
                         </div>
                     </Modal>
                     <ButtonStrip>
-                        <Button
-                            primary
-                            onClick={() => saveConstant({ godataValue })}
-                        >
+                        <Button primary onClick={() => saveConstant()}>
                             {submitText}
                         </Button>
                         <Button onClick={() => onCancelClick(pristine)}>
@@ -290,18 +259,16 @@ export const GeneralForm = ({
     )
 }
 
-OutbreaksForm.defaultProps = {
+GeneralForm.defaultProps = {
     initialValues: {
         parameters: [],
     },
     converterType: '',
 }
 
-OutbreaksForm.propTypes = {
+GeneralForm.propTypes = {
     onCancelClick: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
     converterType: PropTypes.string,
 }
-
-

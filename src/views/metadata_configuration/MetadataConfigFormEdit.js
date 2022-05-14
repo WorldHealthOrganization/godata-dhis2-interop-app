@@ -15,6 +15,7 @@ import {
     GODATA_CONTACT,
     GODATA_CONTACT_OF_CONTACT,
     GODATA_ORG_UNIT,
+    GODATA_EVENT,
 } from '../../constants'
 import { FormRow } from '../../forms'
 import { PageHeadline } from '../../headline'
@@ -25,7 +26,7 @@ import {
     ContactsForm,
     ContactsOfContactForm,
     OutbreaksForm,
-    useReadMappingConfigConstantsQueryById,
+    CustomForm,
 } from '../../constants'
 import i18n from '../../locales'
 import styles from './MetadataConfigFormEdit.module.css'
@@ -56,6 +57,10 @@ const getFormComponent = selectedForm => {
 
     if (GODATA_ORG_UNIT === selectedForm) {
         return LocationsForm
+    }
+
+    if (GODATA_EVENT === selectedForm) {
+        return CustomForm
     }
     throw new Error(`The conversion type does not exist, got "${selectedForm}"`)
 }
@@ -164,10 +169,17 @@ export const MetadataConfigFormEdit = () => {
                         onCancelClick={onCancelClick}
                     />
                 )}
+                {visibleForm === GODATA_EVENT && (
+                    <CustomForm
+                        onSubmit={onSubmit}
+                        passwordRequired={true}
+                        onCancelClick={onCancelClick}
+                    />
+                )}
             </FormRow>
             <FormComponent
                 initialValues={initialValues}
-                converterType={visibleForm}
+                converterType={conversionType}
                 onSubmit={onSubmit}
                 onCancelClick={pristine =>
                     pristine

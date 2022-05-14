@@ -284,7 +284,7 @@ export const ContactsForm = ({
         )
     }
 
-    const submitText = initialValues.name
+    const submitText = initialValues.displayName
         ? i18n.t('Save mappings')
         : i18n.t('Add mappings')
 
