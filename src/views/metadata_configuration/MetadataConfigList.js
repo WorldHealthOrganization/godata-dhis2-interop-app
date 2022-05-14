@@ -160,8 +160,7 @@ export const MetadataConfigList = () => {
                                 </TableCellHead>
                                 <TableCellHead>{i18n.t('Name')}</TableCellHead>
                                 <TableCellHead>{i18n.t('Type')}</TableCellHead>
-                                <TableCellHead />
-                                <TableCellHead />
+                                <TableCellHead/>
                             </TableRowHead>
                         </TableHead>
 
