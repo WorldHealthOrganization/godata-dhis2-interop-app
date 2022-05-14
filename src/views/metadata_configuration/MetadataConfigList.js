@@ -22,7 +22,8 @@ import {
     GODATA_DHIS_OUTBREAK_MODEL,
     GODATA_DHIS_LOCATION_MODEL,
     GODATA_DHIS_PROGRAM_TO_CASE_MODEL,
-    GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL
+    GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL,
+    GODATA_DHIS_PROGRAM_TO_EVENT_MODEL
 } from '../../constants'
 
 import { DeleteConstantsConfirmationDialog } from '../../constants'

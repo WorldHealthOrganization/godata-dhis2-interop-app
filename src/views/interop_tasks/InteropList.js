@@ -26,12 +26,10 @@ import {
     GODATA_DHIS_LOCATION_TASK,
     GODATA_DHIS_CASE_TASK,
     GODATA_DHIS_CONTACT_TASK,
-    GODATA_DHIS_EVENT_TASK
+    GODATA_DHIS_EVENT_TASK,
 } from '../../constants'
 
 import {
-    useCreateTaskConstantMutation,
-    useReadTaskConstantsQueryById,
     useDeleteConstantsMutation,
     DeleteConstantsConfirmationDialog,
     useReadTaskConstantsQueryForTasks,
@@ -81,6 +79,15 @@ export const InteropList = () => {
 
     const onDefaultsClick = async () => {
         console.log('default clicked')
+
+        allValues = GODATA_DHIS_EVENT_TASK
+        nameInput = 'Default Go.Data DHIS2 Event Task'
+        setTasks(
+            await dataStore.appendValue('tasks', {
+                task: allValues,
+                displayName: nameInput,
+            })
+        )
         var allValues = GODATA_DHIS_OUTBREAK_TASK
         var nameInput = 'Default Go.Data DHIS2 Outbreak Task'
         await dataStore.appendValue('tasks', {
@@ -111,16 +118,6 @@ export const InteropList = () => {
                 displayName: nameInput,
             })
         )
-
-        allValues = GODATA_DHIS_EVENT_TASK
-        nameInput = 'Default Go.Data DHIS2 Event Task'
-        setTasks(
-            await dataStore.appendValue('tasks', {
-                task: allValues,
-                displayName: nameInput,
-            })
-        )
-        
     }
 
     const loading = loadingReadConstants || loadingDelete
