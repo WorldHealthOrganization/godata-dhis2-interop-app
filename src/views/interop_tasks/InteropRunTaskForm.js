@@ -253,7 +253,7 @@ export const InteropRunTaskForm = () => {
 
                     instanceObject.data.trackedEntityInstances.push(inst.data)
                 }
-            } else if (taskObject[6] === 'Go.Data Location') {
+            } else if (taskObject[6] === 'Go.Data Location' || taskObject[6] === 'Go.Data Outbreak') {
                 instanceObject = await axios.get(
                     new URL(taskObject[0], credentials.dhis.url).href +
                         taskObject[2],
@@ -459,8 +459,11 @@ export const InteropRunTaskForm = () => {
         for (let y = 0; y < checkedConstants.length; ++y)
             taskPromises.push(getTaskDone(y))
 
-        Promise.all(taskPromises).then(() => {
-            setFinalMessage("Process finished")
+        Promise.all(taskPromises).then((res) => {
+            console.log(res)
+            const errors = res.filter(r => !!r.error).map(error => error.error.message)
+            if (errors.length) setFinalMessage(`Process finished with the following errors: ${JSON.stringify(errors)}`) 
+            else setFinalMessage("Process finished without errors")
             setLoading(false)
         })
     }
