@@ -32,12 +32,10 @@ export const METADATA_CONFIG_FORM_NEW_PATH = '/metadata/new'
 export const MetadataConfigFormNew = () => {
     const history = useHistory()
 
-    const [visibleForm, setVisibleForm] = useState(GODATA_OUTBREAK)
+    const [visibleForm, setVisibleForm] = useState(GODATA_CUSTOM)
 
-    const [
-        saveCasesConstant,
-        { error: saveCasesConstantError },
-    ] = useCreateCasesConstantMutation()
+    const [saveCasesConstant, { error: saveCasesConstantError }] =
+        useCreateCasesConstantMutation()
 
     const error = saveCasesConstantError
 
@@ -87,27 +85,22 @@ export const MetadataConfigFormNew = () => {
                         value={GODATA_OUTBREAK}
                         label={i18n.t(GODATA_OUTBREAK)}
                     />
-
                     <SingleSelectOption
                         value={GODATA_CASE}
                         label={i18n.t(GODATA_CASE)}
                     />
-
                     <SingleSelectOption
                         value={GODATA_CONTACT}
                         label={i18n.t(GODATA_CONTACT)}
                     />
-
                     <SingleSelectOption
                         value={GODATA_CONTACT_OF_CONTACT}
                         label={i18n.t(GODATA_CONTACT_OF_CONTACT)}
                     />
-
                     <SingleSelectOption
                         value={GODATA_ORG_UNIT}
                         label={i18n.t(GODATA_ORG_UNIT)}
                     />
-
                     <SingleSelectOption
                         value={GODATA_CUSTOM}
                         label={i18n.t(GODATA_CUSTOM)}

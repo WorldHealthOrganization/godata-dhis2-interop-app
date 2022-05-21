@@ -111,6 +111,7 @@ export const MetadataConfigFormEdit = () => {
 
     const onSubmit = async values => {
         try {
+            console.log(values)
             history.push(METADATA_CONFIG_LIST_PATH)
         } catch (e) {
             return Promise.reject(e)

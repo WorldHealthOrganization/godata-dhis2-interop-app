@@ -1,7 +1,7 @@
 .container {
     display: grid;
     height: 100%;
-    grid-template-areas: "sidebar main";
+    grid-template-areas: 'sidebar main';
     grid-template-columns: 300px auto;
 }
 
@@ -17,4 +17,14 @@
     grid-area: main;
     padding: 20px;
     background: var(--colors-grey050);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.cell {
+    cursor: pointer;
+    border-right: 1px solid var(--colors-grey300);
+    border-left: 1px solid var(--colors-grey300);
 }
