@@ -4,7 +4,7 @@ export const PROGRAM_WITH_STAGES_QUERY_MAPPINGS_CODE = {
     programs: {
         resource: 'programs',
         params: {
-            paging: false,
+            skipPaging: true,
             fields: ['lastUpdated',
             'id',
             'created',

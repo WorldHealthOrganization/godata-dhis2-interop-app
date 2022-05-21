@@ -1235,7 +1235,7 @@ export const GODATA_DHIS_EVENT_TASK = [
 export const GODATA_DHIS_OUTBREAK_TASK = [
     '/api/32/programs',
     '/api/outbreaks',
-    '?paging=false&fields=*',
+    '?skipPaging=true&fields=*',
     {
         name: 'string',
         description: 'string',
@@ -1548,7 +1548,7 @@ export const GODATA_DHIS_CONTACT_TASK = [
     },
     false,
     1,
-    'Go.Data Contacts',
+    'Go.Data Contact',
     'trackedEntityInstances',
     'Default transference of contacts from DHIS to Go.Data instance after selecting the desired value to be sent.',
 ]
