@@ -21,25 +21,14 @@ import { INTEROP_FORM_NEW_PATH } from './InteropFormNew'
 import { INTEROP_RUN_TASK_FORM_PATH_STATIC } from './InteropRunTaskForm'
 import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 
-import {
-    GODATA_DHIS_OUTBREAK_TASK,
-    GODATA_DHIS_LOCATION_TASK,
-    GODATA_DHIS_CASE_TASK,
-    GODATA_DHIS_CONTACT_TASK,
-    GODATA_DHIS_EVENT_TASK,
-} from '../../constants'
-
-import {
-    useDeleteConstantsMutation,
-    DeleteConstantsConfirmationDialog,
-    useReadTaskConstantsQueryForTasks,
-} from '../../constants'
+import { DeleteConstantsConfirmationDialog } from '../../constants'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
 import { Paragraph } from '../../text'
 import { dataTest } from '../../dataTest'
 import i18n from '../../locales'
 import styles from './InteropList.module.css'
+import { Task } from '../../models/task.js'
 
 export const INTEROP_LIST_PATH = '/interop'
 export const INTEROP_LIST_LABEL = 'Interoperability Tasks'
@@ -50,26 +39,18 @@ export const InteropList = () => {
     const [checkedConstants, setCheckedConstants] = useState([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
     const [tasks, setTasks] = useState({})
-
-    const {
-        loading: loadingReadConstants,
-        error: errorReadConstants,
-        data,
-        refetch: refetchReadConstants,
-    } = useReadTaskConstantsQueryForTasks()
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
 
     useEffect(() => {
-        dataStore.getValue('tasks').then(tasks => {
-            setTasks(tasks)
-        })
+        Task.getAllTasks()
+            .then(tasks => {
+                console.log({ tasks })
+                setTasks(tasks)
+                setLoading(false)
+            })
+            .catch(err => setError(err))
     }, [])
-
-    const constants = data?.constants?.constants
-
-    const [
-        deleteCheckedConstants,
-        { loading: loadingDelete, error: errorDelete },
-    ] = useDeleteConstantsMutation()
 
     const onDeleteClick = async () => {
         setTasks(await dataStore.deleteByArrayIds('tasks', checkedConstants))
@@ -78,49 +59,17 @@ export const InteropList = () => {
     }
 
     const onDefaultsClick = async () => {
-        console.log('default clicked')
-
-        allValues = GODATA_DHIS_EVENT_TASK
-        nameInput = 'Default Go.Data DHIS2 Event Task'
-        setTasks(
-            await dataStore.appendValue('tasks', {
-                task: allValues,
-                displayName: nameInput,
+        setLoading(true)
+        Task.addDefaultTasks()
+            .then(tasks => {
+                setTasks(tasks)
+                setLoading(false)
             })
-        )
-        var allValues = GODATA_DHIS_OUTBREAK_TASK
-        var nameInput = 'Default Go.Data DHIS2 Outbreak Task'
-        await dataStore.appendValue('tasks', {
-            task: allValues,
-            displayName: nameInput,
-        })
-        allValues = GODATA_DHIS_LOCATION_TASK
-        nameInput = 'Default Go.Data DHIS2 Location Task'
-        setTasks(
-            await dataStore.appendValue('tasks', {
-                task: allValues,
-                displayName: nameInput,
+            .catch(err => {
+                setError(err)
+                setLoading(false)
             })
-        )
-        allValues = GODATA_DHIS_CASE_TASK
-        nameInput = 'Default Go.Data DHIS2 Case Task'
-        setTasks(
-            await dataStore.appendValue('tasks', {
-                task: allValues,
-                displayName: nameInput,
-            })
-        )
-        allValues = GODATA_DHIS_CONTACT_TASK
-        nameInput = 'Default Go.Data DHIS2 Contact Task'
-        setTasks(
-            await dataStore.appendValue('tasks', {
-                task: allValues,
-                displayName: nameInput,
-            })
-        )
     }
-
-    const loading = loadingReadConstants || loadingDelete
 
     if (loading) {
         return (
@@ -133,19 +82,11 @@ export const InteropList = () => {
         )
     }
 
-    const error = errorReadConstants || errorDelete
-
-    if (error) {
-        const msg = i18n.t(
-            'Something went wrong whilst performing the requested operation'
-        )
-
+    if (!!error) {
         return (
             <>
                 <PageHeadline>{INTEROP_LIST_LABEL}</PageHeadline>
-                <NoticeBox error title={msg}>
-                    {error.message}
-                </NoticeBox>
+                <NoticeBox error>{error}</NoticeBox>
             </>
         )
     }
@@ -176,8 +117,6 @@ export const InteropList = () => {
         else setCheckedConstants([])
     }
 
-    const hasMappings = !!data?.constants?.constants?.length
-
     return (
         <div
             className={styles.container}
@@ -199,8 +138,7 @@ export const InteropList = () => {
                 onAddClick={onAddConstantClick}
                 onDefaultsClick={onDefaultsClick}
                 onDeleteClick={() => setShowDeleteDialog(true)}
-                disableAdd={loadingDelete}
-                disableDelete={!checkedConstants.length || loadingDelete}
+                disableDelete={!checkedConstants.length}
             />
 
             {Object.keys(tasks).length ? (
@@ -236,7 +174,6 @@ export const InteropList = () => {
                         </TableHead>
 
                         <TableBody>
-                            {console.log(tasks)}
                             {tasks.map((task, i) => (
                                 <TableRow
                                     key={i}
