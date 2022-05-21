@@ -381,7 +381,7 @@ export const InteropForm = ({
                                     label={i18n.t('Sender API parameters')}
                                     className=""
                                     type="text"
-                                    helpText="E.g ?fields=id,name,description,[organisationunits]&paging=false&filters=name.eq.blabla. DHIS2 API example"
+                                    helpText="E.g ?fields=id,name,description,[organisationunits]&skipPaging=true&filters=name.eq.blabla. DHIS2 API example"
                                     value={senderParamsInput}
                                     onChange={ev =>
                                         onSenderParamsInput(ev.value)
