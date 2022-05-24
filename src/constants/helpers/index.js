@@ -4,6 +4,13 @@ import axios from 'axios'
 import { getCredentialsFromUserDataStore } from '../../utils/get'
 import {useState, useEffect} from 'react'
 
+const removeLastSlash = (str) => str.charAt(str.length - 1) === '/' ? str.slice(0,-1) : str
+
+export const buildUrl = (url, path) => new URL(
+        removeLastSlash(new URL(url).pathname) + path,
+        url
+    ).href
+
 export const getDotNotationByValue = (
     dotnot,
     mappingModel,

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-05-14T17:58:19.182Z\n"
-"PO-Revision-Date: 2022-05-14T17:58:19.182Z\n"
+"POT-Creation-Date: 2022-05-24T17:56:31.394Z\n"
+"PO-Revision-Date: 2022-05-24T17:56:31.394Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -53,7 +53,13 @@ msgstr ""
 msgid "Select DHIS2 Model"
 msgstr ""
 
+msgid "Add row"
+msgstr ""
+
 msgid "Confirm deletion"
+msgstr ""
+
+msgid "Are you sure you want to delete the selected row?"
 msgstr ""
 
 msgid "Are you sure you want to delete the selected constants?"
@@ -190,9 +196,6 @@ msgid "Manage Tasks"
 msgstr ""
 
 msgid "Something went wrong whilst loading task"
-msgstr ""
-
-msgid "Something went wrong whilst performing the requested operation"
 msgstr ""
 
 msgid ""

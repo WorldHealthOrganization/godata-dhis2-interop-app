@@ -19,6 +19,7 @@ import {
     ModalActions,
     ModalContent,
     ModalTitle,
+    AlertBar,
 } from '@dhis2/ui'
 import styles from '../App.module.css'
 import {
@@ -59,17 +60,19 @@ import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import { useReadProgramsWithStagesQueryForMappings } from '.'
 import { Mapping } from '../models/mapping.js'
+import { useCredentials } from './helpers'
 
 const { Form } = ReactFinalForm
 
 export const CustomForm = () => {
     const history = useHistory()
     const params = useParams()
+    const [alertBarMessage, setAlertBarMessage] = useState('')
+    const [alertBar, setAlertBar] = useState(false)
     const [clickedRow, setRow] = useState()
     const [open, setOpen] = useState(false)
     const [openDhisModel, setOpenDhisModel] = useState(false)
     const [openGodataModel, setOpenGodataModel] = useState(false)
-    const [valueHolder, setValueHolder] = useState({})
     const [dhisValue, setDhisValue] = useState({})
     const [godataValue, setGodataValue] = useState([])
     const [godataModel, setGodataModel] = useState({})
@@ -77,13 +80,14 @@ export const CustomForm = () => {
     const [objectType, setObjectType] = useState('')
     const [mappingName, setMappingName] = useState('')
     const [nameInput, setNameInput] = useState('')
-    const [dhisLoadEntities, setDhisLoadEntities] = useState(true)
     const [entities, setEntities] = useState({})
     const [attributes, setAttributes] = useState()
     const [inputCellModal, setInputCellModal] = useState(false)
     const [cellModalData, setCellModalData] = useState({})
     const [selectedModal, setSelectedModal] = useState('DHIS2 entities')
     const [deleteModal, setDeleteModal] = useState(false)
+    const { loadingCredentials, credentials } = useCredentials()
+
     const {
         loading,
         data: progData,
@@ -92,13 +96,16 @@ export const CustomForm = () => {
 
     const processAll = useCallback(async () => {
         if (!!params.id) {
+            //EDIT
             const mappings = await dataStore.getValue('mappings')
 
             if (params.id >= mappings.length)
                 history.push(METADATA_CONFIG_LIST_PATH)
             const initialValues = mappings[params.id]
             if (!initialValues) history.push(METADATA_CONFIG_LIST_PATH)
-            setObjectType(initialValues.mapping[0].godataValue[0][0].conversionType)
+            setObjectType(
+                initialValues.mapping[0].godataValue[0][0].conversionType
+            )
             setNameInput(initialValues.displayName)
             setGodataValue(initialValues.mapping[0].godataValue)
             setGodataModel(initialValues.mapping[1])
@@ -140,27 +147,6 @@ export const CustomForm = () => {
         setOpen(false)
     }
 
-    // const submitText = !!initialValues?.displayName
-    //     ? i18n.t('Save mappings')
-    //     : i18n.t('Add mappings')
-
-    const editNode = instance => {
-        setGodataValue(godataValue => {
-            const Outbreak = [...godataValue]
-            var tmp = Outbreak[1][instance.namespace[1]]
-            var path = ''
-            instance.namespace.shift()
-            instance.namespace.shift()
-            instance.namespace.forEach(element => (path = path + element + '.'))
-            path = path + instance.name //for(var p in instance.namespace){path+p+'.'}
-
-            dot.str(path, instance.new_value, tmp) //tmp.dhis2 = instance.new_value
-
-            return Outbreak
-        })
-        return true
-    }
-
     const truncateString = (string, max) =>
         string.length > max ? `${string.slice(0, max)}...` : string
 
@@ -185,41 +171,21 @@ export const CustomForm = () => {
         setOpen(false)
     }
 
-    const selectedNode = instance => {
-        //store initial values into useStore, we need this to replace placeholder next
-        setValueHolder(instance.namespace),
-            instance.name == 'dhis2'
-                ? setOpen(true)
-                : console.log('wrong element selected')
-        return true
-    }
-
     const onCloseModal = () => {
         setOpen(false)
     }
 
-    const addNode = () => {
-        console.log('addjsoneditor')
-    }
-
-    const deleteNode = instance => {
-        const wanted = godataValue[1][instance.namespace[1]]
-        const newgodata = godataValue[1].filter(item => item !== wanted)
-        let Outbreak = [...godataValue]
-        Outbreak[1] = newgodata
-        setGodataValue(Outbreak)
-        return true
-    }
-
     const saveConstant = async godataValue => {
-        if (!!params.id) await dataStore.editById('mappings', params.id, {
-            displayName: nameInput,
-            mapping: [godataValue, godataModel, dhisModel],
-        })
-        else await dataStore.appendValue('mappings', {
-            displayName: nameInput,
-            mapping: [godataValue, godataModel, dhisModel],
-        })
+        if (!!params.id)
+            await dataStore.editById('mappings', params.id, {
+                displayName: nameInput,
+                mapping: [godataValue, godataModel, dhisModel],
+            })
+        else
+            await dataStore.appendValue('mappings', {
+                displayName: nameInput,
+                mapping: [godataValue, godataModel, dhisModel],
+            })
 
         history.push(METADATA_CONFIG_LIST_PATH)
     }
@@ -273,14 +239,57 @@ export const CustomForm = () => {
         setGodataValue(caseMeta)
     }
 
-    const addRow = () => {
-        let val = []
-        if (!!godataValue) val = [...godataValue]
-        else val = [[
+    /**
+     * @post If
+     *          the go.data version is 2.40+
+     *          CustomForm is on CreateMode
+     *
+     */
+    const updateGoDataModel = async () => {
+        const editMode = !!params.id
+        console.log({ editMode, objectType })
+        if (editMode) setAlertBarMessage('Not enabled on edit mode')
+        if (!objectType)
+            setAlertBarMessage(
+                'Please select a form type before using "Autogenerate"'
+            )
+        if (loadingCredentials) setAlertBarMessage('Credentials not loaded')
+
+        if (editMode || !objectType || loadingCredentials) {
+            setAlertBar(true)
+            return
+        }
+
+        const map = await Mapping.autoGenerate(objectType, credentials)
+        if (!map) {
+            setAlertBarMessage('No sample models sent from the configured Go.Data instance. To activate this functionality, please update the Go.Data instance to version 2.40+.')
+            setAlertBar(true)
+            return
+        }
+        setGodataModel(map)
+
+        const caseMeta = []
+        caseMeta.push([
             {
                 conversionType: objectType,
             },
-        ]]
+        ])
+        caseMeta.push(Mapping.mainIterator(map))
+        setGodataValue(caseMeta)
+        //setOpenGodataModel(false)
+    }
+
+    const addRow = () => {
+        let val = []
+        if (!!godataValue) val = [...godataValue]
+        else
+            val = [
+                [
+                    {
+                        conversionType: objectType,
+                    },
+                ],
+            ]
         const newValue = {
             godata: '',
             dhis2: '',
@@ -331,10 +340,7 @@ export const CustomForm = () => {
                         : 'Mappings setup'
                 )}
             </PageHeadline>
-            <Form
-                keepDirtyOnReinitialize
-                onSubmit={onSubmit}
-            >
+            <Form keepDirtyOnReinitialize onSubmit={onSubmit}>
                 {({ handleSubmit }) => (
                     <form
                         onSubmit={handleSubmit}
@@ -343,9 +349,9 @@ export const CustomForm = () => {
                         <FormRow>
                             <SingleSelectField
                                 label={i18n.t('Type')}
-                                onChange={({ selected }) =>
+                                onChange={({ selected }) => {
                                     setObjectTypeAndMappingName(selected)
-                                }
+                                }}
                                 selected={objectType}
                                 dataTest={dataTest(
                                     'views-gatewayconfigformnew-gatewaytype'
@@ -392,31 +398,6 @@ export const CustomForm = () => {
                             <Button primary onClick={addRow}>
                                 {i18n.t('Add row')}
                             </Button>
-                            {/* <Field
-                                name="dhisEntities"
-                                label={i18n.t('DHIS2 Load Entities')}
-                                helpText={i18n.t(
-                                    'If selected, the modal will show dhis2 entities'
-                                )}
-                                render={() => (
-                                    <CheckboxField
-                                        id="senderparams"
-                                        label={i18n.t('DHIS2 entities')}
-                                        className=""
-                                        type="checkbox"
-                                        helpText={i18n.t(
-                                            'If selected, the modal will show dhis2 entities'
-                                        )}
-                                        checked={dhisLoadEntities}
-                                        onChange={ev => {
-                                            setDhisLoadEntities(ev.checked)
-                                            if (ev.checked)
-                                                setDhisValue(entities)
-                                            else setDhisValue(attributes)
-                                        }}
-                                    />
-                                )}
-                            /> */}
                         </ButtonStrip>
 
                         <FormRow>
@@ -454,6 +435,7 @@ export const CustomForm = () => {
                                     </DataTableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {console.log(godataValue)}
                                     {godataValue.length >= 1 &&
                                         godataValue[1].map(
                                             (
@@ -562,17 +544,6 @@ export const CustomForm = () => {
                                         )}
                                 </TableBody>
                             </DataTable>
-
-                            {/* <ReactJson
-                                src={godataValue}
-                                onAdd={addNode}
-                                onEdit={editNode}
-                                onDelete={deleteNode}
-                                enableClipboard={selectedNode}
-                                theme="apathy:inverted"
-                                name={mappingName}
-                                displayArrayKey={true}
-                            /> */}
                         </FormRow>
 
                         <Modal open={open} onClose={onCloseModal} center>
@@ -674,44 +645,53 @@ export const CustomForm = () => {
                 open={inputCellModal}
                 onClose={() => setInputCellModal(false)}
             >
-                <Form
-                    onSubmit={values =>
-                        alertValues(
-                            values,
-                            cellModalData.row,
-                            cellModalData.field,
-                            cellModalData.jsonEdit
-                        )
-                    }
-                >
-                    {({ handleSubmit }) => (
-                        <form onSubmit={handleSubmit}>
-                            {!cellModalData.jsonEdit ? (
-                                <FormRow>
+                <ModalTitle>Introduce your value:</ModalTitle>
+                <ModalContent>
+                    <Form
+                        onSubmit={values =>
+                            alertValues(
+                                values,
+                                cellModalData.row,
+                                cellModalData.field,
+                                cellModalData.jsonEdit
+                            )
+                        }
+                    >
+                        {({ handleSubmit }) => (
+                            <form onSubmit={handleSubmit}>
+                                {!cellModalData.jsonEdit ? (
+                                    <FormRow>
+                                        <Field
+                                            name="value"
+                                            label={cellModalData.label}
+                                            initialValue={cellModalData.data}
+                                            component={InputFieldFF}
+                                        />
+                                    </FormRow>
+                                ) : (
                                     <Field
                                         name="value"
                                         label={cellModalData.label}
                                         initialValue={cellModalData.data}
-                                        component={InputFieldFF}
+                                        component={TextAreaFieldFF}
                                     />
-                                </FormRow>
-                            ) : (
-                                <Field
-                                    name="value"
-                                    label={cellModalData.label}
-                                    initialValue={cellModalData.data}
-                                    component={TextAreaFieldFF}
-                                />
-                            )}
-
-                            <Button type="submit" primary>
-                                Save
-                            </Button>
-                        </form>
-                    )}
-                </Form>
+                                )}
+                                <ButtonStrip>
+                                    <Button type="submit" primary>
+                                        Save
+                                    </Button>
+                                    <Button
+                                        onClick={() => setInputCellModal(false)}
+                                    >
+                                        {i18n.t('Cancel')}
+                                    </Button>{' '}
+                                </ButtonStrip>
+                            </form>
+                        )}
+                    </Form>
+                </ModalContent>
             </Modal>
-            <Modal open={openGodataModel} onClose={onCloseGodataModel} center>
+            <Modal open={openGodataModel} onClose={() => setOpenGodataModel(false)} center>
                 <ModalTitle>Select Go.Data metadata Model </ModalTitle>
                 <ModalContent>
                     <Editor
@@ -720,15 +700,37 @@ export const CustomForm = () => {
                         onChange={ev => setGodataModel(ev)}
                     />
                 </ModalContent>
+                <ModalActions>
+                    <ButtonStrip>
+                        <Button
+                            primary
+                            onClick={() => onCloseGodataModel()}
+                            type="submit"
+                        >
+                            Submit
+                        </Button>
+                        <Button
+                            primary
+                            onClick={() => updateGoDataModel()}
+                            type="submit"
+                        >
+                            Autogenerate model
+                        </Button>
+                        <Button onClick={() => setOpenGodataModel(false)}>
+                            {i18n.t('Cancel')}
+                        </Button>
+                    </ButtonStrip>
+                </ModalActions>
             </Modal>
             <Modal open={openDhisModel} onClose={onCloseDhisModel} center>
                 <ModalTitle>Select DHIS2 metadata Model</ModalTitle>
-
-                <Editor
-                    mode="text"
-                    value={dhisModel}
-                    onChange={ev => setDhisModel(ev)}
-                />
+                <ModalContent>
+                    <Editor
+                        mode="text"
+                        value={dhisModel}
+                        onChange={ev => setDhisModel(ev)}
+                    />
+                </ModalContent>
             </Modal>
             <Modal
                 open={deleteModal}
@@ -771,6 +773,33 @@ export const CustomForm = () => {
                     )}
                 </Form>
             </Modal>
+            {alertBar && (
+                <div
+                    style={{
+                        height: '260px',
+                    }}
+                >
+                    <div
+                        className="alert-bars"
+                        style={{
+                            bottom: 0,
+                            left: 0,
+                            paddingLeft: 16,
+                            position: 'fixed',
+                            width: '100%',
+                        }}
+                    >
+                        <React.Fragment key=".0">
+                            <AlertBar
+                                onHidden={() => setAlertBar(false)}
+                                warning
+                            >
+                                {alertBarMessage}
+                            </AlertBar>
+                        </React.Fragment>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

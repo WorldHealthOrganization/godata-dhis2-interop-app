@@ -75,6 +75,14 @@ export const InteropRunTaskForm = () => {
     `
     let [sloading, setLoading] = useState(true)
 
+    const removeLastSlash = (str) => str.charAt(str.length - 1) === '/' ? str.slice(0,-1) : str
+
+    const buildUrl = (url, path) => new URL(
+            removeLastSlash(new URL(url).pathname) + path,
+            url
+        ).href
+    
+
     const getMappings = async (map_id, taskObject) => {
         const mappingObject = (await dataStore.getValue('mappings'))[map_id]
             .mapping
@@ -100,13 +108,13 @@ export const InteropRunTaskForm = () => {
             })
         }
 
-        setReceiver(new URL(taskObject[1], credentials.godata.url).href)
+        setReceiver(buildUrl(credentials.godata.url, taskObject[1]))
         setPayloadModel(taskObject[3])
         setIsDhis(taskObject[4])
         setTaskType(taskObject[6])
         console.log('TASK OBJECT SET:')
         console.log({
-            'Sender API': new URL(taskObject[0], credentials.dhis.url).href,
+            'Sender API': buildUrl(credentials.dhis.url, taskObject[0]),
             'Receiver API': taskObject[1],
             'Sender API filters': taskObject[2],
             'Sender API payload model': taskObject[3],
@@ -145,8 +153,7 @@ export const InteropRunTaskForm = () => {
             //GET GO.DATA INSTANCES AS PER API ENDPOINT
 
             instanceObject = await axios.get(
-                new URL(taskObject[0], credentials.dhis.url).href +
-                    taskObject[2],
+                buildUrl(credentials.dhis.url, taskObject[0]) + taskObject[2],
                 {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
@@ -189,12 +196,10 @@ export const InteropRunTaskForm = () => {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
                 console.log(
-                    new URL(endpoints[0], credentials.dhis.url).href +
-                        filters[0]
+                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0]                        
                 )
                 instanceIds = await axios.get(
-                    new URL(endpoints[0], credentials.dhis.url).href +
-                        filters[0],
+                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -221,9 +226,7 @@ export const InteropRunTaskForm = () => {
 
                 for (let x = 0; x < fromPromise.length; x++) {
                     var inst = await axios.get(
-                        new URL(endpoints[1], credentials.dhis.url).href +
-                            fromPromise[x] +
-                            filters[1],
+                        buildUrl(credentials.dhis.url, endpoints[1]) + fromPromise[x] + filters[1],
                         {
                             headers: {
                                 'Access-Control-Allow-Origin': '*',
@@ -241,8 +244,7 @@ export const InteropRunTaskForm = () => {
                     console.log({ inst })
                     if (taskObject[6] === GODATA_EVENT) {
                         inst.data['id'] = inst.data.event
-                        inst.data['name'] =
-                            'Case ID: ' + inst.data.event
+                        inst.data['name'] = 'Case ID: ' + inst.data.event
                         inst.data['dataValues'] = []
                     } else {
                         inst.data['id'] = inst.data.trackedEntityInstance
@@ -253,10 +255,12 @@ export const InteropRunTaskForm = () => {
 
                     instanceObject.data.trackedEntityInstances.push(inst.data)
                 }
-            } else if (taskObject[6] === 'Go.Data Location' || taskObject[6] === 'Go.Data Outbreak') {
+            } else if (
+                taskObject[6] === 'Go.Data Location' ||
+                taskObject[6] === 'Go.Data Outbreak'
+            ) {
                 instanceObject = await axios.get(
-                    new URL(taskObject[0], credentials.dhis.url).href +
-                        taskObject[2],
+                    buildUrl(credentials.dhis.url, taskObject[0]) + taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -459,11 +463,18 @@ export const InteropRunTaskForm = () => {
         for (let y = 0; y < checkedConstants.length; ++y)
             taskPromises.push(getTaskDone(y))
 
-        Promise.all(taskPromises).then((res) => {
+        Promise.all(taskPromises).then(res => {
             console.log(res)
-            const errors = res.filter(r => !!r.error).map(error => error.error.message)
-            if (errors.length) setFinalMessage(`Process finished with the following errors: ${JSON.stringify(errors)}`) 
-            else setFinalMessage("Process finished without errors")
+            const errors = res
+                .filter(r => !!r.error)
+                .map(error => error.error.message)
+            if (errors.length)
+                setFinalMessage(
+                    `Process finished with the following errors: ${JSON.stringify(
+                        errors
+                    )}`
+                )
+            else setFinalMessage('Process finished without errors')
             setLoading(false)
         })
     }
