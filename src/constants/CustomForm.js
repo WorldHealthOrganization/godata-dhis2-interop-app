@@ -87,7 +87,8 @@ export const CustomForm = () => {
     const [selectedModal, setSelectedModal] = useState('DHIS2 entities')
     const [deleteModal, setDeleteModal] = useState(false)
     const { loadingCredentials, credentials } = useCredentials()
-
+    const [programIndex, setProgramIndex] = useState(0)
+    
     const {
         loading,
         data: progData,
@@ -112,13 +113,18 @@ export const CustomForm = () => {
             setDhisModel(initialValues.mapping[2])
         }
         if (!loading) {
+            console.log(progData)
+
             const entitiesLoaded = Mapping.entityIterator(
                 progData && progData.programs.programs.length > 0
-                    ? progData.programs.programs[0]
+                    ? progData.programs.programs[programIndex]
                     : {}
             )
-            const attribs = Mapping.secondIterator(dhisModel)
+
+            console.log({ entitiesLoaded })
             setEntities(entitiesLoaded)
+
+            const attribs = Mapping.secondIterator(dhisModel)
             setAttributes(attribs)
             if (selectedModal === 'DHIS2 entities') setDhisValue(entitiesLoaded)
             else setDhisValue(attribs)
@@ -127,7 +133,7 @@ export const CustomForm = () => {
 
     useEffect(() => {
         processAll()
-    }, [loading, progData])
+    }, [loading, loadingCredentials])
 
     const onSubmit = async values => {
         history.push(METADATA_CONFIG_LIST_PATH)
@@ -262,7 +268,9 @@ export const CustomForm = () => {
 
         const map = await Mapping.autoGenerate(objectType, credentials)
         if (!map) {
-            setAlertBarMessage('No sample models sent from the configured Go.Data instance. To activate this functionality, please update the Go.Data instance to version 2.40+.')
+            setAlertBarMessage(
+                'No sample models sent from the configured Go.Data instance. To activate this functionality, please update the Go.Data instance to version 2.40+.'
+            )
             setAlertBar(true)
             return
         }
@@ -276,7 +284,7 @@ export const CustomForm = () => {
         ])
         caseMeta.push(Mapping.mainIterator(map))
         setGodataValue(caseMeta)
-        //setOpenGodataModel(false)
+        setOpenGodataModel(false)
     }
 
     const addRow = () => {
@@ -388,17 +396,28 @@ export const CustomForm = () => {
                                 />
                             </SingleSelectField>
                         </FormRow>
-                        <ButtonStrip>
-                            <Button onClick={() => getGodataModel()}>
-                                {i18n.t('Select Go.Data Model')}
-                            </Button>
-                            <Button onClick={() => getDhisModel()}>
-                                {i18n.t('Select DHIS2 Model')}
-                            </Button>
-                            <Button primary onClick={addRow}>
-                                {i18n.t('Add row')}
-                            </Button>
-                        </ButtonStrip>
+
+                        {!loading && progData.programs.programs.length > programIndex && <FormRow>
+                            <SingleSelectField
+                                label={'Program Stage'}
+                                onChange={({ selected }) => {
+                                    console.log(Mapping.entityIterator(progData.programs.programs[selected]))
+                                    setEntities(Mapping.entityIterator(progData.programs.programs[selected]))
+                                    if (selectedModal === 'DHIS2 entities') setDhisValue(Mapping.entityIterator(progData.programs.programs[selected]))
+                                    setProgramIndex(selected)
+                                }}
+                                selected={programIndex.toString()}
+                            >
+                                {progData.programs.programs.map(({shortName}, i) => 
+                                    <SingleSelectOption
+                                        key={i}
+                                        value={i.toString()}
+                                        label={shortName}
+                                    />
+                                )}
+                                
+                            </SingleSelectField>
+                        </FormRow>}
 
                         <FormRow>
                             <InputField
@@ -412,6 +431,19 @@ export const CustomForm = () => {
                                 }}
                             />
                         </FormRow>
+                        <div style={{ marginBottom: 20, marginTop: 30 }}>
+                            <ButtonStrip>
+                                <Button onClick={() => getGodataModel()}>
+                                    {i18n.t('Select Go.Data Model')}
+                                </Button>
+                                <Button onClick={() => getDhisModel()}>
+                                    {i18n.t('Select DHIS2 Model')}
+                                </Button>
+                                <Button primary onClick={addRow}>
+                                    {i18n.t('Add row')}
+                                </Button>
+                            </ButtonStrip>
+                        </div>
 
                         <FormRow>
                             <DataTable>
@@ -691,7 +723,11 @@ export const CustomForm = () => {
                     </Form>
                 </ModalContent>
             </Modal>
-            <Modal open={openGodataModel} onClose={() => setOpenGodataModel(false)} center>
+            <Modal
+                open={openGodataModel}
+                onClose={() => setOpenGodataModel(false)}
+                center
+            >
                 <ModalTitle>Select Go.Data metadata Model </ModalTitle>
                 <ModalContent>
                     <Editor
