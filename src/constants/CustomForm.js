@@ -4,17 +4,12 @@ import {
     Button,
     ButtonStrip,
     ReactFinalForm,
-    TextArea,
     CenteredContent,
     CircularLoader,
-    composeValidators,
     hasValue,
-    string,
-    Input,
     InputField,
     InputFieldFF,
     TextAreaFieldFF,
-    CheckboxField,
     TableHead,
     ModalActions,
     ModalContent,
@@ -24,6 +19,7 @@ import {
 import styles from '../App.module.css'
 import {
     DataTable,
+    DataTableToolbar,
     DataTableColumnHeader,
     DataTableRow,
     DataTableCell,
@@ -88,7 +84,14 @@ export const CustomForm = () => {
     const [deleteModal, setDeleteModal] = useState(false)
     const { loadingCredentials, credentials } = useCredentials()
     const [programIndex, setProgramIndex] = useState(0)
-    
+    const conversionValue = {
+        true: 'Property',
+        false: 'Constant',
+        delm: 'Data Element',
+        attr: 'Attribute',
+        stage: 'Stage',
+    }
+
     const {
         loading,
         data: progData,
@@ -139,7 +142,8 @@ export const CustomForm = () => {
         history.push(METADATA_CONFIG_LIST_PATH)
     }
 
-    const alertValues = (values, row, field, json) => {
+    const alertValues = (values, row, field, json, isConstant = false) => {
+        console.log({ values, row, field, json })
         const breakoutField = field.split('.')
         const val = godataValue
         if (breakoutField.length > 1)
@@ -147,6 +151,11 @@ export const CustomForm = () => {
                 ? JSON.parse(values.value)
                 : values.value
         else val[1][row][field] = values.value
+
+        if (isConstant) {
+            val[1][row].props.conversion = 'false'
+            val[1][row].dhis2Description = val[1][row].dhis2
+        }
 
         setGodataValue(val)
         setInputCellModal(false)
@@ -156,22 +165,20 @@ export const CustomForm = () => {
     const truncateString = (string, max) =>
         string.length > max ? `${string.slice(0, max)}...` : string
 
-    const copyFromPopup = instance => {
-        const value = dot.str('dhis2', instance.src, godataValue[1][clickedRow])
+    const copyFromPopup = selected => {
+        const val = godataValue
+        console.log(selected)
+        let value = val[1][clickedRow]
         if (selectedModal === 'DHIS2 entities') {
-            if (!!instance?.namespace && instance.namespace.length > 1) {
-                const selectedEntity = entities[instance.namespace[1]]
-                if (!!selectedEntity && !!selectedEntity['description: name']) {
-                    value.dhis2Description = selectedEntity['description: name']
-                }
+            if (!!selected['description: name']) {
+                value.dhis2Description = selected['description: name']
             }
-            let dhis2 = value.dhis2.split(' ')
+            let dhis2 = selected.dhis2.split(' ')
             if (dhis2.length > 1) {
                 value.props.conversion = dhis2[0]
                 value.dhis2 = dhis2[1]
             } else value.dhis2 = dhis2[0]
         }
-        const val = godataValue
         val[1][clickedRow] = value
         setGodataValue(val)
         setOpen(false)
@@ -397,27 +404,53 @@ export const CustomForm = () => {
                             </SingleSelectField>
                         </FormRow>
 
-                        {!loading && progData.programs.programs.length > programIndex && <FormRow>
-                            <SingleSelectField
-                                label={'Program Stage'}
-                                onChange={({ selected }) => {
-                                    console.log(Mapping.entityIterator(progData.programs.programs[selected]))
-                                    setEntities(Mapping.entityIterator(progData.programs.programs[selected]))
-                                    if (selectedModal === 'DHIS2 entities') setDhisValue(Mapping.entityIterator(progData.programs.programs[selected]))
-                                    setProgramIndex(selected)
-                                }}
-                                selected={programIndex.toString()}
-                            >
-                                {progData.programs.programs.map(({shortName}, i) => 
-                                    <SingleSelectOption
-                                        key={i}
-                                        value={i.toString()}
-                                        label={shortName}
-                                    />
-                                )}
-                                
-                            </SingleSelectField>
-                        </FormRow>}
+                        {!loading &&
+                            progData.programs.programs.length >
+                                programIndex && (
+                                <FormRow>
+                                    <SingleSelectField
+                                        label={'Program'}
+                                        onChange={({ selected }) => {
+                                            console.log(
+                                                Mapping.entityIterator(
+                                                    progData.programs.programs[
+                                                        selected
+                                                    ]
+                                                )
+                                            )
+                                            setEntities(
+                                                Mapping.entityIterator(
+                                                    progData.programs.programs[
+                                                        selected
+                                                    ]
+                                                )
+                                            )
+                                            if (
+                                                selectedModal ===
+                                                'DHIS2 entities'
+                                            )
+                                                setDhisValue(
+                                                    Mapping.entityIterator(
+                                                        progData.programs
+                                                            .programs[selected]
+                                                    )
+                                                )
+                                            setProgramIndex(selected)
+                                        }}
+                                        selected={programIndex.toString()}
+                                    >
+                                        {progData.programs.programs.map(
+                                            ({ shortName }, i) => (
+                                                <SingleSelectOption
+                                                    key={i}
+                                                    value={i.toString()}
+                                                    label={shortName}
+                                                />
+                                            )
+                                        )}
+                                    </SingleSelectField>
+                                </FormRow>
+                            )}
 
                         <FormRow>
                             <InputField
@@ -467,7 +500,7 @@ export const CustomForm = () => {
                                     </DataTableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {console.log(godataValue)}
+                                    {console.log({ godataValue })}
                                     {godataValue.length >= 1 &&
                                         godataValue[1].map(
                                             (
@@ -516,25 +549,10 @@ export const CustomForm = () => {
                                                             : dhis2}
                                                     </DataTableCell>
                                                     <DataTableCell
-                                                        className={
-                                                            styles.pointer
-                                                        }
-                                                        onClick={() => {
-                                                            setInputCellModal(
-                                                                true
-                                                            )
-                                                            setCellModalData({
-                                                                row: i,
-                                                                data: props.conversion,
-                                                                field: 'props.conversion',
-                                                                label: 'Conversion Type',
-                                                            })
-                                                        }}
                                                     >
-                                                        {truncateString(
-                                                            props.conversion,
-                                                            27
-                                                        )}
+                                                        {conversionValue[
+                                                            props.conversion
+                                                        ] || ''}
                                                     </DataTableCell>
                                                     <DataTableCell
                                                         className={styles.cell}
@@ -612,7 +630,8 @@ export const CustomForm = () => {
                                                     values,
                                                     cellModalData.row,
                                                     'dhis2',
-                                                    false
+                                                    false,
+                                                    true
                                                 )
                                             }
                                         >
@@ -641,13 +660,71 @@ export const CustomForm = () => {
                                         </Form>
                                     </FormRow>
                                 ) : (
-                                    <ReactJson
-                                        src={dhisValue}
-                                        enableClipboard={copyFromPopup}
-                                        theme="apathy:inverted"
-                                        name={'Options'}
-                                        displayArrayKey={true}
-                                    />
+                                    <div style={{ marginTop: 30 }}>
+                                        <DataTableToolbar>
+                                            <p>
+                                                {
+                                                    progData.programs.programs[
+                                                        programIndex
+                                                    ].shortName
+                                                }
+                                            </p>
+                                        </DataTableToolbar>
+                                        <DataTable>
+                                            <TableHead>
+                                                <DataTableRow>
+                                                    <DataTableColumnHeader>
+                                                        Name
+                                                    </DataTableColumnHeader>
+                                                    <DataTableColumnHeader>
+                                                        Conversion
+                                                    </DataTableColumnHeader>
+                                                </DataTableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {dhisValue.length > 0 &&
+                                                    dhisValue.map(
+                                                        (dhisValueElem, i) => (
+                                                            <DataTableRow
+                                                                key={i}
+                                                            >
+                                                                <DataTableCell
+                                                                    className={
+                                                                        styles.pointer
+                                                                    }
+                                                                    onClick={() =>
+                                                                        copyFromPopup(
+                                                                            dhisValueElem
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {dhisValueElem[
+                                                                        'description: name'
+                                                                    ] ||
+                                                                        dhisValueElem.dhis2 ||
+                                                                        ''}
+                                                                </DataTableCell>
+                                                                <DataTableCell
+                                                                    className={
+                                                                        styles.cell
+                                                                    }
+                                                                    onClick={() =>
+                                                                        copyFromPopup(
+                                                                            dhisValueElem
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {!!dhisValueElem.conversion ? (conversionValue[
+                                                                        dhisValueElem
+                                                                            .conversion
+                                                                    ] || '') : "Property"}
+                                                                </DataTableCell>
+                                                            </DataTableRow>
+                                                        )
+                                                    )}
+                                            </TableBody>
+                                        </DataTable>
+                                    </div>
                                 )}
                             </ModalContent>
                         </Modal>
