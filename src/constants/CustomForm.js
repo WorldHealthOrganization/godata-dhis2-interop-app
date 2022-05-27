@@ -140,7 +140,6 @@ export const CustomForm = () => {
     }
 
     const alertValues = (values, row, field, json, isConstant = false) => {
-        console.log({ values, row, field, json })
         const breakoutField = field.split('.')
         const val = godataValue
         if (breakoutField.length > 1)
