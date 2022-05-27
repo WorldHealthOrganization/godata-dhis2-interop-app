@@ -19,11 +19,6 @@
     background: var(--colors-grey050);
 }
 
-.cellOnly {
-    border-right: 1px solid var(--colors-grey300);
-    border-left: 1px solid var(--colors-grey300);
-}
-
 .pointer {
     cursor: pointer;
 }

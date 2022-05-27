@@ -42,7 +42,8 @@ export const getCredentialsFromUserDataStore = async () =>
             dhisuser,
             dhisuserpass,
             dhisbaseurl
-        ]) => new Object({
+        ]) => {
+            const res = {
                 godata: {
                     username: godatauser,
                     password: godatauserpass,
@@ -53,6 +54,8 @@ export const getCredentialsFromUserDataStore = async () =>
                     password: dhisuserpass,
                     url: dhisbaseurl,
                 },
-            })
+            }
+            return res;
+        }
     )
 
