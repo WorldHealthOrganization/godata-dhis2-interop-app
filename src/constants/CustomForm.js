@@ -116,15 +116,12 @@ export const CustomForm = () => {
             setDhisModel(initialValues.mapping[2])
         }
         if (!loading) {
-            console.log(progData)
-
             const entitiesLoaded = Mapping.entityIterator(
                 progData && progData.programs.programs.length > 0
                     ? progData.programs.programs[programIndex]
                     : {}
             )
 
-            console.log({ entitiesLoaded })
             setEntities(entitiesLoaded)
 
             const attribs = Mapping.secondIterator(dhisModel)
@@ -155,6 +152,7 @@ export const CustomForm = () => {
         if (isConstant) {
             val[1][row].props.conversion = 'false'
             val[1][row].dhis2Description = val[1][row].dhis2
+            delete val[1][row].program      
         }
 
         setGodataValue(val)
@@ -178,6 +176,7 @@ export const CustomForm = () => {
                 value.props.conversion = dhis2[0]
                 value.dhis2 = dhis2[1]
             } else value.dhis2 = dhis2[0]
+            value.program =  progData.programs.programs[programIndex].shortName
         }
         val[1][clickedRow] = value
         setGodataValue(val)
@@ -260,7 +259,6 @@ export const CustomForm = () => {
      */
     const updateGoDataModel = async () => {
         const editMode = !!params.id
-        console.log({ editMode, objectType })
         if (editMode) setAlertBarMessage('Not enabled on edit mode')
         if (!objectType)
             setAlertBarMessage(
@@ -411,13 +409,6 @@ export const CustomForm = () => {
                                     <SingleSelectField
                                         label={'Program'}
                                         onChange={({ selected }) => {
-                                            console.log(
-                                                Mapping.entityIterator(
-                                                    progData.programs.programs[
-                                                        selected
-                                                    ]
-                                                )
-                                            )
                                             setEntities(
                                                 Mapping.entityIterator(
                                                     progData.programs.programs[
@@ -469,9 +460,9 @@ export const CustomForm = () => {
                                 <Button onClick={() => getGodataModel()}>
                                     {i18n.t('Select Go.Data Model')}
                                 </Button>
-                                <Button onClick={() => getDhisModel()}>
+                                {/* <Button onClick={() => getDhisModel()}>
                                     {i18n.t('Select DHIS2 Model')}
-                                </Button>
+                                </Button> */}
                                 <Button primary onClick={addRow}>
                                     {i18n.t('Add row')}
                                 </Button>
@@ -489,6 +480,9 @@ export const CustomForm = () => {
                                             DHIS2
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
+                                            Program
+                                        </DataTableColumnHeader>
+                                        <DataTableColumnHeader>
                                             Conversion
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
@@ -500,13 +494,13 @@ export const CustomForm = () => {
                                     </DataTableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {console.log({ godataValue })}
                                     {godataValue.length >= 1 &&
                                         godataValue[1].map(
                                             (
                                                 {
                                                     godata,
                                                     dhis2,
+                                                    program,
                                                     props,
                                                     dhis2Description,
                                                 },
@@ -548,14 +542,15 @@ export const CustomForm = () => {
                                                             ? dhis2Description
                                                             : dhis2}
                                                     </DataTableCell>
-                                                    <DataTableCell
-                                                    >
+                                                    <DataTableCell>
+                                                        {program}
+                                                    </DataTableCell>
+                                                    <DataTableCell className={styles.cellOnly}>
                                                         {conversionValue[
                                                             props.conversion
                                                         ] || ''}
                                                     </DataTableCell>
                                                     <DataTableCell
-                                                        className={styles.cell}
                                                         onClick={() => {
                                                             setInputCellModal(
                                                                 true
@@ -580,7 +575,7 @@ export const CustomForm = () => {
                                                     </DataTableCell>
                                                     <DataTableCell
                                                         className={
-                                                            styles.pointer
+                                                            styles.cell
                                                         }
                                                         onClick={() => {
                                                             setRow(i)
@@ -612,10 +607,10 @@ export const CustomForm = () => {
                                         value={'DHIS2 entities'}
                                         label={'DHIS2 entities'}
                                     />
-                                    <SingleSelectOption
+                                    {/* <SingleSelectOption
                                         value={'DHIS2 modal keys'}
                                         label={'DHIS2 modal keys'}
-                                    />
+                                    /> */}
                                     <SingleSelectOption
                                         value={'Constant'}
                                         label={'Constant'}
@@ -714,10 +709,13 @@ export const CustomForm = () => {
                                                                         )
                                                                     }
                                                                 >
-                                                                    {!!dhisValueElem.conversion ? (conversionValue[
-                                                                        dhisValueElem
-                                                                            .conversion
-                                                                    ] || '') : "Property"}
+                                                                    {!!dhisValueElem.conversion
+                                                                        ? conversionValue[
+                                                                              dhisValueElem
+                                                                                  .conversion
+                                                                          ] ||
+                                                                          ''
+                                                                        : 'Property'}
                                                                 </DataTableCell>
                                                             </DataTableRow>
                                                         )
