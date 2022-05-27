@@ -45,7 +45,7 @@ export class Task {
         this.description = description
     }
 
-    #getTaskData() {
+    getTaskData() {
         return [
             this.senderEndpoint,
             this.receiverEndpoint,

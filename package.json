@@ -41,6 +41,7 @@
         "classnames": "^2.2.6",
         "d2": "^31.4.0",
         "dot-object": "^2.1.4",
+        "eslint-plugin-prettier": "^4.0.0",
         "express": "^4.17.1",
         "http-proxy-middleware": "^2.0.1",
         "jsoneditor": "^9.5.7",
