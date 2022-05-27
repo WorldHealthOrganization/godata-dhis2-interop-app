@@ -116,11 +116,11 @@ const App = () => {
                                 component={InteropRunTaskForm}
                             />
 
-                            <Route
+                            {/* <Route
                                 exact
                                 path={SCHEDULED_TASK_FORM_PATH}
                                 component={ScheduleTaskForm}
-                            />
+                            /> */}
 
                             <Redirect from="*" to={HOME_PATH} />
                         </Switch>

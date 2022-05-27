@@ -22,9 +22,9 @@
         "format": "yarn format:js && yarn format:text"
     },
     "devDependencies": {
-        "@dhis2/cli-app-scripts": "^5.2.0",
+        "@dhis2/cli-app-scripts": "^3.0.2",
         "@dhis2/cli-style": "^7.0.0",
-        "@dhis2/cli-utils-cypress": "^2.2.1",
+        "@dhis2/cli-utils-cypress": "^9.0.2",
         "@testing-library/react-hooks": "^3.3.0",
         "react-test-renderer": "^16.13.1"
     },
@@ -39,8 +39,9 @@
         "ajv": "^8.7.1",
         "axios": "^0.24.0",
         "classnames": "^2.2.6",
-        "d2": "^31.10.2",
+        "d2": "^31.4.0",
         "dot-object": "^2.1.4",
+        "eslint-plugin-prettier": "^4.0.0",
         "express": "^4.17.1",
         "http-proxy-middleware": "^2.0.1",
         "jsoneditor": "^9.5.7",
