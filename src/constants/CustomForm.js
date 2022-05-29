@@ -177,6 +177,8 @@ export const CustomForm = () => {
                 value.dhis2 = dhis2[1]
             } else value.dhis2 = dhis2[0]
             value.program =  progData.programs.programs[programIndex].shortName
+        } else if (selectedModal === 'DHIS2 property') {
+            value.dhis2 = selected.dhis2
         }
         val[1][clickedRow] = value
         setGodataValue(val)
@@ -460,9 +462,9 @@ export const CustomForm = () => {
                                 <Button onClick={() => getGodataModel()}>
                                     {i18n.t('Select Go.Data Model')}
                                 </Button>
-                                {/* <Button onClick={() => getDhisModel()}>
+                                <Button onClick={() => getDhisModel()}>
                                     {i18n.t('Select DHIS2 Model')}
-                                </Button> */}
+                                </Button>
                                 <Button primary onClick={addRow}>
                                     {i18n.t('Add row')}
                                 </Button>
@@ -607,10 +609,10 @@ export const CustomForm = () => {
                                         value={'DHIS2 entities'}
                                         label={'DHIS2 entities'}
                                     />
-                                    {/* <SingleSelectOption
-                                        value={'DHIS2 modal keys'}
-                                        label={'DHIS2 modal keys'}
-                                    /> */}
+                                    <SingleSelectOption
+                                        value={'DHIS2 property'}
+                                        label={'DHIS2 property'}
+                                    />
                                     <SingleSelectOption
                                         value={'Constant'}
                                         label={'Constant'}
