@@ -39,17 +39,14 @@ import {
     GODATA_CONTACT_OF_CONTACT,
     GODATA_ORG_UNIT,
     GODATA_EVENT,
-    mappingNames,
 } from '../constants'
 import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 import 'react-responsive-modal/styles.css'
 const { Field } = ReactFinalForm
 import 'jsoneditor-react/es/editor.min.css'
-import ReactJson from 'react-json-view'
 import 'react-responsive-modal/styles.css'
 import { Modal } from 'react-responsive-modal'
-import dot from 'dot-object'
 import { FormRow } from '../forms'
 import { PageHeadline } from '../headline'
 import { dataTest } from '../dataTest'
@@ -69,12 +66,11 @@ export const CustomForm = () => {
     const [open, setOpen] = useState(false)
     const [openDhisModel, setOpenDhisModel] = useState(false)
     const [openGodataModel, setOpenGodataModel] = useState(false)
-    const [dhisValue, setDhisValue] = useState({})
+    const [dhisValue, setDhisValue] = useState([])
     const [godataValue, setGodataValue] = useState([])
     const [godataModel, setGodataModel] = useState({})
     const [dhisModel, setDhisModel] = useState({})
     const [objectType, setObjectType] = useState('')
-    const [mappingName, setMappingName] = useState('')
     const [nameInput, setNameInput] = useState('')
     const [entities, setEntities] = useState({})
     const [attributes, setAttributes] = useState()
@@ -84,6 +80,7 @@ export const CustomForm = () => {
     const [deleteModal, setDeleteModal] = useState(false)
     const { loadingCredentials, credentials } = useCredentials()
     const [programIndex, setProgramIndex] = useState(0)
+    const [dhis2ModalFilter, setDHIS2ModalFilter] = useState('true')
     const conversionValue = {
         true: 'Property',
         false: 'Constant',
@@ -152,7 +149,7 @@ export const CustomForm = () => {
         if (isConstant) {
             val[1][row].props.conversion = 'false'
             val[1][row].dhis2Description = val[1][row].dhis2
-            delete val[1][row].program      
+            delete val[1][row].program
         }
 
         setGodataValue(val)
@@ -168,19 +165,13 @@ export const CustomForm = () => {
         console.log(selected)
         let value = val[1][clickedRow]
         if (selectedModal === 'DHIS2 entities') {
-            if (!!selected['description: name']) {
-                value.dhis2Description = selected['description: name']
-            }
-            let dhis2 = selected.dhis2.split(' ')
-            if (dhis2.length > 1) {
-                value.props.conversion = dhis2[0]
-                value.dhis2 = dhis2[1]
-            } else value.dhis2 = dhis2[0]
-            value.program =  progData.programs.programs[programIndex].shortName
-        } else if (selectedModal === 'DHIS2 property') {
-            value.dhis2 = selected.dhis2
+            value = {...value, ...selected}
+            value.programName = progData.programs.programs[programIndex].shortName
         }
+
+        value = {...value, ...selected}
         val[1][clickedRow] = value
+        console.log(val[1])
         setGodataValue(val)
         setOpen(false)
     }
@@ -211,19 +202,6 @@ export const CustomForm = () => {
             if (val.length > 0 && val[0].length > 0)
                 val[0][0].conversionType = selected
             setGodataValue(val)
-        }
-        if (selected == GODATA_OUTBREAK) {
-            setMappingName('Outbreak')
-        } else if (selected == GODATA_CASE) {
-            setMappingName('Case')
-        } else if (selected == GODATA_CONTACT) {
-            setMappingName('Contact')
-        } else if (selected == GODATA_CONTACT_OF_CONTACT) {
-            setMappingName('Contact-of-Contact')
-        } else if (selected == GODATA_ORG_UNIT) {
-            setMappingName('Location')
-        } else if (selected == GODATA_EVENT) {
-            setMappingName('Event')
         }
     }
     const getGodataModel = () => {
@@ -502,7 +480,7 @@ export const CustomForm = () => {
                                                 {
                                                     godata,
                                                     dhis2,
-                                                    program,
+                                                    programName,
                                                     props,
                                                     dhis2Description,
                                                 },
@@ -545,9 +523,13 @@ export const CustomForm = () => {
                                                             : dhis2}
                                                     </DataTableCell>
                                                     <DataTableCell>
-                                                        {program}
+                                                        {programName}
                                                     </DataTableCell>
-                                                    <DataTableCell className={styles.cellOnly}>
+                                                    <DataTableCell
+                                                        className={
+                                                            styles.cellOnly
+                                                        }
+                                                    >
                                                         {conversionValue[
                                                             props.conversion
                                                         ] || ''}
@@ -576,9 +558,7 @@ export const CustomForm = () => {
                                                         )}
                                                     </DataTableCell>
                                                     <DataTableCell
-                                                        className={
-                                                            styles.cell
-                                                        }
+                                                        className={styles.cell}
                                                         onClick={() => {
                                                             setRow(i)
                                                             setDeleteModal(true)
@@ -618,6 +598,29 @@ export const CustomForm = () => {
                                         label={'Constant'}
                                     />
                                 </SingleSelectField>
+
+                                {selectedModal === 'DHIS2 entities' && (
+                                    <SingleSelectField
+                                        onChange={({ selected }) =>
+                                            setDHIS2ModalFilter(selected)
+                                        }
+                                        selected={dhis2ModalFilter}
+                                    >
+                                        <SingleSelectOption
+                                            value={'true'}
+                                            label={'Metadata properties'}
+                                        />
+                                        <SingleSelectOption
+                                            value={'delm'}
+                                            label={'Data elements'}
+                                        />
+
+                                        <SingleSelectOption
+                                            value={'attr'}
+                                            label={'Attributes'}
+                                        />
+                                    </SingleSelectField>
+                                )}
 
                                 {selectedModal === 'Constant' ? (
                                     <FormRow>
@@ -673,55 +676,77 @@ export const CustomForm = () => {
                                                     <DataTableColumnHeader>
                                                         Name
                                                     </DataTableColumnHeader>
-                                                    <DataTableColumnHeader>
+                                                    {/* <DataTableColumnHeader>
                                                         Conversion
-                                                    </DataTableColumnHeader>
+                                                    </DataTableColumnHeader> */}
+                                                    {dhis2ModalFilter ===
+                                                        'delm' && (
+                                                        <DataTableColumnHeader>
+                                                            Program Stage
+                                                        </DataTableColumnHeader>
+                                                    )}
                                                 </DataTableRow>
                                             </TableHead>
                                             <TableBody>
                                                 {dhisValue.length > 0 &&
-                                                    dhisValue.map(
-                                                        (dhisValueElem, i) => (
-                                                            <DataTableRow
-                                                                key={i}
-                                                            >
-                                                                <DataTableCell
-                                                                    className={
-                                                                        styles.pointer
-                                                                    }
-                                                                    onClick={() =>
-                                                                        copyFromPopup(
-                                                                            dhisValueElem
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {dhisValueElem[
-                                                                        'description: name'
-                                                                    ] ||
-                                                                        dhisValueElem.dhis2 ||
-                                                                        ''}
-                                                                </DataTableCell>
-                                                                <DataTableCell
-                                                                    className={
-                                                                        styles.cell
-                                                                    }
-                                                                    onClick={() =>
-                                                                        copyFromPopup(
-                                                                            dhisValueElem
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {!!dhisValueElem.conversion
-                                                                        ? conversionValue[
-                                                                              dhisValueElem
-                                                                                  .conversion
-                                                                          ] ||
-                                                                          ''
-                                                                        : 'Property'}
-                                                                </DataTableCell>
-                                                            </DataTableRow>
+                                                    dhisValue
+                                                        .filter(
+                                                            ({ conversion }) =>
+                                                                conversion ===
+                                                                dhis2ModalFilter
                                                         )
-                                                    )}
+                                                        .map(
+                                                            (
+                                                                dhisValueElem,
+                                                                i
+                                                            ) => (
+                                                                <DataTableRow
+                                                                    key={i}
+                                                                >
+                                                                    <DataTableCell
+                                                                        className={
+                                                                            styles.pointer
+                                                                        }
+                                                                        onClick={() =>
+                                                                            copyFromPopup(
+                                                                                dhisValueElem
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {dhisValueElem.dhis2Description ||
+                                                                            dhisValueElem.dhis2 ||
+                                                                            ''}
+                                                                    </DataTableCell>
+                                                                    {/* <DataTableCell
+                                                                        className={
+                                                                            styles.cell
+                                                                        }
+                                                                        onClick={() =>
+                                                                            copyFromPopup(
+                                                                                dhisValueElem
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {!!dhisValueElem.conversion
+                                                                            ? conversionValue[
+                                                                                  dhisValueElem
+                                                                                      .conversion
+                                                                              ] ||
+                                                                              ''
+                                                                            : 'Property'}
+                                                                    </DataTableCell> */}
+                                                                    {dhis2ModalFilter ===
+                                                                        'delm' && (
+                                                                        <DataTableCell className={
+                                                                            styles.cell
+                                                                        }>
+                                                                            {dhisValueElem.programStageName ||
+                                                                                ''}
+                                                                        </DataTableCell>
+                                                                    )}
+                                                                </DataTableRow>
+                                                            )
+                                                        )}
                                             </TableBody>
                                         </DataTable>
                                     </div>

@@ -75,13 +75,11 @@ export const InteropRunTaskForm = () => {
     `
     let [sloading, setLoading] = useState(true)
 
-    const removeLastSlash = (str) => str.charAt(str.length - 1) === '/' ? str.slice(0,-1) : str
+    const removeLastSlash = str =>
+        str.charAt(str.length - 1) === '/' ? str.slice(0, -1) : str
 
-    const buildUrl = (url, path) => new URL(
-            removeLastSlash(new URL(url).pathname) + path,
-            url
-        ).href
-    
+    const buildUrl = (url, path) =>
+        new URL(removeLastSlash(new URL(url).pathname) + path, url).href
 
     const getMappings = async (map_id, taskObject) => {
         const mappingObject = (await dataStore.getValue('mappings'))[map_id]
@@ -125,35 +123,14 @@ export const InteropRunTaskForm = () => {
             description: taskObject[8],
         })
         setTask(taskObject[6])
-        if (isDhis) {
-            StatusAlertService.showInfo(i18n.t('DHIS2 is receiving endpoint.'))
-            StatusAlertService.showInfo(
-                i18n.t('Login in to Go.Data Instance.') + credentials.godata.url
-            )
+        if (taskObject[4]) {
+            //IsDHIS2 receiver!!!
             const loginObject = await axios.post(
                 credentials.godata.url + '/api/users/login',
                 {
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods':
-                            'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                        'Content-Type': 'application/json',
-                        crossDomain: true,
-                    },
-                    data: {
-                        email: credentials.godata.username,
-                        password: credentials.godata.password,
-                    },
-                }
-            )
-            StatusAlertService.showSuccess(
-                i18n.t('Login in to Go.Data Instance - Success.')
-            )
-            StatusAlertService.showInfo(i18n.t('Reading sender data.'))
-            //GET GO.DATA INSTANCES AS PER API ENDPOINT
-
-            instanceObject = await axios.get(
-                buildUrl(credentials.dhis.url, taskObject[0]) + taskObject[2],
+                    email: credentials.godata.username,
+                    password: credentials.godata.password,
+                },
                 {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
@@ -161,29 +138,53 @@ export const InteropRunTaskForm = () => {
                             'GET,PUT,POST,DELETE,PATCH,OPTIONS',
                         'Content-Type': 'application/json',
                         crossDomain: true,
-                        Authorization: loginObject.data.id,
                     },
                 }
             )
-            StatusAlertService.showSuccess(
-                i18n.t('Reading sender data - Success.')
+            //GET GO.DATA INSTANCES AS PER API ENDPOINT
+            console.log('Here')
+            console.log(
+                buildUrl(credentials.godata.url, taskObject[0]) + taskObject[2]
             )
-            var tmp = JSON.parse(JSON.stringify(instanceObject.data))
-            setSenderData(tmp)
-            instance = []
-            instanceObject.data.map(function (object, i) {
-                instance.push({
-                    name: object.name,
-                    id: object.id,
+            await axios
+                .get(
+                    buildUrl(credentials.godata.url, taskObject[0]) +
+                        taskObject[2],
+                    {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Methods':
+                                'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                            'Content-Type': 'application/json',
+                            crossDomain: true,
+                            Authorization: loginObject.data.id,
+                        },
+                    }
+                )
+                .then(({ data }) => {
+                    setInst(data)
+                    setOpen(true)
+                    setLoading(false)
                 })
+            //var tmp = JSON.parse(JSON.stringify(instanceObject.data))
+            //setSenderData(tmp)
+            //instance = []
+            // instanceObject.data.map(function (object, i) {
+            //     instance.push({
+            //         name: object.name,
+            //         id: object.id,
+            //     })
 
-                instance = JSON.parse(JSON.stringify(instance)) //MAP AND SHOW MODAL FOR SELECTION
+            //     instance = JSON.parse(JSON.stringify(instance)) //MAP AND SHOW MODAL FOR SELECTION
 
-                setInst(instance)
-                setOpen(true)
-                setLoading(false)
-            }) //if DHIS2 is not receiving end
-        } else {
+            //     console.log({ instance })
+            //     setInst(instance)
+            //     setOpen(true)
+            //     setLoading(false)
+            // })
+        }
+        //if DHIS2 is not receiving end
+        else {
             StatusAlertService.showInfo(i18n.t('Reading sender data.'))
 
             //GET DHIS2 INSTANCES AS PER API ENDPOINT
@@ -196,7 +197,7 @@ export const InteropRunTaskForm = () => {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
                 console.log(
-                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0]                        
+                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0]
                 )
                 instanceIds = await axios.get(
                     buildUrl(credentials.dhis.url, endpoints[0]) + filters[0],
@@ -226,7 +227,9 @@ export const InteropRunTaskForm = () => {
 
                 for (let x = 0; x < fromPromise.length; x++) {
                     var inst = await axios.get(
-                        buildUrl(credentials.dhis.url, endpoints[1]) + fromPromise[x] + filters[1],
+                        buildUrl(credentials.dhis.url, endpoints[1]) +
+                            fromPromise[x] +
+                            filters[1],
                         {
                             headers: {
                                 'Access-Control-Allow-Origin': '*',
@@ -260,7 +263,8 @@ export const InteropRunTaskForm = () => {
                 taskObject[6] === 'Go.Data Outbreak'
             ) {
                 instanceObject = await axios.get(
-                    buildUrl(credentials.dhis.url, taskObject[0]) + taskObject[2],
+                    buildUrl(credentials.dhis.url, taskObject[0]) +
+                        taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
@@ -442,41 +446,41 @@ export const InteropRunTaskForm = () => {
     }
 
     const runAllTasks = async () => {
-        const taskPromises = []
-        if (taskType === 'Go.Data Location') {
-            getTaskDone(1)
-                .then(res => {
-                    setFinalMessage(
-                        `Locations send and processed successfully. Organisation units: ${JSON.stringify(
-                            res?.data.length
-                        )}`
-                    )
-                    setLoading(false)
-                })
-                .catch(error => {
-                    setFinalMessage(JSON.stringify(error?.response?.data))
-                    setLoading(false)
-                })
-            return
-        }
+        console.log({isDhis, inst, checkedConstants})
+        // const taskPromises = []
+        // if (taskType === 'Go.Data Location') {
+        //     getTaskDone(1)
+        //         .then(res => {
+        //             setFinalMessage(
+        //                 `Locations send and processed successfully. Organisation units: ${JSON.stringify(
+        //                     res?.data.length
+        //                 )}`
+        //             )
+        //             setLoading(false)
+        //         })
+        //         .catch(error => {
+        //             setFinalMessage(JSON.stringify(error?.response?.data))
+        //             setLoading(false)
+        //         })
+        //     return
+        // }
 
-        for (let y = 0; y < checkedConstants.length; ++y)
-            taskPromises.push(getTaskDone(y))
+        // for (let y = 0; y < checkedConstants.length; ++y)
+        //     taskPromises.push(getTaskDone(y))
 
-        Promise.all(taskPromises).then(res => {
-            console.log(res)
-            const errors = res
-                .filter(r => !!r.error)
-                .map(error => error.error.message)
-            if (errors.length)
-                setFinalMessage(
-                    `Process finished with the following errors: ${JSON.stringify(
-                        errors
-                    )}`
-                )
-            else setFinalMessage('Process finished without errors')
-            setLoading(false)
-        })
+        // Promise.all(taskPromises).then(res => {
+        //     const errors = res
+        //         .filter(r => !!r.error)
+        //         .map(error => error.error.message)
+        //     if (errors.length)
+        //         setFinalMessage(
+        //             `Process finished with the following errors: ${JSON.stringify(
+        //                 errors
+        //             )}`
+        //         )
+        //     else setFinalMessage('Process finished without errors')
+        //     setLoading(false)
+        // })
     }
 
     const getTaskDone = async y => {
@@ -647,11 +651,12 @@ export const InteropRunTaskForm = () => {
                                     </TableHead>
 
                                     <TableBody>
-                                        {inst.map(constant => (
+                                        {console.log(inst)}
+                                        {inst.map(({id, name}) => (
                                             <TableRow
-                                                key={constant.id}
-                                                dataTest={dataTest(
-                                                    'constants-constantstable-row'
+                                            key={id}
+                                            dataTest={dataTest(
+                                                'constants-constantstable-row'
                                                 )}
                                             >
                                                 <TableCell
@@ -663,14 +668,14 @@ export const InteropRunTaskForm = () => {
                                                     )}
                                                 >
                                                     <Checkbox
-                                                        value={constant.id}
+                                                        value={id}
                                                         onChange={() =>
                                                             toggleConstant(
-                                                                constant.id
+                                                                id
                                                             )
                                                         }
                                                         checked={checkedConstants.includes(
-                                                            constant.id
+                                                            id
                                                         )}
                                                         dataTest={dataTest(
                                                             'constants-constantstable-id'
@@ -683,7 +688,7 @@ export const InteropRunTaskForm = () => {
                                                         'constants-constantstable-name'
                                                     )}
                                                 >
-                                                    {constant.name}
+                                                    {name || id}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

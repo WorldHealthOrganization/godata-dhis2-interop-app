@@ -1,4 +1,6 @@
+import axios from 'axios'
 import { getInstance } from 'd2'
+import { buildUrl, useCredentials, dhis2Headers } from '../constants/helpers'
 
 export class Cache {
     constructor() {
@@ -101,6 +103,26 @@ class Api {
         return response
     }
 }
+
+export const getFromDHIS2 = (url, credentials) =>
+    axios.get(url, dhis2Headers(credentials))
+
+export const postToDHIS2 = (path, credentials, data) => 
+    axios.post(buildUrl(credentials.dhis.url, path), data, dhis2Headers(credentials))
+
+export const getFromGoData = (url, credentials) =>
+    axios
+        .post(`${credentials.godata.url}/api/users/login`, {
+            email: credentials.godata.username,
+            password: credentials.godata.password,
+        })
+        .then(({ data: { id } }) =>
+            axios.get(buildUrl(url, '', [{ key: 'accessToken', value: id }]), {
+                headers: {
+                    Authorization: id,
+                },
+            })
+        )
 
 const apiInstance = new Api()
 export default apiInstance

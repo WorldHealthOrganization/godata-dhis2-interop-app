@@ -1,0 +1,14 @@
+.mb {
+    margin-bottom: 15px;
+}
+
+.max800 {
+    max-width: 800px;
+}
+
+.container {
+    display: grid;
+    height: 100%;
+    grid-template-areas: 'sidebar main';
+    grid-template-columns: 300px auto;
+}

@@ -391,7 +391,7 @@ export const InteropForm = ({
                         />
                     </FormRow>
 
-                    {/* <FormRow>
+                    <FormRow>
                         <Field
                             name="dhisReceiver"
                             label={i18n.t('DHIS2 Receiving End')}
@@ -413,7 +413,7 @@ export const InteropForm = ({
                                 />
                             )}
                         />
-                    </FormRow> */}
+                    </FormRow>
 
                     <ButtonStrip>
                         <Button primary onClick={() => saveConstant()}>

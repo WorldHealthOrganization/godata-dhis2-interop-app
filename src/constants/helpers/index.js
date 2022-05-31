@@ -2,14 +2,34 @@ import dot from 'dot-object'
 import centroid from 'turf-centroid'
 import axios from 'axios'
 import { getCredentialsFromUserDataStore } from '../../utils/get'
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 
-const removeLastSlash = (str) => str.charAt(str.length - 1) === '/' ? str.slice(0,-1) : str
+export const createAuthenticationHeader = (username, password) =>
+    'Basic ' + new Buffer.from(username + ':' + password).toString('base64')
 
-export const buildUrl = (url, path) => new URL(
-        removeLastSlash(new URL(url).pathname) + path,
-        url
-    ).href
+export const dhis2Headers = (credentials) => new Object({
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        Authorization: createAuthenticationHeader(
+            credentials.dhis.username,
+            credentials.dhis.password
+        ),
+        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+        'Content-Type': 'application/json',
+        crossDomain: true,
+    },
+})
+
+const removeLastSlash = str =>
+    str.charAt(str.length - 1) === '/' ? str.slice(0, -1) : str
+
+export const buildUrl = (url, path, extraParams = []) => {
+    const ret = new URL(removeLastSlash(new URL(url).pathname) + path, url)
+    extraParams.forEach(({key, value}) => {
+        ret.searchParams.append(key, value)
+    })
+    return ret.href
+}
 
 export const getDotNotationByValue = (
     dotnot,
@@ -178,8 +198,6 @@ export const getDotNotationByValue = (
     }
 } //end of getTaskDone()
 
-export const createAuthenticationHeader = (username, password) =>
-    'Basic ' + new Buffer.from(username + ':' + password).toString('base64')
 
 export const sendPayloadTo = (receiver, payload, credentials) =>
     axios({
@@ -217,7 +235,7 @@ export const useCredentials = () => {
 
     const fetchNow = () => {
         setStatus({ loading: true })
-        getCredentialsFromUserDataStore().then(res =>{
+        getCredentialsFromUserDataStore().then(res => {
             setStatus({ credentials: res, loading: false })
         })
     }

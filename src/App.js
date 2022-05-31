@@ -34,6 +34,7 @@ import {
 } from './views'
 import { CustomForm } from './constants'
 import { dataTest } from './dataTest'
+import { LiveTaskForm } from './views/interop_tasks/LiveForm/LiveTaskForm'
 
 const d2Config = {
     schemas: ['dataStore'],
@@ -114,6 +115,12 @@ const App = () => {
                                 exact
                                 path={INTEROP_RUN_TASK_FORM_PATH}
                                 component={InteropRunTaskForm}
+                            />
+
+                            <Route
+                                exact
+                                path={'/liveTask'}
+                                component={LiveTaskForm}
                             />
 
                             {/* <Route
