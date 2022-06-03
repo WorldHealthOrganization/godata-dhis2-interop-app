@@ -113,12 +113,15 @@ export const CustomForm = () => {
             setDhisModel(initialValues.mapping[2])
         }
         if (!loading) {
+            console.log(progData)
+
             const entitiesLoaded = Mapping.entityIterator(
                 progData && progData.programs.programs.length > 0
                     ? progData.programs.programs[programIndex]
                     : {}
             )
 
+            console.log({ entitiesLoaded })
             setEntities(entitiesLoaded)
 
             const attribs = Mapping.secondIterator(dhisModel)
@@ -137,7 +140,6 @@ export const CustomForm = () => {
     }
 
     const alertValues = (values, row, field, json, isConstant = false) => {
-        console.log({ values, row, field, json })
         const breakoutField = field.split('.')
         const val = godataValue
         if (breakoutField.length > 1)
@@ -249,6 +251,7 @@ export const CustomForm = () => {
      */
     const updateGoDataModel = async () => {
         const editMode = !!params.id
+        console.log({ editMode, objectType })
         if (editMode) setAlertBarMessage('Not enabled on edit mode')
         if (!objectType)
             setAlertBarMessage(
@@ -399,6 +402,13 @@ export const CustomForm = () => {
                                     <SingleSelectField
                                         label={'Program'}
                                         onChange={({ selected }) => {
+                                            console.log(
+                                                Mapping.entityIterator(
+                                                    progData.programs.programs[
+                                                        selected
+                                                    ]
+                                                )
+                                            )
                                             setEntities(
                                                 Mapping.entityIterator(
                                                     progData.programs.programs[
@@ -470,9 +480,6 @@ export const CustomForm = () => {
                                             DHIS2
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
-                                            Program
-                                        </DataTableColumnHeader>
-                                        <DataTableColumnHeader>
                                             Conversion
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
@@ -484,6 +491,7 @@ export const CustomForm = () => {
                                     </DataTableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {console.log({ godataValue })}
                                     {godataValue.length >= 1 &&
                                         godataValue[1].map(
                                             (
@@ -545,6 +553,7 @@ export const CustomForm = () => {
                                                         ] || ''}
                                                     </DataTableCell>
                                                     <DataTableCell
+                                                        className={styles.cell}
                                                         onClick={() => {
                                                             setInputCellModal(
                                                                 true
