@@ -29,6 +29,10 @@ export class Mapping {
         [this.GODATA_EVENT]: 'case',
     }
 
+    constructor(mapping) {
+        this.mapping = mapping
+    }
+
     setMapping = mapping => {
         this.mapping = mapping
     }
@@ -164,7 +168,7 @@ export class Mapping {
     applyMappingExport = ({ attributes, enrollments, ...rest }) => {
         const ret = {}
         // console.log({attributes, enrollments, ...rest})
-        const dataElements = this.getDataElementsFromEnrollments(enrollments)
+        const dataElements = (!enrollments || enrollments.length === 0) ? {} : this.getDataElementsFromEnrollments(enrollments)
 
         const godataValue = this.getGodataValue()
         if (!!godataValue) {

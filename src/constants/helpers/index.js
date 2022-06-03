@@ -230,7 +230,7 @@ export const sendPayloadTo = (receiver, payload, credentials) =>
 
 export const useCredentials = () => {
     const [status, setStatus] = useState({
-        loading: false,
+        loading: true,
     })
 
     const fetchNow = () => {
@@ -243,6 +243,6 @@ export const useCredentials = () => {
     useEffect(() => {
         fetchNow()
     }, [])
-
+    
     return { ...status }
 }

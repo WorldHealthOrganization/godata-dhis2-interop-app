@@ -169,6 +169,16 @@ export const CustomForm = () => {
             value.programName = progData.programs.programs[programIndex].shortName
         }
 
+        if (selected.conversion === "true"){
+            selected.dhis2Description = selected.dhis2
+        }
+        selected.props = {}
+        selected.props.values = {}
+        selected.props.conversion = selected.conversion
+        delete selected.conversion
+        console.log({value})
+        console.log({selected})
+
         value = {...value, ...selected}
         val[1][clickedRow] = value
         console.log(val[1])

@@ -15,7 +15,7 @@ export const FieldGoDataUrlTemplate = () => (
     <Field
         required
         dataTest={dataTest('gateways-fieldgatewayurltemplate')}
-        name="urlTemplate"
+        name="url"
         label={i18n.t('Url template')}
         component={InputFieldFF}
         validate={composeValidators(hasValue)}

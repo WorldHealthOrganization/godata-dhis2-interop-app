@@ -1,5 +1,6 @@
 import {
     ReactFinalForm,
+    NoticeBox,
     Button,
     ButtonStrip,
     Checkbox,
@@ -47,6 +48,7 @@ import {
     GODATA_ORG_UNIT,
     GODATA_EVENT,
 } from '../../constants/constantTypes.js'
+import { Mapping } from '../../models/mapping'
 
 export const InteropRunTaskForm = () => {
     const history = useHistory()
@@ -68,6 +70,7 @@ export const InteropRunTaskForm = () => {
     const [senderData, setSenderData] = useState()
     const [mappingModel, setMappingModel] = useState()
     const [finalMessage, setFinalMessage] = useState('')
+    const [errorState, setErrorState] = useState(false)
     const override = css`
         display: block;
         margin: 0 auto;
@@ -82,12 +85,12 @@ export const InteropRunTaskForm = () => {
         new URL(removeLastSlash(new URL(url).pathname) + path, url).href
 
     const getMappings = async (map_id, taskObject) => {
-        const mappingObject = (await dataStore.getValue('mappings'))[map_id]
-            .mapping
+        console.log({ map_id })
+        console.log(await dataStore.getValue('mappings'))
+        const mappingObject = (await dataStore.getValue('mappings')).find(
+            ({ displayName }) => displayName === map_id
+        ).mapping
         setMappingModel(mappingObject)
-        StatusAlertService.showSuccess(
-            i18n.t('Read mappings config - Success.')
-        )
         //setTask(JSON.parse(taskObject.data))//in promise
         //setMappings(JSON.parse(mappingObject.data)) //in promise
         // taskConfig 0 - sender API, 1 - receiver API, 2 - sender API filters,
@@ -107,12 +110,14 @@ export const InteropRunTaskForm = () => {
         }
 
         setReceiver(buildUrl(credentials.godata.url, taskObject[1]))
-        setPayloadModel(taskObject[3])
+        const payload = await Mapping.autoGenerate(taskObject[6], credentials)
+        setPayloadModel(payload)
+        console.log({ payload })
         setIsDhis(taskObject[4])
         setTaskType(taskObject[6])
         console.log('TASK OBJECT SET:')
         console.log({
-            'Sender API': buildUrl(credentials.dhis.url, taskObject[0]),
+            'Sender API': buildUrl(credentials.dhis2.url, taskObject[0]),
             'Receiver API': taskObject[1],
             'Sender API filters': taskObject[2],
             'Sender API payload model': taskObject[3],
@@ -197,16 +202,16 @@ export const InteropRunTaskForm = () => {
                 var endpoints = taskObject[0].split(' ')
                 var filters = taskObject[2].split(' ')
                 console.log(
-                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0]
+                    buildUrl(credentials.dhis2.url, endpoints[0]) + filters[0]
                 )
                 instanceIds = await axios.get(
-                    buildUrl(credentials.dhis.url, endpoints[0]) + filters[0],
+                    buildUrl(credentials.dhis2.url, endpoints[0]) + filters[0],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
                             Authorization: createAuthenticationHeader(
-                                credentials.dhis.username,
-                                credentials.dhis.password
+                                credentials.dhis2.username,
+                                credentials.dhis2.password
                             ),
                             'Access-Control-Allow-Methods':
                                 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -227,15 +232,15 @@ export const InteropRunTaskForm = () => {
 
                 for (let x = 0; x < fromPromise.length; x++) {
                     var inst = await axios.get(
-                        buildUrl(credentials.dhis.url, endpoints[1]) +
+                        buildUrl(credentials.dhis2.url, endpoints[1]) +
                             fromPromise[x] +
                             filters[1],
                         {
                             headers: {
                                 'Access-Control-Allow-Origin': '*',
                                 Authorization: createAuthenticationHeader(
-                                    credentials.dhis.username,
-                                    credentials.dhis.password
+                                    credentials.dhis2.username,
+                                    credentials.dhis2.password
                                 ),
                                 'Access-Control-Allow-Methods':
                                     'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -263,14 +268,14 @@ export const InteropRunTaskForm = () => {
                 taskObject[6] === 'Go.Data Outbreak'
             ) {
                 instanceObject = await axios.get(
-                    buildUrl(credentials.dhis.url, taskObject[0]) +
+                    buildUrl(credentials.dhis2.url, taskObject[0]) +
                         taskObject[2],
                     {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
                             Authorization: createAuthenticationHeader(
-                                credentials.dhis.username,
-                                credentials.dhis.password
+                                credentials.dhis2.username,
+                                credentials.dhis2.password
                             ),
                             'Access-Control-Allow-Methods':
                                 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -446,41 +451,43 @@ export const InteropRunTaskForm = () => {
     }
 
     const runAllTasks = async () => {
-        console.log({isDhis, inst, checkedConstants})
-        // const taskPromises = []
-        // if (taskType === 'Go.Data Location') {
-        //     getTaskDone(1)
-        //         .then(res => {
-        //             setFinalMessage(
-        //                 `Locations send and processed successfully. Organisation units: ${JSON.stringify(
-        //                     res?.data.length
-        //                 )}`
-        //             )
-        //             setLoading(false)
-        //         })
-        //         .catch(error => {
-        //             setFinalMessage(JSON.stringify(error?.response?.data))
-        //             setLoading(false)
-        //         })
-        //     return
-        // }
+        console.log({ isDhis, inst, checkedConstants })
+        const taskPromises = []
+        if (taskType === 'Go.Data Location') {
+            getTaskDone(1)
+                .then(res => {
+                    setFinalMessage(
+                        `Locations send and processed successfully. Organisation units: ${JSON.stringify(
+                            res?.data.length
+                        )}`
+                    )
+                    setLoading(false)
+                })
+                .catch(error => {
+                    setFinalMessage(JSON.stringify(error?.response?.data))
+                    setErrorState(true)
+                    setLoading(false)
+                })
+            return
+        }
 
-        // for (let y = 0; y < checkedConstants.length; ++y)
-        //     taskPromises.push(getTaskDone(y))
+        for (let y = 0; y < checkedConstants.length; ++y)
+            taskPromises.push(getTaskDone(y))
 
-        // Promise.all(taskPromises).then(res => {
-        //     const errors = res
-        //         .filter(r => !!r.error)
-        //         .map(error => error.error.message)
-        //     if (errors.length)
-        //         setFinalMessage(
-        //             `Process finished with the following errors: ${JSON.stringify(
-        //                 errors
-        //             )}`
-        //         )
-        //     else setFinalMessage('Process finished without errors')
-        //     setLoading(false)
-        // })
+        Promise.all(taskPromises).then(res => {
+            const errors = res
+                .filter(r => !!r.error)
+                .map(error => error.error.message)
+            if (errors.length) {
+                setFinalMessage(
+                    `Process finished with the following errors: ${JSON.stringify(
+                        errors
+                    )}`
+                )
+                setErrorState(true)
+            } else setFinalMessage('Process finished without errors')
+            setLoading(false)
+        })
     }
 
     const getTaskDone = async y => {
@@ -558,17 +565,22 @@ export const InteropRunTaskForm = () => {
                 }
             }
         }
-        console.log({ taskType })
-        if (!taskType != 'Go.Data Location') {
-            iterate(payloadModel)
-        }
-
-        //SEND PAYLOAD TO RECIEVER
-        StatusAlertService.showInfo(i18n.t('Start sending data'))
 
         if (taskType === 'Go.Data Location')
             return sendPayloadTo(receiver, file, credentials)
-        return sendPayloadTo(receiver, payloadModel, credentials)
+
+        console.log({ taskType })
+        if (taskType === 'Go.Data Outbreak') {
+            iterate(payloadModel)
+            return sendPayloadTo(receiver, payloadModel, credentials)
+        }
+        const m = new Mapping({ mapping: mappingModel })
+        console.log(m.applyMappingExport(senderObject))
+        return sendPayloadTo(
+            receiver,
+            m.applyMappingExport(senderObject),
+            credentials
+        )
     }
 
     const onCloseModal = () => {
@@ -583,10 +595,12 @@ export const InteropRunTaskForm = () => {
     if (!sloading && !open)
         return (
             <>
-                <h4>{finalMessage}</h4>
-                <Button onClick={() => history.push(INTEROP_LIST_PATH)}>
-                    {i18n.t('Go back to tasks')}
-                </Button>
+                <NoticeBox error={errorState}>{finalMessage}</NoticeBox>
+                <div style={{ marginTop: '15px' }}>
+                    <Button onClick={() => history.push(INTEROP_LIST_PATH)}>
+                        {i18n.t('Go back to tasks')}
+                    </Button>
+                </div>
             </>
         )
 
@@ -651,12 +665,11 @@ export const InteropRunTaskForm = () => {
                                     </TableHead>
 
                                     <TableBody>
-                                        {console.log(inst)}
-                                        {inst.map(({id, name}) => (
+                                        {inst.map(({ id, name }) => (
                                             <TableRow
-                                            key={id}
-                                            dataTest={dataTest(
-                                                'constants-constantstable-row'
+                                                key={id}
+                                                dataTest={dataTest(
+                                                    'constants-constantstable-row'
                                                 )}
                                             >
                                                 <TableCell
@@ -670,9 +683,7 @@ export const InteropRunTaskForm = () => {
                                                     <Checkbox
                                                         value={id}
                                                         onChange={() =>
-                                                            toggleConstant(
-                                                                id
-                                                            )
+                                                            toggleConstant(id)
                                                         }
                                                         checked={checkedConstants.includes(
                                                             id

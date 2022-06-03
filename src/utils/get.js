@@ -27,32 +27,13 @@ export const get = (path, object) => {
 export const getCredentialsFromUserDataStore = async () => 
     Promise.all(
         [
-            'godatauser',
-            'godatauserpass',
-            'godatabaseurl',
-            'dhisuser',
-            'dhisuserpass',
-            'dhisbaseurl',
+            'godata',
+            'dhis2',
         ].map(field => getValueUserDataStore(field))
     ).then(
         ([
-            godatauser,
-            godatauserpass,
-            godatabaseurl,
-            dhisuser,
-            dhisuserpass,
-            dhisbaseurl
-        ]) => new Object({
-                godata: {
-                    username: godatauser,
-                    password: godatauserpass,
-                    url: godatabaseurl,
-                },
-                dhis: {
-                    username: dhisuser,
-                    password: dhisuserpass,
-                    url: dhisbaseurl,
-                },
-            })
+            godata,
+            dhis2
+        ]) => new Object({dhis2, godata})
     )
 

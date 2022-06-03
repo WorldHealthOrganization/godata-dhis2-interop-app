@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-05-28T16:39:19.197Z\n"
-"PO-Revision-Date: 2022-05-28T16:39:19.197Z\n"
+"POT-Creation-Date: 2022-06-03T07:01:34.036Z\n"
+"PO-Revision-Date: 2022-06-03T07:01:34.036Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -87,9 +87,6 @@ msgid "Save task"
 msgstr ""
 
 msgid "Add task"
-msgstr ""
-
-msgid "Task setup"
 msgstr ""
 
 msgid "Sender json object\"s collection name"
@@ -218,9 +215,6 @@ msgstr ""
 msgid "It looks like there aren't any configured task, or they couldn't be loaded."
 msgstr ""
 
-msgid "Read mappings config - Success."
-msgstr ""
-
 msgid "Reading sender data."
 msgstr ""
 
@@ -234,9 +228,6 @@ msgid "Read Task config - Success."
 msgstr ""
 
 msgid "Reading mappings config."
-msgstr ""
-
-msgid "Start sending data"
 msgstr ""
 
 msgid "Go back to tasks"

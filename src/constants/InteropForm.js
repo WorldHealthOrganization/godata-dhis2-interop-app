@@ -26,17 +26,17 @@ import {
     GODATA_CONTACT,
     GODATA_CONTACT_OF_CONTACT,
     GODATA_ORG_UNIT,
-    GODATA_EVENT
+    GODATA_EVENT,
 } from '../constants/constantTypes.js'
 
 const { Field } = ReactFinalForm
 
-import { JsonEditor as Editor } from 'jsoneditor-react'
 import 'jsoneditor-react/es/editor.min.css'
 import 'react-responsive-modal/styles.css'
 
 import { FormRow } from '../forms'
 import { PageSubHeadline } from '../headline'
+import { PageHeadline } from '../headline'
 import { dataTest } from '../dataTest'
 import i18n from '../locales'
 import * as dataStore from '../utils/dataStore.js'
@@ -60,7 +60,7 @@ export const InteropForm = ({
     const [description, setDescription] = useState('')
 
     const [converters, setConverters] = useState([])
-    const [converter, setConverter] = useState(0)
+    const [converter, setConverter] = useState()
 
     const [taskType, setTaskType] = useState('')
 
@@ -74,22 +74,25 @@ export const InteropForm = ({
         setConverters(
             mappings.map((m, i) => ({
                 label: m.displayName,
-                value: i,
+                value: m.displayName,
             }))
         )
 
-        if (initialValues && initialValues.name != 'undefined') {
+        if (!!initialValues && initialValues.displayName !== 'undefined') {
+            console.log({initialValues})
             setNameInput(initialValues.displayName)
             setSenderEndpointInput(initialValues.task[0])
             setReceiverEndpointInput(initialValues.task[1])
             setSenderParamsInput(initialValues.task[2])
             setPayloadInput(initialValues.task[3])
             setDhisReceiver(initialValues.task[4])
-            setConverter(initialValues.task[5])
+            if (!!mappings.find(({displayName}) => displayName === initialValues.task[5]))
+                setConverter(initialValues.task[5])
+            else if (mappings.length > 0) setConverter(mappings[0].displayName)
             setTaskType(initialValues.task[6])
             setJsonCollectionName(initialValues.task[7])
             setDescription(initialValues.task[8])
-        }
+        } else if (mappings.length > 0) setConverter(mappings[0].displayName)
     })
 
     useEffect(() => {
@@ -129,9 +132,6 @@ export const InteropForm = ({
     const onReceiverInput = ev => {
         setDhisReceiver(ev.value == true ? false : true)
     }
-    const onConvertorInput = ev => {
-        setConverter(converters.map(c => c.label).indexOf(ev))
-    }
     const onTaskTypeInput = ev => {
         setTaskType(ev)
     }
@@ -144,17 +144,14 @@ export const InteropForm = ({
         allValues.push(senderEndpointInput)
         allValues.push(receiverEndpointInput)
         allValues.push(senderParamsInput)
-        allValues.push(payloadInput)
+        allValues.push({})
         allValues.push(dhisReceiver)
         allValues.push(converter)
         allValues.push(taskType)
         allValues.push(jsonCollectionName)
         allValues.push(description)
         console.log('===============================')
-        console.log({
-            displayName: nameInput,
-            task: allValues,
-        })
+        console.log(allValues)
         if (!!initialValues.displayName)
             await dataStore.editById('tasks', taskId, {
                 displayName: nameInput,
@@ -179,7 +176,8 @@ export const InteropForm = ({
                     onSubmit={handleSubmit}
                     data-test={dataTest('gateways-gatewaygenericform')}
                 >
-                    <PageSubHeadline>{i18n.t('Task setup')}</PageSubHeadline>
+                    <PageHeadline>Task setup</PageHeadline>
+                    <PageSubHeadline>Fill in the required parameters</PageSubHeadline>
 
                     <FormRow>
                         <SingleSelectField
@@ -337,40 +335,44 @@ export const InteropForm = ({
                         />
                     </FormRow>
 
-                    {converter !== '' &&
-                    converter !== null &&
-                    converter !== undefined &&
-                    !!converters &&
-                    converters.length !== 0 ? (
+                    {console.log({converter, converters})}
+                    {!!converter && converters.length > 0 ? (
                         <FormRow>
                             <SingleSelectField
                                 label={i18n.t('Converter')}
-                                onChange={({ selected }) =>
-                                    onConvertorInput(selected)
-                                }
-                                selected={converters[converter].label}
+                                onChange={({ selected }) => {
+                                    console.log({ selected })
+                                    setConverter(selected)
+                                }}
+                                selected={converter}
                             >
-                                {converters.map(function (object, i) {
-                                    return (
-                                        <SingleSelectOption
-                                            label={object.label}
-                                            value={object.label}
-                                            key={i}
-                                        />
-                                    )
-                                })}
+                                {converters.map((object, i) => (
+                                    <SingleSelectOption
+                                        label={object.label}
+                                        value={object.value}
+                                        key={i}
+                                    />
+                                ))}
                             </SingleSelectField>
                         </FormRow>
                     ) : (
-                        <></>
+                        <FormRow>
+                            <SingleSelectField
+                                label={i18n.t('Converter')}
+                                onChange={({ selected }) => {
+                                    console.log({ selected })
+                                    setConverter(selected)
+                                }}
+                            />
+                        </FormRow>
                     )}
-                    <FormRow>
+                    {/* <FormRow>
                         <Editor
                             mode="text"
                             value={!!payloadInput ? payloadInput : {}}
                             onChange={ev => onPayloadInput(ev)}
                         />
-                    </FormRow>
+                    </FormRow> */}
 
                     <FormRow>
                         <Field
@@ -391,7 +393,7 @@ export const InteropForm = ({
                         />
                     </FormRow>
 
-                    <FormRow>
+                    {/* <FormRow>
                         <Field
                             name="dhisReceiver"
                             label={i18n.t('DHIS2 Receiving End')}
@@ -413,7 +415,7 @@ export const InteropForm = ({
                                 />
                             )}
                         />
-                    </FormRow>
+                    </FormRow> */}
 
                     <ButtonStrip>
                         <Button primary onClick={() => saveConstant()}>
