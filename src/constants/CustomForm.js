@@ -167,21 +167,22 @@ export const CustomForm = () => {
         console.log(selected)
         let value = val[1][clickedRow]
         if (selectedModal === 'DHIS2 entities') {
-            value = {...value, ...selected}
-            value.programName = progData.programs.programs[programIndex].shortName
+            value = { ...value, ...selected }
+            value.programName =
+                progData.programs.programs[programIndex].shortName
         }
 
-        if (selected.conversion === "true"){
+        if (selected.conversion === 'true') {
             selected.dhis2Description = selected.dhis2
         }
         selected.props = {}
         selected.props.values = {}
         selected.props.conversion = selected.conversion
         delete selected.conversion
-        console.log({value})
-        console.log({selected})
+        console.log({ value })
+        console.log({ selected })
 
-        value = {...value, ...selected}
+        value = { ...value, ...selected }
         val[1][clickedRow] = value
         console.log(val[1])
         setGodataValue(val)
@@ -483,9 +484,12 @@ export const CustomForm = () => {
                                             Conversion
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
-                                            Values
+                                            Program
                                         </DataTableColumnHeader>
                                         <DataTableColumnHeader>
+                                            Values
+                                        </DataTableColumnHeader>
+                                        <DataTableColumnHeader  width="48px">
                                             Delete
                                         </DataTableColumnHeader>
                                     </DataTableRow>
@@ -540,12 +544,14 @@ export const CustomForm = () => {
                                                             ? dhis2Description
                                                             : dhis2}
                                                     </DataTableCell>
-                                                    <DataTableCell>
+                                                    <DataTableCell
+                                                        className={styles.pointer}
+                                                    >
                                                         {programName}
                                                     </DataTableCell>
                                                     <DataTableCell
                                                         className={
-                                                            styles.cellOnly
+                                                            styles.cell
                                                         }
                                                     >
                                                         {conversionValue[
@@ -553,7 +559,7 @@ export const CustomForm = () => {
                                                         ] || ''}
                                                     </DataTableCell>
                                                     <DataTableCell
-                                                        className={styles.cell}
+                                                        className={styles.pointer}
                                                         onClick={() => {
                                                             setInputCellModal(
                                                                 true
@@ -578,6 +584,8 @@ export const CustomForm = () => {
                                                     </DataTableCell>
                                                     <DataTableCell
                                                         className={styles.cell}
+                                                        width="48px"
+                                                        align="center"
                                                         onClick={() => {
                                                             setRow(i)
                                                             setDeleteModal(true)
@@ -756,9 +764,11 @@ export const CustomForm = () => {
                                                                     </DataTableCell> */}
                                                                     {dhis2ModalFilter ===
                                                                         'delm' && (
-                                                                        <DataTableCell className={
-                                                                            styles.cell
-                                                                        }>
+                                                                        <DataTableCell
+                                                                            className={
+                                                                                styles.cell
+                                                                            }
+                                                                        >
                                                                             {dhisValueElem.programStageName ||
                                                                                 ''}
                                                                         </DataTableCell>
