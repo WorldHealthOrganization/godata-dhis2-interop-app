@@ -92,9 +92,12 @@ export const MappingForm = () => {
 
     const onSubmitDeleteAction = deleteRow => {
         if (deleteRow) {
+            console.log({deleteRow, clickedRow})
             const val = godataValue
             val[1].splice(clickedRow, 1)
+            console.log(val[1])
             setGodataValue(val)
+            setDeleteModal(false)
         }
     }
 
@@ -126,7 +129,7 @@ export const MappingForm = () => {
                 jsonEdit: true,
             })
         } else if (cell === 'delete') {
-            setRow(i)
+            setRow(rowId)
             setDeleteModal(true)
         }
     }
@@ -740,6 +743,7 @@ export const MappingForm = () => {
                     />
                 </ModalContent>
             </Modal>
+            {console.log(deleteModal)}
             <DeleteModal open={deleteModal} onSubmit={onSubmitDeleteAction} />
             {alertBar && (
                 <div

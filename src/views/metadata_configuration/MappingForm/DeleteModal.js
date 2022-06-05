@@ -21,9 +21,9 @@ export const DeleteModal = ({ open: openState, onSubmit }) => {
     const onClose = () => {
         setOpen(false)
     }
-
+    console.log({open})
     return (
-        <Modal open={open} onClose={() => onClose(false)} center>
+        <Modal open={openState} onClose={() => onClose(false)} center>
             <Form onSubmit={() => onSubmit(true)}>
                 {({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
