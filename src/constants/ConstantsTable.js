@@ -14,7 +14,7 @@ import { PropTypes } from '@dhis2/prop-types'
 import { useHistory } from 'react-router-dom'
 import React from 'react'
 
-import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from '../views/metadata_configuration/MetadataConfigFormEdit'
+import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from '../views/metadata_configuration/MetadataConfigList'
 import { dataTest } from '../dataTest'
 import { getTypeLabelByType } from './getTypeLabelByType'
 import i18n from '../locales'

@@ -19,8 +19,6 @@ import {
     SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     DHIS_CONFIG_FORM_PATH,
-    MetadataConfigFormNew,
-    MetadataConfigFormEdit,
     MetadataConfigList,
     InteropList,
     InteropFormNew,
@@ -35,6 +33,7 @@ import {
 import { CustomForm } from './constants'
 import { dataTest } from './dataTest'
 import { LiveTaskForm } from './views/interop_tasks/LiveForm/LiveTaskForm'
+import {MappingForm} from './views/metadata_configuration/MappingForm/MappingForm.js'
 
 const d2Config = {
     schemas: ['dataStore'],
@@ -84,13 +83,13 @@ const App = () => {
                             <Route
                                 exact
                                 path={METADATA_CONFIG_FORM_EDIT_PATH}
-                                component={CustomForm}
+                                component={MappingForm}
                             />
 
                             <Route
                                 exact
                                 path={METADATA_CONFIG_FORM_NEW_PATH}
-                                component={CustomForm}
+                                component={MappingForm}
                             />
 
                             <Route

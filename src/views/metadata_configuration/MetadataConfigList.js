@@ -15,9 +15,6 @@ import {
     TableCell,
 } from '@dhis2/ui'
 
-import { METADATA_CONFIG_FORM_NEW_PATH } from './MetadataConfigFormNew'
-import { METADATA_CONFIG_FORM_EDIT_PATH_STATIC } from './MetadataConfigFormEdit'
-
 import {
     GODATA_DHIS_OUTBREAK_MODEL,
     GODATA_DHIS_LOCATION_MODEL,
@@ -36,6 +33,11 @@ import styles from './MetadataConfigList.module.css'
 
 export const METADATA_CONFIG_LIST_PATH = '/metadata'
 export const METADATA_CONFIG_LIST_LABEL = 'Metadata Mapping'
+
+export const METADATA_CONFIG_FORM_EDIT_PATH_STATIC = '/metadata/edit'
+export const METADATA_CONFIG_FORM_EDIT_PATH = `${METADATA_CONFIG_FORM_EDIT_PATH_STATIC}/:id`
+
+export const METADATA_CONFIG_FORM_NEW_PATH = '/metadata/new'
 
 export const MetadataConfigList = () => {
     const history = useHistory()

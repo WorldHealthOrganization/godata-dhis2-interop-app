@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-06-03T07:01:34.036Z\n"
-"PO-Revision-Date: 2022-06-03T07:01:34.036Z\n"
+"POT-Creation-Date: 2022-06-05T09:12:45.717Z\n"
+"PO-Revision-Date: 2022-06-05T09:12:45.717Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -234,18 +234,6 @@ msgid "Go back to tasks"
 msgstr ""
 
 msgid "Proceed"
-msgstr ""
-
-msgid "Something went wrong whilst loading constants"
-msgstr ""
-
-msgid "Something went wrong whilst saving the constant"
-msgstr ""
-
-msgid "Add constant"
-msgstr ""
-
-msgid "Form"
 msgstr ""
 
 msgid ""
