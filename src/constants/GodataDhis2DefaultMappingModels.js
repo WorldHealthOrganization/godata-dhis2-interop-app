@@ -505,419 +505,413 @@ export const GODATA_DHIS_PROGRAM_TO_CASE_MODEL = [
             ],
             [
                 {
-                    godata: 'firstName',
                     dhis2: 'sB1IHYu2xQT',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'firstName',
+                    program: 'uYjxkTbwRNf',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
+                    dhis2Description: 'First Name',
                 },
                 {
-                    godata: 'gender',
                     dhis2: 'oindugucx72',
                     props: {
+                        values: {},
                         conversion: 'attr',
-                        values: {},
                     },
+                    godata: 'gender',
+                    program: 'uYjxkTbwRNf',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
+                    dhis2Description: 'Sex',
                 },
                 {
-                    godata: 'classification',
-                    dhis2: 'classification',
+                    dhis2: 'ovY6E8BSdto',
                     props: {
-                        conversion: 'false',
-                        values: {},
-                    },
-                },
-                {
-                    godata: 'riskReason',
-                    dhis2: 'fyzp8BpsPMl',
-                    props: {
+                        values: {
+                            LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED:
+                                'Positive',
+                            LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED:
+                                'Negative',
+                            LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT:
+                                'Inconclusive',
+                            LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_PROBABLE:
+                                'Inconclusive',
+                            LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NONE:
+                                'Unknown',
+                        },
                         conversion: 'delm',
-                        values: {},
                     },
+                    godata: 'classification',
+                    program: 'uYjxkTbwRNf',
+                    conversion: 'delm',
+                    programName: 'COVID-19 Case-based Surveillance',
+                    programStageId: 'dDHkBd3X8Ce',
+                    dhis2Description: 'Lab Test Result',
+                    programStageName: 'Stage 3 - Lab Results',
                 },
                 {
-                    godata: 'safeBurial',
                     dhis2: 'true',
                     props: {
-                        conversion: 'false',
                         values: {},
+                        conversion: 'false',
                     },
+                    godata: 'safeBurial',
                 },
                 {
-                    godata: 'wasCase',
                     dhis2: 'no',
                     props: {
-                        conversion: 'false',
                         values: {},
+                        conversion: 'false',
                     },
+                    godata: 'wasCase',
                 },
                 {
-                    godata: 'active',
                     dhis2: 'true',
                     props: {
+                        values: {},
                         conversion: 'false',
-                        values: {},
                     },
+                    godata: 'active',
                 },
                 {
-                    godata: 'id',
-                    dhis2: 'HAZ7VQ730yn',
+                    dhis2: 'trackedEntityInstance',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'true',
                     },
+                    godata: 'id',
+                    dhis2Description: 'trackedEntityInstance',
                 },
                 {
-                    godata: 'outbreakId',
                     dhis2: '1baf28ab-9a4d-4a3f-aca1-9a18683977df',
                     props: {
+                        values: {},
                         conversion: 'false',
-                        values: {},
                     },
+                    godata: 'outbreakId',
                 },
                 {
-                    godata: 'visualId',
-                    dhis2: 'he05i8FUwu3',
+                    dhis2: 'HAZ7VQ730yn',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'visualId',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'System Generated Case ID',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'middleName',
                     dhis2: 'ENRjVGxVL6l',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
-                },
-                {
                     godata: 'lastName',
-                    dhis2: '',
-                    props: {
-                        conversion: 'false',
-                        values: {},
-                    },
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Surname',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'occupation',
-                    dhis2: 'ooK7aSiAaGq',
+                    dhis2: 'created',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'true',
                     },
-                },
-                {
                     godata: 'dateOfReporting',
-                    dhis2: 's3eoonJ8OJb',
-                    props: {
-                        conversion: 'delm',
-                        values: {},
-                    },
+                    dhis2Description: 'created',
                 },
                 {
-                    godata: 'isDateOfReportingApproximate',
                     dhis2: 'yes',
                     props: {
+                        values: {},
                         conversion: 'false',
-                        values: {},
                     },
+                    godata: 'isDateOfReportingApproximate',
                 },
                 {
-                    godata: 'dateOfLastContact',
-                    dhis2: '',
+                    dhis2: 'orgUnit',
                     props: {
+                        values: {},
                         conversion: 'true',
-                        values: {},
                     },
-                },
-                {
-                    godata: 'followUpTeamId',
-                    dhis2: '',
-                    props: {
-                        conversion: 'false',
-                        values: {},
-                    },
-                },
-                {
-                    godata: 'hasRelationships',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
-                },
-                {
                     godata: 'usualPlaceOfResidenceLocationId',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
+                    dhis2Description: 'orgUnit',
                 },
                 {
-                    godata: 'responsibleUserId',
-                    dhis2: '',
+                    dhis2: 'created',
                     props: {
-                        conversion: 'true',
                         values: {},
+                        conversion: 'true',
                     },
-                },
-                {
                     godata: 'createdAt',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
+                    dhis2Description: 'created',
                 },
                 {
-                    godata: 'createdBy',
-                    dhis2: '',
+                    dhis2: 'lastUpdatedAtClient',
                     props: {
-                        conversion: 'true',
                         values: {},
+                        conversion: 'true',
                     },
-                },
-                {
                     godata: 'updatedAt',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
+                    dhis2Description: 'lastUpdatedAtClient',
                 },
                 {
-                    godata: 'updatedBy',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
-                },
-                {
-                    godata: 'createdOn',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
-                },
-                {
-                    godata: 'deleted',
                     dhis2: 'false',
                     props: {
+                        values: {},
                         conversion: 'false',
-                        values: {},
                     },
+                    godata: 'deleted',
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'duplicateKeys.name.0',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'duplicateKeys.name.1',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'duplicateKeys.name.2',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'relationshipsRepresentation.0.id',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'relationshipsRepresentation.0.active',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'relationshipsRepresentation.0.otherParticipantType',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'relationshipsRepresentation.0.otherParticipantId',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'relationshipsRepresentation.0.target',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUp.originalStartDate',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUp.startDate',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUp.endDate',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUp.status',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUpHistory.0.status',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'followUpHistory.0.startDate',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
+                    dhis2: '',
+                    props: {
+                        values: {},
+                        conversion: 'true',
+                    },
                     godata: 'addresses.0.typeId',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
                 },
                 {
-                    godata: 'addresses.0.city',
-                    dhis2: '',
-                    props: {
-                        conversion: 'true',
-                        values: {},
-                    },
-                },
-                {
-                    godata: 'addresses.0.addressLine1',
                     dhis2: 'Xhdn49gUd52',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'addresses.0.city',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Home Address',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'addresses.0.postalCode',
+                    dhis2: 'ooK7aSiAaGq',
+                    props: {
+                        values: {},
+                        conversion: 'attr',
+                    },
+                    godata: 'addresses.0.addressLine1',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Workplace/school physical address',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
+                },
+                {
                     dhis2: '',
                     props: {
+                        values: {},
                         conversion: 'true',
-                        values: {},
                     },
+                    godata: 'addresses.0.postalCode',
                 },
                 {
-                    godata: 'addresses.0.locationId',
-                    dhis2: 'arPkmfgnHgW',
+                    dhis2: 'hBcoBCZBWFb',
                     props: {
-                        conversion: 'delm',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'addresses.0.locationId',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Country of Residence',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'addresses.0.geoLocationAccurate',
                     dhis2: 'false',
                     props: {
-                        conversion: 'false',
                         values: {},
+                        conversion: 'false',
                     },
+                    godata: 'addresses.0.geoLocationAccurate',
                 },
                 {
-                    godata: 'addresses.0.date',
                     dhis2: 'NI0QRzJvQ0k',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'addresses.0.date',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Date of birth',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'addresses.0.phoneNumber',
                     dhis2: 'fctSQp5nAYl',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'addresses.0.phoneNumber',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Telephone (local)',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'addresses.0.emailAddress',
                     dhis2: 'noemail@noemail.no',
                     props: {
-                        conversion: 'false',
                         values: {},
+                        conversion: 'false',
                     },
+                    godata: 'addresses.0.emailAddress',
                 },
                 {
-                    godata: 'age.years',
                     dhis2: 'Rv8WM2mTuS5',
                     props: {
-                        conversion: 'attr',
                         values: {},
+                        conversion: 'attr',
                     },
+                    godata: 'age.years',
+                    program: 'uYjxkTbwRNf',
+                    dhis2Description: 'Age',
+                    conversion: 'attr',
+                    programName: 'COVID-19 Case-based Surveillance',
                 },
                 {
-                    godata: 'age.months',
                     dhis2: '0',
                     props: {
-                        conversion: 'false',
                         values: {},
+                        conversion: 'false',
                     },
+                    godata: 'age.months',
                 },
             ],
         ],
     },
     {},
-    {},
+    {
+        created: '2022-06-03T00:33:50.275',
+        deleted: false,
+        orgUnit: 'Plmg8ikyfrK',
+        inactive: false,
+        featureType: 'NONE',
+        lastUpdated: '2022-06-05T01:47:43.666',
+        createdAtClient: '2022-06-03T00:33:50.275',
+        trackedEntityType: 'MCPQUTHX1Ze',
+        lastUpdatedAtClient: '2022-06-03T00:33:50.275',
+        trackedEntityInstance: 'l8dcQz81rDa',
+    },
 ]
+
 export const GODATA_DHIS_PROGRAM_TO_CONTACT_MODEL = [
     {
         godataValue: [

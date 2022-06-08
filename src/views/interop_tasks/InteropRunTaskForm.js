@@ -452,7 +452,6 @@ export const InteropRunTaskForm = () => {
 
     const runAllTasks = async () => {
         console.log({ isDhis, inst, checkedConstants })
-        const taskPromises = []
         if (taskType === 'Go.Data Location') {
             getTaskDone(1)
                 .then(res => {
@@ -472,22 +471,23 @@ export const InteropRunTaskForm = () => {
         }
 
         for (let y = 0; y < checkedConstants.length; ++y)
-            taskPromises.push(getTaskDone(y))
-
-        Promise.all(taskPromises).then(res => {
-            const errors = res
-                .filter(r => !!r.error)
-                .map(error => error.error.message)
-            if (errors.length) {
-                setFinalMessage(
-                    `Process finished with the following errors: ${JSON.stringify(
-                        errors
-                    )}`
-                )
-                setErrorState(true)
-            } else setFinalMessage('Process finished without errors')
-            setLoading(false)
-        })
+            await getTaskDone(y)
+        setFinalMessage('Process finished without errors')
+        setLoading(false)
+        // Promise.all(taskPromises).then(res => {
+        //     const errors = res
+        //         .filter(r => !!r.error)
+        //         .map(error => error.error.message)
+        //     if (errors.length) {
+        //         setFinalMessage(
+        //             `Process finished with the following errors: ${JSON.stringify(
+        //                 errors
+        //             )}`
+        //         )
+        //         setErrorState(true)
+        //     } else setFinalMessage('Process finished without errors')
+        //     setLoading(false)
+        // })
     }
 
     const getTaskDone = async y => {
