@@ -2,8 +2,7 @@ import { Menu } from '@dhis2/ui'
 import React from 'react'
 
 import {
-    SCHEDULED_TASK_FORM_PATH,
-    SCHEDULED_TASK_FORM_LABEL,
+
     INTEROP_LIST_PATH,
     INTEROP_LIST_LABEL,    
     METADATA_CONFIG_LIST_PATH,

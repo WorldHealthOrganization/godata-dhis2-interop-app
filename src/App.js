@@ -4,7 +4,6 @@ import React from 'react'
 import styles from './App.module.css'
 
 import { useD2 } from '@dhis2/app-runtime-adapter-d2'
-import { getUserSettings } from 'd2'
 
 import { AlertHandler } from './notifications'
 import { Navigation } from './navigation'
@@ -16,7 +15,6 @@ import {
     INTEROP_FORM_NEW_PATH,
     INTEROP_FORM_EDIT_PATH,
     INTEROP_RUN_TASK_FORM_PATH,
-    SCHEDULED_TASK_FORM_PATH,
     GODATA_CONFIG_FORM_PATH,
     DHIS_CONFIG_FORM_PATH,
     MetadataConfigList,
@@ -24,13 +22,11 @@ import {
     InteropFormNew,
     InteropFormEdit,
     InteropRunTaskForm,
-    ScheduleTaskForm,
     GoDataConfigForm,
     DhisConfigForm,
     HOME_PATH,
     Home,
 } from './views'
-import { CustomForm } from './constants'
 import { dataTest } from './dataTest'
 import { LiveTaskForm } from './views/interop_tasks/LiveForm/LiveTaskForm'
 import {MappingForm} from './views/metadata_configuration/MappingForm/MappingForm.js'
@@ -121,12 +117,6 @@ const App = () => {
                                 path={'/liveTask'}
                                 component={LiveTaskForm}
                             />
-
-                            {/* <Route
-                                exact
-                                path={SCHEDULED_TASK_FORM_PATH}
-                                component={ScheduleTaskForm}
-                            /> */}
 
                             <Redirect from="*" to={HOME_PATH} />
                         </Switch>

@@ -21,7 +21,7 @@ import { INTEROP_FORM_NEW_PATH } from './InteropFormNew'
 import { INTEROP_RUN_TASK_FORM_PATH_STATIC } from './InteropRunTaskForm'
 import { INTEROP_FORM_EDIT_PATH_STATIC } from './InteropFormEdit'
 
-import { DeleteConstantsConfirmationDialog } from '../../constants'
+import { DeleteConstantsConfirmationDialog } from '../../constants/DeleteConstantsConfirmationDialog.js'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
 import { Paragraph } from '../../text'

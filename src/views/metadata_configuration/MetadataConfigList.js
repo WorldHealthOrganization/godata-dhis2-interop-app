@@ -23,7 +23,7 @@ import {
     GODATA_DHIS_PROGRAM_TO_EVENT_MODEL
 } from '../../constants'
 
-import { DeleteConstantsConfirmationDialog } from '../../constants'
+import { DeleteConstantsConfirmationDialog } from '../../constants/DeleteConstantsConfirmationDialog.js'
 import { ListActions } from '../../dataList'
 import { PageHeadline } from '../../headline'
 import { Paragraph } from '../../text'

@@ -4,7 +4,6 @@ import { PageHeadline } from '../../headline'
 import { dataTest } from '../../dataTest'
 import {
     DHIS_CONFIG_FORM_PATH,
-    SCHEDULED_TASK_FORM_PATH,
     INTEROP_LIST_PATH,
     METADATA_CONFIG_LIST_PATH,
     GODATA_CONFIG_FORM_PATH,

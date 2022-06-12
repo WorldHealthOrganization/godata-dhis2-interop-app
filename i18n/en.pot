@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-06-05T09:12:45.717Z\n"
-"PO-Revision-Date: 2022-06-05T09:12:45.717Z\n"
+"POT-Creation-Date: 2022-06-12T15:49:27.015Z\n"
+"PO-Revision-Date: 2022-06-12T15:49:27.015Z\n"
 
 msgid "Are you sure you want to cancel? Unsaved changes will be lost"
 msgstr ""
@@ -17,49 +17,7 @@ msgstr ""
 msgid "Yes, cancel"
 msgstr ""
 
-msgid "Something went wrong whilst loading gateways"
-msgstr ""
-
-msgid "Edit"
-msgstr ""
-
-msgid "Save mappings"
-msgstr ""
-
-msgid "Add mappings"
-msgstr ""
-
-msgid "Cases mappings setup"
-msgstr ""
-
-msgid "Name"
-msgstr ""
-
-msgid "Cancel"
-msgstr ""
-
-msgid "Type"
-msgstr ""
-
-msgid "Contacts mappings setup"
-msgstr ""
-
-msgid "Contact of Contact mappings setup"
-msgstr ""
-
-msgid "Select Go.Data Model"
-msgstr ""
-
-msgid "Select DHIS2 Model"
-msgstr ""
-
-msgid "Add row"
-msgstr ""
-
 msgid "Confirm deletion"
-msgstr ""
-
-msgid "Are you sure you want to delete the selected row?"
 msgstr ""
 
 msgid "Are you sure you want to delete the selected constants?"
@@ -71,6 +29,12 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+msgid "Cancel"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
@@ -80,13 +44,13 @@ msgstr ""
 msgid "User name"
 msgstr ""
 
-msgid "Outbreaks mappings setup"
-msgstr ""
-
 msgid "Save task"
 msgstr ""
 
 msgid "Add task"
+msgstr ""
+
+msgid "Type"
 msgstr ""
 
 msgid "Sender json object\"s collection name"
@@ -192,6 +156,9 @@ msgstr ""
 msgid "Manage Tasks"
 msgstr ""
 
+msgid "Edit"
+msgstr ""
+
 msgid "Something went wrong whilst loading task"
 msgstr ""
 
@@ -236,10 +203,22 @@ msgstr ""
 msgid "Proceed"
 msgstr ""
 
+msgid "Select Go.Data Model"
+msgstr ""
+
+msgid "Select DHIS2 Model"
+msgstr ""
+
+msgid "Add row"
+msgstr ""
+
 msgid ""
 "Mapping are used to integrate Go.Data<->DHIS2 data sharing. Multiple "
 "mappings can be set up to process and handle data in multiple ways. Add and "
 "configure mappings below."
+msgstr ""
+
+msgid "Add mappings"
 msgstr ""
 
 msgid "No mappings found"
@@ -248,16 +227,4 @@ msgstr ""
 msgid ""
 "It looks like there aren't any configured metadta, or they couldn't be "
 "loaded."
-msgstr ""
-
-msgid "Something went wrong whilst saving configs"
-msgstr ""
-
-msgid "Something went wrong whilst saving server configs"
-msgstr ""
-
-msgid "Edit Server Config"
-msgstr ""
-
-msgid "GET"
 msgstr ""

@@ -1,17 +1,15 @@
-import { ReactFinalForm, NoticeBox } from '@dhis2/ui'
+import { ReactFinalForm } from '@dhis2/ui'
 import { useHistory } from 'react-router-dom'
 import React from 'react'
 
 import { INTEROP_LIST_PATH } from './InteropList'
 
-import { FormRow } from '../../forms'
-import { PageHeadline } from '../../headline'
+
 import { dataTest } from '../../dataTest'
-import { InteropForm } from '../../constants'
-import i18n from '../../locales'
+import { InteropForm } from '../../constants/InteropForm.js'
 import styles from './InteropFormNew.module.css'
 
-const { Form, useForm } = ReactFinalForm
+const { Form } = ReactFinalForm
 
 export const INTEROP_FORM_NEW_PATH = '/interop/new'
 

@@ -14,26 +14,18 @@ import { getCredentialsFromUserDataStore } from '../../../utils/get.js'
 import { Mapping } from '../../../models/mapping.js'
 
 export const LiveTaskForm = () => {
-    const [credentials, setCredentials] = useState({})
+    const {loading, credentials} = useCredentials()
     const [data, setData] = useState()
     const [columns, setColumns] = useState([])
     const [formAnswer, setFormAnswer] = useState({})
     const [alertBar, setAlertBar] = useState(false)
     const [alertBarMessage, setAlertBarMessage] = useState(false)
-    const [loadingCredentials, setLoadingCredentials] = useState(true)
 
     const {
         loadingPrograms,
         data: progData,
         error,
     } = useReadProgramsWithStagesQueryForMappings()
-
-    useEffect(() => {
-        getCredentialsFromUserDataStore().then(res => {
-            setCredentials(res)
-            setLoadingCredentials(false)
-        })
-    }, [])
 
     const dataSubmit = ({ mapping: mappingDump, idsToSend }) => {
         console.log("dataSubmit")
@@ -101,7 +93,7 @@ export const LiveTaskForm = () => {
         }
     }
 
-    if (loadingCredentials || !progData) {
+    if (loading || !progData) {
         return (
             <CenteredContent>
                 <CircularLoader />
