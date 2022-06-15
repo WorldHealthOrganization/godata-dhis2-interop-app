@@ -11,8 +11,8 @@ export const dhis2Headers = (credentials) => new Object({
     headers: {
         'Access-Control-Allow-Origin': '*',
         Authorization: createAuthenticationHeader(
-            credentials.dhis.username,
-            credentials.dhis.password
+            credentials.dhis2.username,
+            credentials.dhis2.password
         ),
         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         'Content-Type': 'application/json',

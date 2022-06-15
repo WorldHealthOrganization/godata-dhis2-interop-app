@@ -19,6 +19,34 @@ export class Task {
         'Default Go.Data DHIS2 Contact Task': GODATA_DHIS_CONTACT_TASK,
     }
 
+    static bidirectionalTaskType = {
+        Outbreak: 'programs',
+        Location: 'organisationUnits',
+        'Tracked Entity': 'trackedEntityInstances',
+        Event: 'events'
+    }
+
+    static getColumnsFromTaskType = (taskType) => {
+        const elements = {
+            programs: ['id', 'name', 'code', 'created'],
+            organisationUnits: ['trackedEntityInstance', 'orgUnit', 'created'],
+            trackedEntityInstances: ['trackedEntityInstance', 'orgUnit', 'created'],
+        }
+
+        return elements[taskType] || elements['Outbreak']
+    }
+
+    static getIdFromTaskType = (taskType) => {
+        console.log({taskType})
+        const elements = {
+            programs: ['id', 'name', 'code', 'created'],
+            organisationUnits: ['trackedEntityInstance', 'orgUnit', 'created'],
+            trackedEntityInstances: ['trackedEntityInstance', 'orgUnit', 'created'],
+        }
+
+        return (elements[taskType] || elements['Outbreak'])[0]
+    }
+
     constructor(
         name,
         [
@@ -80,14 +108,12 @@ export class Task {
     }
 
     static async addDefaultTasks() {
-        for(const [key, value] of Object.entries(this.defaultTaskModels))
+        for (const [key, value] of Object.entries(this.defaultTaskModels))
             await this.saveTask(key, value)
-        return this.getAllTasks();
+        return this.getAllTasks()
     }
 
     static getAllTasks() {
         return dataStore.getValue(this.#dataStoreTaskKey)
     }
-
-
 }

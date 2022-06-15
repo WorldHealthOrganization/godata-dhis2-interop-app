@@ -62,8 +62,10 @@ export class Mapping {
         }
 
         const godataValue = this.getGodataValue()
-        const orgUnit = godataValue[1].find(({dhis2}) => dhis2 === "orgUnit").godata
-        console.log({orgUnit});
+        const orgUnit = godataValue[1].find(
+            ({ dhis2 }) => dhis2 === 'orgUnit'
+        ).godata
+        console.log({ orgUnit })
         if (!!godataValue) {
             godataValue[1].forEach(
                 ({
@@ -77,17 +79,22 @@ export class Mapping {
                     if (conversion === 'true') {
                         if (!!dhis2)
                             ret[dhis2] = this.getFromPredefinedValuesImport(
-                                values, dot.pick(godata, rest)
+                                values,
+                                dot.pick(godata, rest)
                             )
                     } else if (conversion === 'false') {
-                        ret[dhis2] = this.getFromPredefinedValuesImport(values, godata)
+                        ret[dhis2] = this.getFromPredefinedValuesImport(
+                            values,
+                            godata
+                        )
                     } else if (conversion === 'attr') {
                         const value = dot.pick(godata, rest)
                         if (!!value)
                             ret.attributes.push({
                                 attribute: dhis2,
                                 value: this.getFromPredefinedValuesImport(
-                                    values, value
+                                    values,
+                                    value
                                 ),
                             })
                     } else if (conversion === 'delm') {
@@ -96,7 +103,8 @@ export class Mapping {
                             const dataValue = {
                                 dataElement: dhis2,
                                 value: this.getFromPredefinedValuesImport(
-                                    values, value
+                                    values,
+                                    value
                                 ),
                             }
                             let enrollment = ret.enrollments.findIndex(
@@ -155,8 +163,7 @@ export class Mapping {
 
     getFromPredefinedValuesExport = (godataDhis2, target) => {
         for (const [key, value] of Object.entries(godataDhis2))
-            if (value === target)
-                return key
+            if (value === target) return key
 
         return (
             Object.keys(godataDhis2).find(k => godataDhis2[k] === 'default') ||
@@ -164,11 +171,13 @@ export class Mapping {
         )
     }
 
-
     applyMappingExport = ({ attributes, enrollments, ...rest }) => {
         const ret = {}
         // console.log({attributes, enrollments, ...rest})
-        const dataElements = (!enrollments || enrollments.length === 0) ? {} : this.getDataElementsFromEnrollments(enrollments)
+        const dataElements =
+            !enrollments || enrollments.length === 0
+                ? {}
+                : this.getDataElementsFromEnrollments(enrollments)
 
         const godataValue = this.getGodataValue()
         if (!!godataValue) {
@@ -190,6 +199,13 @@ export class Mapping {
                     }
 
                     if (!!values && !!ret[godata]) {
+                        console.log({
+                            values,
+                            result: this.getFromPredefinedValuesExport(
+                                values,
+                                ret[godata]
+                            ),
+                        })
                         ret[godata] = this.getFromPredefinedValuesExport(
                             values,
                             ret[godata]
@@ -264,12 +280,6 @@ export class Mapping {
         programTrackedEntityAttributes,
         ...rest
     }) {
-        console.log({
-            id,
-            programStages,
-            programTrackedEntityAttributes,
-            ...rest,
-        })
         return programStages
             .map(({ id: programStageId, name, programStageDataElements }) =>
                 programStageDataElements.map(

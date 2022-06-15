@@ -6,21 +6,20 @@ import {
     DataTableRow,
     DataTableCell,
     TableBody,
-    TableHead
+    TableHead,
 } from '@dhis2-ui/table'
 import { FormRow } from '../../../forms'
 import { DeleteIcon } from '../../../svg/delete-16.js'
 import styles from '../../../App.module.css'
 
-
-export const DataTableMap = ({data, onRowClick}) => {
-
+export const DataTableMap = ({ data, onRowClick }) => {
     const conversionValue = {
         true: 'Property',
         false: 'Constant',
         delm: 'Data Element',
         attr: 'Attribute',
         stage: 'Stage',
+        geo: 'Geometry',
     }
 
     const truncateString = (string, max) =>

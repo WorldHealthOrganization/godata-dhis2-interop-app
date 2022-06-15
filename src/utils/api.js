@@ -107,8 +107,29 @@ class Api {
 export const getFromDHIS2 = (url, credentials) =>
     axios.get(url, dhis2Headers(credentials))
 
-export const postToDHIS2 = (path, credentials, data) => 
-    axios.post(buildUrl(credentials.dhis.url, path), data, dhis2Headers(credentials))
+export const postToDHIS2 = (path, credentials, data) =>
+    axios.post(
+        buildUrl(credentials.dhis2.url, path),
+        data,
+        dhis2Headers(credentials)
+    )
+
+export const getGodataToken = credentials =>
+    axios
+        .post(`${credentials.godata.url}/api/users/login`, {
+            email: credentials.godata.username,
+            password: credentials.godata.password,
+        })
+        .then(({ data: { id } }) => id)
+
+export const postToGodata = (path, credentials, data, token) =>
+    axios.post(
+        buildUrl(credentials.godata.url, path), data, {
+            headers: {
+                Authorization: token,
+            },
+        }
+    ).catch(e => e)
 
 export const getFromGoData = (url, credentials) =>
     axios

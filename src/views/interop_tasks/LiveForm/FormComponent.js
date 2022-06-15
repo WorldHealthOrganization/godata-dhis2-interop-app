@@ -1,27 +1,39 @@
 import React, { useState, useEffect } from 'react'
 import {
+    SingleSelectField,
     SingleSelectFieldFF,
     ReactFinalForm,
     InputFieldFF,
     hasValue,
     Button,
     ButtonStrip,
+    SingleSelectOption,
     CenteredContent,
     CircularLoader,
 } from '@dhis2/ui'
 import './liveForm.css'
-import * as dataStore from '../../../utils/dataStore.js'
 import { PageHeadline, PageSubHeadline } from '../../../headline'
+import { Task } from '../../../models/task.js'
 
-export const Form = ({ onSubmit, progData }) => {
+const { Form, Field } = ReactFinalForm
+
+export const FormComponent = ({ onSubmit, progData }) => {
+    const taskTypeOptions = () =>
+        Object.entries(Task.bidirectionalTaskType).map(
+            ([label, value]) =>
+                new Object({
+                    label,
+                    value,
+                })
+        )
     return (
-        <ReactFinalForm.Form onSubmit={onSubmit}>
+        <Form onSubmit={onSubmit}>
             {({ handleSubmit }) => (
                 <form onSubmit={handleSubmit} className="max800">
                     <PageHeadline>Bidirectional Task Model</PageHeadline>
                     <PageSubHeadline>Input task parameters</PageSubHeadline>
-                    <div className="mb">
-                        <ReactFinalForm.Field
+                    {/* <div className="mb">
+                        <Field
                             required
                             name="name"
                             label="Task name"
@@ -29,13 +41,13 @@ export const Form = ({ onSubmit, progData }) => {
                             validate={hasValue}
                             initialValue="asdf"
                         />
-                    </div>
+                    </div> */}
                     <div className="mb">
                         <ReactFinalForm.Field
                             name="action"
                             label="Action"
                             component={SingleSelectFieldFF}
-                            initialValue="import"
+                            initialValue="export"
                             options={[
                                 {
                                     label: 'Import',
@@ -49,7 +61,17 @@ export const Form = ({ onSubmit, progData }) => {
                         />
                     </div>
                     <div className="mb">
-                        <ReactFinalForm.Field
+                            <Field
+                                name="taskType"
+                                label="Task Type"
+                                component={SingleSelectFieldFF}
+                                initialValue="programs"
+                                options={taskTypeOptions()}
+                            />
+                        </div>
+
+                    <div className="mb">
+                        <Field
                             name="program"
                             label="Program"
                             component={SingleSelectFieldFF}
@@ -69,23 +91,25 @@ export const Form = ({ onSubmit, progData }) => {
                     </div>
 
                     <div className="mb">
-                        <ReactFinalForm.Field
+                        <Field
                             required
                             name="pathSender"
                             label="Sender Path"
                             component={InputFieldFF}
                             validate={hasValue}
-                            initialValue="/api/outbreaks/51421ef5-8a59-4937-8e5c-d01a4ad62bb3/cases"
+                            //initialValue="/api/programs?fields=*&paging=false"
+                            initialValue="/api/trackedEntityInstances.json?ouMode=ALL&fields=*"
                         />
                     </div>
                     <div className="mb">
-                        <ReactFinalForm.Field
+                        <Field
                             required
                             name="pathReceiver"
                             label="Receiver Path"
                             component={InputFieldFF}
                             validate={hasValue}
-                            initialValue="/api/trackedEntityInstances"
+                            //initialValue="/api/outbreaks"
+                            initialValue="/api/outbreaks/5d03e3bd-cf77-4c9a-b4d0-6245c0ec1926/cases"
                         />
                     </div>
 
@@ -93,10 +117,9 @@ export const Form = ({ onSubmit, progData }) => {
                         <Button type="submit" primary>
                             Next
                         </Button>
-                        <Button type="submit">Cancel</Button>
                     </ButtonStrip>
                 </form>
             )}
-        </ReactFinalForm.Form>
+        </Form>
     )
 }

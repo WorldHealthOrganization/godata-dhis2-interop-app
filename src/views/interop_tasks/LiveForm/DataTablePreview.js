@@ -11,7 +11,6 @@ import {
     MultiSelectField,
     MultiSelectOption,
 } from '@dhis2/ui'
-import { useHistory } from 'react-router-dom'
 
 import { PageHeadline, PageSubHeadline } from '../../../headline'
 import * as dataStore from '../../../utils/dataStore.js'
@@ -37,13 +36,12 @@ const useLocalMappings = () => {
         : { loading: false, mappings: mappings }
 }
 
-export const DataTablePreview = ({ columns, data, onSubmit, program, isExport}) => {
+export const DataTablePreview = ({ columns, data, onSubmit, program, isExport, onCancel}) => {
 
     const idString = columns[0]
     const [checkedConstants, setCheckedConstants] = useState([])
     const [pageNumber, setPageNumber] = useState(1)
     const [pageSize, setPageSize] = useState(10)
-    const history = useHistory()
 
     const attributes = ({ programTrackedEntityAttributes }) =>
         programTrackedEntityAttributes.map(
@@ -246,7 +244,7 @@ export const DataTablePreview = ({ columns, data, onSubmit, program, isExport}) 
                             <Button type="submit" primary>
                                 {isExport ? "Export" : "Import"}
                             </Button>
-                            {/* <Button onClick={() => history.push('/liveTask')}>Cancel</Button> */}
+                            <Button onClick={() => onCancel()}>Cancel</Button>
                         </ButtonStrip>
                     </div>
                 </form>

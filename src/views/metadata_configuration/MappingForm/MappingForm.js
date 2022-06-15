@@ -92,7 +92,7 @@ export const MappingForm = () => {
 
     const onSubmitDeleteAction = deleteRow => {
         if (deleteRow) {
-            console.log({deleteRow, clickedRow})
+            console.log({ deleteRow, clickedRow })
             const val = godataValue
             val[1].splice(clickedRow, 1)
             console.log(val[1])
@@ -129,6 +129,7 @@ export const MappingForm = () => {
                 jsonEdit: true,
             })
         } else if (cell === 'delete') {
+            console.log("delete")
             setRow(rowId)
             setDeleteModal(true)
         }
@@ -145,7 +146,6 @@ export const MappingForm = () => {
         selected.props.conversion = selected.conversion
         delete selected.conversion
 
-
         value = { ...value, ...selected }
         val[1][clickedRow] = value
         setGodataValue(val)
@@ -160,7 +160,6 @@ export const MappingForm = () => {
         selected.props.values = {}
         selected.props.conversion = selected.conversion
         delete selected.conversion
-
 
         value = { ...value, ...selected }
         val[1][clickedRow] = value
@@ -189,7 +188,6 @@ export const MappingForm = () => {
             setProperties(attribs)
         }
         if (!loading) {
-
             const entitiesLoaded = Mapping.entityIterator(
                 progData && progData.programs.programs.length > 0
                     ? progData.programs.programs[programIndex]
@@ -568,7 +566,7 @@ export const MappingForm = () => {
 
                                 {selectedModal === 'Constant' && (
                                     <FormRow>
-                                    {console.log("modal render")}
+                                        {console.log('modal render')}
                                         <Form
                                             onSubmit={values =>
                                                 alertValues(
@@ -593,7 +591,6 @@ export const MappingForm = () => {
                                                                 InputFieldFF
                                                             }
                                                         />
-
                                                     </FormRow>
                                                     <Button
                                                         type="submit"
@@ -670,16 +667,20 @@ export const MappingForm = () => {
                                     </FormRow>
                                 ) : (
                                     <>
-                                    <Field
-                                    name="value"
-                                    label={cellModalData.label}
-                                    initialValue={cellModalData.data}
-                                    component={TextAreaFieldFF}
-                                    />
-                                    <p style={{color: "red", margin: "10px"}}>
-                                        
-                                        {errorConstant && "Please input a valid json"}
-                                        
+                                        <Field
+                                            name="value"
+                                            label={cellModalData.label}
+                                            initialValue={cellModalData.data}
+                                            component={TextAreaFieldFF}
+                                        />
+                                        <p
+                                            style={{
+                                                color: 'red',
+                                                margin: '10px',
+                                            }}
+                                        >
+                                            {errorConstant &&
+                                                'Please input a valid json'}
                                         </p>
                                     </>
                                 )}
@@ -688,10 +689,13 @@ export const MappingForm = () => {
                                         Save
                                     </Button>
                                     <Button
-                                        onClick={() => {setInputCellModal(false); setErrorConstant(false)}}
+                                        onClick={() => {
+                                            setInputCellModal(false)
+                                            setErrorConstant(false)
+                                        }}
                                     >
                                         {i18n.t('Cancel')}
-                                    </Button>{' '}
+                                    </Button>
                                 </ButtonStrip>
                             </form>
                         )}
@@ -703,7 +707,7 @@ export const MappingForm = () => {
                 onClose={() => setOpenGodataModel(false)}
                 center
             >
-                <ModalTitle>Select Go.Data metadata Model </ModalTitle>
+                <ModalTitle>Select Go.Data metadata Model</ModalTitle>
                 <ModalContent>
                     <Editor
                         mode="text"
@@ -743,8 +747,8 @@ export const MappingForm = () => {
                     />
                 </ModalContent>
             </Modal>
-            {console.log(deleteModal)}
-            <DeleteModal open={deleteModal} onSubmit={onSubmitDeleteAction} />
+            {console.log({deleteModal})}
+            {deleteModal && <DeleteModal onSubmit={onSubmitDeleteAction} onCancel={() => setDeleteModal(false)} />}
             {alertBar && (
                 <div
                     style={{
