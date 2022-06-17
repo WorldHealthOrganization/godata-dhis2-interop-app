@@ -1,5 +1,3 @@
-# Go.Data - DHIS2 Interoperability app
-
 # Introduction
 The Go.Data-DHIS2 Interoperability App enables metadata to be securely exchanged between [Go.Data](https://www.who.int/tools/godata), an outbreak response tool developed by WHO, and [DHIS2](https://dhis2.org/), a widely used system for national health information management developed by the University of Oslo. This includes bi-directional exchange of reference metadata used across both platforms (i.e., location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). Such an integration enables field teams to make use of additional visualizations for chains of transmission and contact tracing follow up in Go.Data during an acute outbreak scenario while ensuring key field intel gets reflected back into overarching DHIS2 system. 
 
@@ -24,6 +22,16 @@ The app module consists of a main menu from which we can navigate to the four pa
 2. **DHIS2 Configuration panel**: It's used to configure the connection to the DHIS2 server. The user's DHIS credentials need to be introduced here for the app to work.   
 3. **Metadata Mapping panel**: It's used to create, modify, or delete metadata mappings. For all mappings, and throughout subsequent system development, dot notation is used (a way of accessing JSON objects of any depth).
 4. **Interoperability Tasks panel**: It's used to add and manage tasks for data exchange across platforms.
+
+The two pillars of the app are Metadata Mappings and Interoperability Tasks. Their main functions and characteristics can be consulted in table 1.
+
+*__Table 1__. Characteristics and functions of Metadata Mappings and Interoperability Tasks*
+
+| Metadata Mappings | Interoperability Tasks | 
+| :-------------: | :-------------: | 
+| User-defined mappings between DHIS2 and Go.Data variables.| Tasks are the executable bits of the app. |
+| They allow the app to understand how to read, transform, and migrate data.| When run, they use a Metadata Mapping to read and transfer data from one software to another. |
+| Must be manually filled, tailored for each use case. | Some parameters need to be set before running them. | 
 
 
 ## Bi-directional data exchange
@@ -162,7 +170,8 @@ For example, Go.Data's variable "geographicalLevelId" maps to DHIS2's variable "
 
 To map these values and transform them so that they are compatible within each of the softwares, we need to create a set of key-value pairs where the key of the pair is Go.Data's value to modify, and the value of the pair is the DHIS2 value to modify. This way, when the app finds "0" in DHIS2's "level" variable and it maps it to Go.Data's "geographicalLevelId" variable, it will automatically transform it to "Admin Level 1". This intra-variable mapping is illustrated in figure 5.
 
-![image](https://user-images.githubusercontent.com/91990504/173690183-fb5e7c3e-b504-4e3e-85ff-fec6470b86a0.png)
+![image](https://user-images.githubusercontent.com/91990504/174273584-fe5a4f0d-f6be-480c-82b5-a0a7fee03893.png)
+
 *__Figure 5__. Diagram illustrating how the Values column serves as a intra-variable mapping to transform the values of a DHIS2 variable to modified values in Go.Data.*
 
 ##### Mapping Case 2: Go.Data variable can be mapped to a value
@@ -188,39 +197,94 @@ Sometimes we will find that no correct DHIS2 variable or constant value can matc
 In this case we can choose a default value to point out that a variable is missing, such as "Unknown" or "Undefined", to remind the user that will work with the Go.Data instance we are creating that a given variable's values are not available. Alternatively, we can leave the DHIS2 completely empty, and instead of a default value, the Go.Data variable will be left blank. 
 
 ## Interoperability Tasks
-The Interoperability Tasks section is dedicated for managing the data integration tasks. Interoperability Tasks use Metadata Mappings to fetch data from the sender instance, transform it if necessary, and send it to and load it into the receiver instance following the transformations and equivalences set in the mapping. 
+The Interoperability Tasks section is dedicated to managing integration tasks.Each Interoperability Task uses a Metadata Mapping to fetch data from the sender instance, transform it if necessary, and send it to and load it into the receiver instance, following all the matches and transformations set in the mapping. 
 
-Tasks have a series of items that need to be filled before running: “name”, “conversionType”, “senderAPIEndpoint”, “receiverAPIEndpoint”, “converter”, “referenceModel”, “senderAPIParams”, and “sender” elements. 
+Before running a task, we need to configure some of its parameters. If you are working with the DHIS2 COVID-19 standardized metadata packages, you can use the 5 default mappings built-in the app, which may save you some time. To load them, simply go to the Interoperability Tasks overview and click on "Load default config". 
 
-![Imagen4](https://user-images.githubusercontent.com/91990504/156535781-73d73b27-4d04-4bec-9418-7561c4da982e.png)
-*Figure 8. Tasks screen*
+No we will look into how to configure an Interoperability Task (if your project does not use the DHIS2 COVID-19 standardized metadata packages), and then we will briefly comment what a good Interoperability Task pipeline looks like -- this part is of interest whether you are working with the default COVID-19 Interoperability Tasks or with custom-created ones.
 
-### Name
-Name with which the task will be saved
+### Configuring Interoperability tasks
+Tasks have a series of items that need to be filled before running, as can be seen in figure 8. In this section, we will go through how to configure a task.
 
-### conversionType
-Type of the objects in the conversion: Outbreak, Location, Case, Contact, ContactOfContact.
+![image](https://user-images.githubusercontent.com/91990504/173920004-48ff73f5-1bb4-4fd4-9362-4404c4b10236.png)
+*__Figure 8__. Tasks screen*
 
-### senderAPIEndpoint
-API endpoint of the sender instance. Here we need to introduce the link to the API URL where the data object we want to draw our data from is located. For example, when we want to migrate locations from DHIS2 to Go.Data, we need to introduce the following URL: _host:port/dhis/api/organisationUnits.json_, where we substitute _host_ and _port_ with our DHIS2 instance's host and port. The available data objects in your DHIS2 instance can be consulted by navigating to host:port/dhis/api/resources. 
+#### Type, Name, and Description.
 
-### receiverAPIEndpoint
-API endpoint of the receiver instance. 
+Interoperability Tasks, just like Metadata Mappings, are of a given type. Each Interoperability Task will be associated to a Metadata Mapping, and the types of both need to match. Thus, the first thing we need to set is the type of the task, according to what kind of element we want to share between the two softwares (remember: _outbreak, location, case_, etc.).
 
-- “name” – the  the name of the task
-- “conversionType” – type of objects in the conversion (Outbreak, Case, Contact, ContactsOfContact, Location) 
-- “senderAPIEndpoint” – API endpoint of sender (http://godata.org/locations) 
-- “receiverAPIEndpoint” – API endpoint of sender (http://dhis2.org/locations) 
-- “converter” – mapping created in mapping menu for conversion “godata” – “dhis2”
-- “referenceModel” – JSON model accepted by the receiving endpoint
-- “senderAPIParams” – parameters to be send to sender endpoint, filters=created.eq.”25/11/2021”&paging=false
-- “sender” – determines which instance is sender (true – DHIS2, false – Go.Data)
+After setting the type, we need to give the task a meaningful name so that it can be easily identified in the Interoperability Task menu. We can also give our task a description for making it more understandable to other users.
 
 
+#### DHIS2 Endpoint Pathname and Sender Object Collection Name
+
+The application needs to know where to locate the items we want to migrate, and where to send them. In order to specify the DHIS2 location of the elements we want to transfer, we need to fill the "DHIS2 endpoint pathname" with the path to their location. 
+
+API endpoint of the sender instance. Here we need to introduce the link to the path to where the data object we want to draw our data from is located. The available data objects in your DHIS2 instance can be consulted by navigating to "_{host}:{port}/dhis/api/resources_". The required path and object collection for each of the types of task can be found in table 2. The required value for your given type of task can be copied and pasted into it's respective field in the Interoperability Task settings.
+
+*__Table 2__. DHIS2 endpoint pathnames and Sender object collection names for the different types of task.*
+
+| Type of Task | DHIS2 endpoint pathname | Sender object collection name |
+| ------------- | :------------- | ------------- |
+| Go.Data Location  | /api/organisationUnits.json | organisationUnits |
+| Go.Data Outbreak  | /api/32/programs | programs |
+| Go.Data Contact  | /api/trackedEntityInstances/query.json /api/trackedEntityInstances/ | trackedEntityInstances |
+| Go.Data Case  | /api/trackedEntityInstances/query.json /api/trackedEntityInstances/ | trackedEntityInstances |
+| Go.Data Event  | /api/events/query.json /api/events/ | trackedEntityInstances |
 
 
+#### Receiver API Endpoint
+
+Similarily as with the DHIS2 endpoint, we also need to specify the pathname of the receiver endpoint (Go.Data). In table 3, the required paths for the different types of task can be found. Those can be copy-pasted in the "Receiver API Endpoint" field of the Interopoerability Task. In the case of Go.Data Case, Contact, and Contact of Contact tasks, please take into account that the the pathname will require that you change the "{outbreakId}" part of the field to the outbreakId of the outbreak to which we want to send our cases, contacts, or contacts of contacts. The curly brackets need to be removed: they are just to illustrate the part that needs to be changed.
+
+*__Table 3__. Receiver endpoint (Go.Data) pathnames for the different types of task. In bold, and in between curly brackets are some placeholders for outbreakId that need to be replaced with the outbreakId of your outbreak of interest. The brackets need to be removed too.*
+
+| Type of Task | Receiver endpoint pathname | 
+| ------------- | :------------- | 
+| Go.Data Location  | /api/locations/import |
+| Go.Data Outbreak  | /api/outbreaks | 
+| Go.Data Contact  | /api/outbreaks/**{outbreakId}**/contacts  |
+| Go.Data Case  | /api/outbreaks/**{outbreakId}**/cases  |
+| Go.Data Event  | /api/outbreaks/**{outbreakId}**/cases  |
 
 
+#### Converter
 
+In the Converter drop-down menu we need to select which of the Metadata Mappings we want to use for this specific Interoperability task.
 
+#### Sender API parameters
 
+This field requires some query parameters for the query over the sender API. You can find some recommended parameters in table 4. Take into account that if you use the parameters in the table for Cases, Contacts, or Contacts of Contacts tasks, you will need to replace the terms in the curly brackets with the IDs of the following DHIS2 elements:
+
+* __root_OU_id__: The ID for the DHIS2 root Organization Unit.
+* __program_id__: The ID for the DHIS2 program from which you want to send the cases or contacts from, be it the cases, contacts, or events program.
+* __program_stage_id__: The ID for the DHIS2 events program stage, only in the case of the events Interoperability Task.
+
+These ID's can be found either through navigating the DHIS2 API or by navigating to the the desired element (the root OU, the program, or program stage of interest) through DHIS2's Maintenance app, and inspecting the URL on the browser bar, where the ID will be the 11-letter alphabetic code after the last slash in the URL.
+
+*__Table 4__. Sender API query parameters for the different types of Interoperability Task. In bold, and in between curly brackets are some placeholders that need to be replaced with the correspondent IDs. The brackets need to be removed too.*
+
+| Type of Task | Recommended sender API query parameters | 
+| ------------- | :------------- | 
+| Go.Data Location  | ?paging=false&fields=*,geography&?order=level:asc |
+| Go.Data Outbreak  | ?skipPaging=true&fields=* | 
+| Go.Data Contact  | ?ou=**{root_OU_id}**&ouMode=DESCENDANTS&program=**{program_id}**&fields=id,name&skipPaging=true&skipMeta=true .json?ouMode=ALL&program=**{program_id}**&fields=*  |
+| Go.Data Case  | ?ou=**{root_OU_id}**&ouMode=DESCENDANTS&program=**{program_id}**&fields=id,name&skipPaging=true&skipMeta=true .json?ouMode=ALL&program=**{program_id}**&fields=*  |
+| Go.Data Event  | ?ou=**{root_OU_id}**&program=**{program_id}**&skipPaging=true&skipMeta=true&programStage=**{rogram_stage_id}** .json?ou=**{root_OU_id}**&program=**{program_id}**&programStage=**{program_stage_id}**  |
+
+### Interoperability Task Pipeline
+
+The app's main functionality is directed towards sending data to Go.Data from a DHIS2 instance where the development of a disease outbreak has been tracked using Event Capture or Tracker Capture. 
+
+When we want to do so for the first time, and start filling a blank Go.Data instance with the data recorded in a DHIS2 instance, there is an specific order in which we need to pass the data from DHIS2 to Go.Data: the interoperability tasks pipeline, as can be seen in figure 9.
+
+![image](https://user-images.githubusercontent.com/91990504/174290565-868016e8-d9b1-485e-8c7c-68cba17bf695.png)
+*__Figure 9__. Diagram illustrating the Interoperability Task Pipeline. The dashed arrows between events and cases transfer illustrate how events and cases can be transferred in any order with respect to one another.*
+
+The process must start with running the Interoperability Task for locations. It is very important that this part is carefully done, and in principle, the transfer of locations should be a one-time task. 
+
+If changes to the DHIS2 organization unit tree are introduced after a Go.Data instance has been filled with locations, it's crucial that the location tree in Go.Data is manually updated according to the changes introduced in the DHIS2 organization unit tree. 	
+
+After transferring the locations, we can transfer the outbreaks. The DHIS2 element matching the Go.Data concept of Outbreak is the Program. However, it is possible that the match is not one-to-one. This is the case of the DHIS2 COVID-19 metadata packages, where more than one DHIS2 program maps to the same Go.Data outbreak, that unifies the information from the Cases and the Contacts DHIS2 programs. This means that we may need to send cases and contacts from two different DHIS2 Programs to a single Go.Data Outbreak.
+
+Once the locations and the outbreak have been transferred, it's time to transfer either events or cases. If your instance is based on Event Capture, you will need to transfer events. If your instance is based on Tracker Capture, you will need to send first your cases, and then the contacts. This last part is important because contacts should be associated to a given case, so the specified order must be followed.
