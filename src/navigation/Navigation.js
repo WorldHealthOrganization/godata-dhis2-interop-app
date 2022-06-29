@@ -44,10 +44,10 @@ export const Navigation = () => (
             label={INTEROP_LIST_LABEL}
         />
 
-        {/* <NavigationItem
+        <NavigationItem
             path={"/liveTask"}
             label={"Bidirectional Task"}
-        /> */}
+        />
 
     </Menu>
 )

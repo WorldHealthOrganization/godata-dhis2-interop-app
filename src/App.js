@@ -112,11 +112,11 @@ const App = () => {
                                 component={InteropRunTaskForm}
                             />
 
-                            {/* <Route
+                            <Route
                                 exact
                                 path={'/liveTask'}
                                 component={LiveTaskForm}
-                            /> */}
+                            />
 
                             <Redirect from="*" to={HOME_PATH} />
                         </Switch>

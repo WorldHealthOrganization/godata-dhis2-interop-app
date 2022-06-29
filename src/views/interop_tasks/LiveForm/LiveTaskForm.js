@@ -73,27 +73,30 @@ export const LiveTaskForm = () => {
                         )
                     })
                 ).then(e => {
-                    console.log(e)
-                    if (e.length > 0) {
-                        const errors = e.map(
-                            ({
-                                response: {
-                                    data: {
-                                        error: { message },
-                                    },
-                                },
-                            }) => message
-                        )
-                        setIsErrorTransmission(errors)
-                        setEndMessage(
-                            `The ${formAnswer.action} task has been completed with the following errors:`
-                        )
-                    } else {
+                    // console.log("here")
+                    // console.log(e)
+                    // const errorResponses = e.map(({response: {status}}) => status > 400 ? new Object({...response}) : []).flat()
+                    // console.log({errorResponses})
+                    // if (errorResponses.length > 0) {
+                    //     const errors = errorResponses.map(
+                    //         ({
+                    //             response: {
+                    //                 data: {
+                    //                     error: { message },
+                    //                 },
+                    //             },
+                    //         }) => message
+                    //     )
+                    //     setIsErrorTransmission(errors)
+                    //     setEndMessage(
+                    //         `The ${formAnswer.action} task has been completed with the following errors:`
+                    //     )
+                    // } else {
                         setIsErrorTransmission([])
                         setEndMessage(
                             `The ${formAnswer.action} task has been completed successfully!`
                         )
-                    }
+                    //}
                 })
             })
         } else if (formAnswer.action === 'import') {
