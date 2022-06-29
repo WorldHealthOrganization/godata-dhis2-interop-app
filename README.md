@@ -47,3 +47,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## Feedback and contact
 
 For any questions or feedabck, please contact godata@who.int or post on the Go.Data Community of Practice here: https://community-godata.who.int/
+
+## Bidirectionality tasks note
+
+The bidirectional tasks endpoint is /livetask, its logic can be found in ./src/views/interop_tasks/LiveForm folder.
