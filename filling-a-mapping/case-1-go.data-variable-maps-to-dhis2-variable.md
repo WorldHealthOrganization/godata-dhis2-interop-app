@@ -22,7 +22,7 @@ Let's address the example we spoke about before: The demo GIF below shows how we
 
 Notice how the "Program" and "Conversion" column values change automatically when we select a DHIS2 variable.
 
-The value under "Program" indicates us what DHIS2 program was selected when the the DHIS2 variable was chosen. Although this may seem redundant information, the app has been built to ensure maximum flexibility. If a user wanted to create a mapping where variables are taken from two different programs, it would be possible. The "Program" drop-down menu works in a dynamic manner: after filling a part of the mapping with variables from a given DHIS2 program, we can select a different program and keep filling the mapping with variables from this second program. This may not be the most common use case, but it is allowed.
+The value under "Program" indicates us what DHIS2 program was selected when the DHIS2 variable was chosen. Although this may seem redundant information, the app has been built to ensure maximum flexibility. If a user wanted to create a mapping where variables are taken from two different programs, it would be possible. The "Program" drop-down menu works in a dynamic manner: after filling a part of the mapping with variables from a given DHIS2 program, we can select a different program and keep filling the mapping with variables from this second program. This may not be the most common use case, but it is allowed.
 
 The "Conversion" column indicates what kind of conversion will be performed by the app, also reminding us which kind of element we introduced in the mapping (a Constant, or a DHIS2 Data Element, Attribute, or Metadata Property).
 
