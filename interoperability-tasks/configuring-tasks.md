@@ -64,4 +64,8 @@ _**Table 4**. Sender API query parameters for the different types of Interoperab
 | Go.Data Case     | ?ou=**{root\_OU\_id}**\&ouMode=DESCENDANTS\&program=**{program\_id}**\&fields=id,name\&skipPaging=true\&skipMeta=true .json?ouMode=ALL\&program=**{program\_id}**\&fields=\*                                          |
 | Go.Data Event    | ?ou=**{root\_OU\_id}**\&program=**{program\_id}**\&skipPaging=true\&skipMeta=true\&programStage=**{rogram\_stage\_id}** .json?ou=**{root\_OU\_id}**\&program=**{program\_id}**\&programStage=**{program\_stage\_id}** |
 
+### Saving the Task
+
+When we are finished creating or modifying the task, we can save it by clicking on the "Add task" button. Modifying or renaming a task won't create a duplicate, it will overwrite the modified task. There is currently no way to duplicate tasks. However, if the default Interoperability Tasks created for the DHIS2 COVID19 metadata packages are renamed and saved, a fresh copy of the original default task can be reloaded by clicking on the "Load default config" button again. This allows the user to modify a default task if necessary, save it, and still be able to re-load the default.&#x20;
+
 ####

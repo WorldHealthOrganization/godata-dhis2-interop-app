@@ -12,4 +12,4 @@ If you find a bug, stability issue, or any other kind of technical problem, plea
 
 ### Implementation Issues
 
-If you have any issues regarding how to use the app for your specific metadata set-up and implementation of DHIS2, you can consult the Go.Data team by contacting us at [godata@who.int](mailto:Godata@who.int.).
+If you have any issues regarding how to use the app for your specific metadata set-up and implementation of DHIS2, you can consult the Go.Data team by contacting us at [godata@who.int](mailto:Godata@who.int.) .

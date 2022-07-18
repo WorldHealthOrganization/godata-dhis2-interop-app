@@ -2,7 +2,9 @@
 
 ## Go.Data Configuration
 
-The app requires your Go.Data instance's URL, and the username and password for your Go.Data user. Take into account that the default port for Go.Data is 8000, but it may be different in your instance. The credentials are safely encrypted and stored in DHIS2's _userDataStore_ according to DHIS2's safety and cybersecurity requirements.
+The app requires your Go.Data instance's URL, complete with host and port, and the username and password for your Go.Data user. The credentials are safely encrypted and stored in DHIS2's _userDataStore_ according to DHIS2's safety and cybersecurity requirements.
+
+Take into account that the default port for Go.Data is 8000, but it may be different in your instance. Some Go.Data instances have been set as default, in which case it's not necessary to specify a port. If you are unsure about the port or are having trouble configuring the connection, you may contact your system administrator.
 
 ![Configuring GoData](https://user-images.githubusercontent.com/91990504/172189552-fffafa9b-c1fc-4857-b06f-688b4616ed0d.png)
 

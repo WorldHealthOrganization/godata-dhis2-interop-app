@@ -16,14 +16,36 @@ The process must start with running the Interoperability Task for Locations (ple
 
 If changes to the DHIS2 organization unit tree are introduced after a Go.Data instance has been filled with locations, it's crucial that the location tree in Go.Data is manually updated according to the changes introduced in the DHIS2 organization unit tree to avoid that any inconsistencies could cause data loss.
 
+
+
+{% embed url="https://www.youtube.com/watch?v=nhokGefXRec" %}
+
+{% embed url="https://www.youtube.com/watch?v=FIXqG4jmBI4" %}
+
+##
+
 ### 2. Transferring Outbreaks
 
-After transferring the locations, we can transfer the outbreaks. The DHIS2 element matching the Go.Data concept of Outbreak is the Program. However, it is possible that the match is not one-to-one. This is the case of the DHIS2 COVID-19 metadata packages, where more than one DHIS2 program maps to the same Go.Data outbreak, that unifies the information from the Cases and the Contacts DHIS2 programs. This means that we may need to send cases and contacts from two different DHIS2 Programs to a single Go.Data Outbreak.
+After transferring the locations, we can transfer the outbreaks. The DHIS2 element matching the Go.Data concept of Outbreak is the Program. However, it is possible that the match is not one-to-one. This is the case of the DHIS2 COVID-19 metadata packages, where more than one DHIS2 program maps to the same Go.Data outbreak, that unifies the information from the Cases and the Contacts DHIS2 programs. This means that in the following steps we may need to send DHIS2 cases and DHIS2 contacts from two different DHIS2 Programs to a single Go.Data Outbreak.
+
+When running the Interoperability Task for an outbreak, the app will create a new outbreak in Go.Data. Using the Outbreak interoperability task is necessary to guarantee the workflow of the app: cases and contacts transfers may fail if the Go.Data outbreak has been created manually.
+
+{% embed url="https://www.youtube.com/watch?v=OoiGTh6Judo" %}
+
+After transferring the outbreak, it is necessary to retrieve the outbreak identifier from Go.Data and introducing it correctly into the Metadata Mapping for Events, Cases, and/or Contacts (as explained in [case-2-go.data-variable-maps-to-a-value.md](../filling-a-mapping/case-2-go.data-variable-maps-to-a-value.md "mention")) and also into the respective Interoperability Tasks (as explained in [configuring-tasks.md](../interoperability-tasks/configuring-tasks.md "mention")). Even if your mappings and tasks have been configured by your system administrator, introducing the outbreakId in the mappings and tasks is a necessary step.&#x20;
 
 ### 3. Transferring Cases / Events
 
 Once the locations and the outbreak have been transferred, it's time to transfer either events or cases. If your DHIS2 instance is based on Event Capture, you will only need to transfer events. If your instance is based on Tracker Capture, you will need to send first your cases, and then your contacts. This last part is important because contacts should be associated to a given case, so cases need to be transferred before contacts.&#x20;
 
+It is necessary to introduce the outbreakId in the Metadata Mapping and the Interoperability Task for Cases/Events and to set the newly created Go.Data outbreak as active in your Go.Data instance before running the respective tasks to transfer them.&#x20;
+
+{% embed url="https://www.youtube.com/watch?v=q7s70Dp8vT8" %}
+
+{% embed url="https://www.youtube.com/watch?v=BjxfwFjCwiQ" %}
+
 ### 4. Transferring Contacts
 
 If your DHIS2 instance is based on Tracker Capture, you will need to transfer your contacts after you have transferred your cases. This would be the last step in the process.&#x20;
+
+It is necessary to introduce the outbreakId in the Metadata Mapping and the Interoperability Task for Contacts before transferring the contacts. Make sure that, before transferring the contacts, the target outbreak is active in your Go.Data instance.
