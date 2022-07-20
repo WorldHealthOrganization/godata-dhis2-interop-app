@@ -6,10 +6,8 @@
 
 * [Requirements and Compatibilities](getting-started/requirements-and-compatibilities.md)
 * [Installation and Issue Reporting](getting-started/installation-and-issue-reporting.md)
-* [App Functionalities](getting-started/app-functionalities.md)
-* [Setting Up the App](getting-started/setting-up-the-app/README.md)
-  * [Connecting the App](getting-started/setting-up-the-app/connecting-the-app.md)
-  * [Metadata Mappings and Interoperability Tasks](getting-started/setting-up-the-app/metadata-mappings-and-interoperability-tasks.md)
+* [App Structure](getting-started/app-structure.md)
+* [Setting Up the App](getting-started/setting-up-the-app.md)
 
 ## Metadata Mappings
 

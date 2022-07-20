@@ -6,7 +6,7 @@ Before starting to fill the mapping, we need to define a Go.Data model from whic
 
 To do so, we need to click on the "Select Go.Data Model" button of the Metadata Mapping we are working on.&#x20;
 
-![](<../../.gitbook/assets/image (2).png>)
+![](<../../.gitbook/assets/image (2) (1).png>)
 
 This will open a pop-up with a text box. If your Go.Data instance is version 2.40 or higher as recommended, you can automatically fetch the Go.Data model by clicking on the "Autogenerate model" button.
 
