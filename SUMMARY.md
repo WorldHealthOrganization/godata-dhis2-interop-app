@@ -32,4 +32,3 @@
 ## Quick User Guide
 
 * [Data Interoperability Pipeline](quick-user-guide/data-interoperability-pipeline.md)
-* [Demo Videos](quick-user-guide/demo-videos.md)
