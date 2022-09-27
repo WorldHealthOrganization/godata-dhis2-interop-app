@@ -1,5 +1,5 @@
 # DHIS2-Go.Data Interoperability App 
-Documentation site here: [https://worldhealthorganization.github.io/godata-dhis2-interop-app/](https://worldhealthorganization.github.io/godata-dhis2-interop-app/)
+Documentation site here: [https://go-data.gitbook.io/go.data-dhis2-interoperability-app/](https://go-data.gitbook.io/go.data-dhis2-interoperability-app/)
 
 ## Overview
 The DHIS2-Go.Data Interoperability App enables metadata to be securely exchanged between [DHIS2](https://dhis2.org/) (a widely used system for national health information management developed by the University of Oslo) and [Go.Data](https://www.who.int/tools/godata) (an outbreak response tool developed by WHO). This includes exchange of reference metadata used across both platforms (i.e. location hierarchies, facility lists); and case/contact data (cases being registered and investigated; and their contacts who are being listed and traced). 
