@@ -46,7 +46,7 @@
         "http-proxy-middleware": "^2.0.1",
         "jsoneditor": "^9.5.7",
         "jsoneditor-react": "^3.1.1",
-        "moment": "^2.27.0",
+        "moment": "^2.29.4",
         "react-http-client": "^1.0.1",
         "react-json-view": "^1.21.3",
         "react-jsonpath-editor": "^1.4.0",
